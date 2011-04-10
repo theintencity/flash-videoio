@@ -1,0 +1,14 @@
+application: flash-videoio
+version: 38
+runtime: python
+api_version: 1
+
+handlers:
+- url: /static
+  static_dir: static
+  
+- url: /.*
+  script: main.py
+
+inbound_services:
+- xmpp_message

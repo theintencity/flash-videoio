@@ -1,0 +1,304 @@
+<html>
+<body onunload="unload()">
+	<script type="text/javascript">
+    var stream = Math.floor(Math.random()*10000000).toString();
+    var me = "user" + stream;
+	var base_url = location.href.substring(0,location.href.lastIndexOf('/'));
+        	
+	var you = null;
+	var media_url = 'rtmfp://stratus.rtmfp.net/d1e1e5b3f17e90eb35d244fd-c711881365d9/';
+	var src = null;
+	var dest = null;
+	var timer = null;
+	var publish_interval = 6000;
+
+	function getRequest() {
+		var ajaxRequest;  // The variable that makes Ajax possible!
+		
+		try{ // Opera 8.0+, Firefox, Safari
+			ajaxRequest = new XMLHttpRequest();
+		} catch (e) { // Internet Explorer Browsers
+			try{
+				ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+			} catch (e) {
+				try {
+					ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {
+					return false; // Something went wrong
+				}
+			}
+		}
+		return ajaxRequest;
+	}
+	  
+	function getFlashMovie(movieName) {
+	    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+	    return (isIE) ? window[movieName] : document[movieName];
+	}
+
+
+    function promptNickname() {
+	    while (true) {
+			me = prompt("Enter your nickname\n(alphanumeric, no spaces, at most 32 characters)", me);
+			if (me == null || me.length <= 32 && me.match(/^([a-zA-Z0-9_-]+)$/)) {
+				return me;
+			}
+	    }
+    }
+
+    promptNickname();
+    
+	function onCreationComplete(event) {
+		if (event.objectID == "video1") {
+			if (me) {
+				var url = media_url + "?publish=" + stream;
+				getFlashMovie("video1").setProperty("src", url);
+			}
+		}		
+	}
+
+	function onPropertyChange(event) {
+		if (event.property == "nearID" && event.objectID == "video1") {
+			src = media_url + "?nickname=" + me + "&play=" + stream + "&farID=" + event.newValue;
+			setTimeout("publish(true)", 1000); // first invokation after 1 second.
+			timer = setInterval("publish()", publish_interval);
+		}
+	}
+
+	function unload() {
+		if (timer)
+			clearInterval(timer);
+		
+		var request = getRequest();
+		var url = base_url + "/logout";
+		request.open("POST", url, true);
+		request.send(src);
+	}
+
+	function send() {
+		
+		var msg = document.getElementById("input").value;
+		if (msg) {
+			document.getElementById("input").value = "";
+			
+			if (dest) {
+				log("Me: " + msg);
+				var request = getRequest();
+				var url = base_url + "/send";
+				request.open("POST", url, true);
+				request.send(dest + "\nYou: " + msg);
+			}
+			else {
+				log("Me (not connected): " + msg);
+			}
+		}
+	}
+
+	function publish(change) {
+		if (!src) {
+			alert("You must Login before publishing");
+			return;
+		}
+		
+		var request = getRequest();
+		var url = base_url + "/publish" + (change ? "?change=true" : "");
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				if (request.status == 200) {
+					if (request.responseText != dest) {
+						var body = request.responseText;
+						var oldyou = you;
+						if (body) {
+							var index = body.indexOf("\n");
+							var msg = null, newdest = null;
+							if (index >= 0) {
+								msg = body.substr(index+1);
+								newdest = body.substr(0, index);
+							} else {
+								newdest = body;
+							}
+
+							if (newdest != dest) {
+								you = "";
+								dest = newdest;
+								index = dest.indexOf("?");
+								var parts = dest.substr(index+1).split("&");
+								for (var i=0; i<parts.length; ++i) {
+									var part = parts[i];
+									if (part.indexOf("nickname=") == 0) {
+										you = part.substr(9);
+									}
+								}
+								getFlashMovie("video2").setProperty("src", dest);
+							}
+							
+							if (msg)
+								log(msg);
+						} else {
+							you = "";
+							getFlashMovie("video2").setProperty("src", null);
+						}
+						
+						if (you != oldyou) {
+							if (you) {
+								log("connected to " + you);
+								document.getElementById("remote").innerHTML = you;
+							} else {
+								log("you are not connected");
+								document.getElementById("remote").innerHTML = "You are not connected";
+							}
+						}
+					}
+				} else {
+					log("publish failed: " + request.status);
+					document.getElementById("remote").innerHTML = "You are not connected";
+				}
+			}
+		}
+		request.open("POST", url, true);
+	    
+		request.send(src);
+	}
+
+	function toggleLogin() {
+		var button = document.getElementById("login");
+		if (button.innerHTML == "Logout") {
+			button.innerHTML = "Login";
+			log(me + " logged out");
+			unload();
+			getFlashMovie("video1").setProperty("src", null);
+			getFlashMovie("video2").setProperty("src", null);
+			document.getElementById("remote").innerHTML = "You are not connected";
+			you = "";
+			src = null;
+			dest = null;
+		}
+		else {
+			if (me != null || promptNickname()) {
+				document.getElementById("local").innerHTML = "I am " + me;
+				log(me + " logging in");
+				button.innerHTML = "Logout";
+				var url = media_url + "?publish=" + stream;
+				getFlashMovie("video1").setProperty("src", url);
+			}
+		}
+	}
+	
+	function log(msg) {
+		var obj = document.getElementById("history");
+		obj.value += (obj.value == "" ? "" : "\n") + msg; 
+	}
+
+	</script>	
+
+    <div style="position: absolute; left: 10px; top: 10px; width: 320px; height: 240px;">
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video1" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="/static/VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="allowScriptAccess" value="always" />
+			<embed src="/static/VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video1" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				allowScriptAccess="always"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+		</object>
+    </div>
+    <div style="position: absolute; left: 10px; top: 260px; width: 320px; height: 240px;">
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video2" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="/static/VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="flashVars" value="controls=true" />
+			<param name="allowScriptAccess" value="always" />
+			<embed src="/static/VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video2" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				allowScriptAccess="always"
+				flashVars="controls=true"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+		</object>
+    </div>
+
+	<div style="position: absolute; left: 340px; top: 10px; width: 320px; height: 490px;">
+		<div style="float: right; height: 18px;">
+			<div id="local" style="float: left;"></div> &nbsp; |
+			<a id="login" href="#" onclick="javascript: toggleLogin()">Logout</script></a>
+		</div>
+		<script>
+			if (!me)
+				document.getElementById("login").innerHTML = "Login";
+			document.getElementById("local").innerHTML = me ? "I am " + me : "";
+		</script>
+		<br/> 
+		<textarea id="history" autocomplete="off"
+			style="width: 320px; height: 410px;"></textarea>
+		<br/>
+		Enter your text message: 
+		<input id="input" type="text" autocomplete="off"
+			style="width: 320px; height: 24px;"
+			onkeypress="javascript: if ((event.keyCode || event.which) == 13) { send(); return false; }"/>
+			
+		<div style="float: right; height: 18px;">
+			<div id="remote" style="float: left;">You are not connected</div> &nbsp; |
+			<a href="#" onclick="javascript: publish(true); return false;">Next Person</a>
+		</div> 
+	</div>
+	
+	<div style="position: absolute; left: 670px; top: 10px; width: 320px; height: 490px; border: 1px 1px 1px 1px;">
+		<h2 style="margin-top: 0px;" >What is this?</h2>
+		
+		<p style="font-size: 12px; text-align: justify;">
+		This is a <a href="http://en.wikipedia.org/wiki/Chatroulette" target="_blank">chatroulette</a>-type 
+		application built using the
+		<a href="http://code.google.com/p/flash-videoio" target="_blank">Flash VideoIO</a> component on 
+		<a href="http://labs.adobe.com/technologies/stratus/" target="_blank">Adobe Stratus</a>
+		service and <a href="http://en.wikipedia.org/wiki/Google_App_Engine" target="_blank">Google App Engine</a>. 
+		This site is just a demonstration of how such services can be
+		built using the generic Flash-VideoIO component, and not meant for production 
+		use.</p>
+		
+		<p style="font-size: 12px; text-align: justify;">
+		When you land on this page, it prompts you for some nickname, and starts publishing 
+		your audio and video stream, after you approve the device access. 
+		It tries to connect you with another person who is 
+		also on the page publishing his or her video. The status of the connection is 
+		displayed in the chat history area. You can also type a message to send to the 
+		person you are talking with.</p>
+		
+		<p style="font-size: 12px; text-align: justify;">
+		It uses Google App Engine for all session initiation and discovery of other users,
+		and Adobe Stratus to do media negotiation for peer-to-peer media streams. The project
+		contains one HTML file with some javascript and one Python file, with about 400 lines
+		total. There is no authentication, but is easy to add using Google App Engine. 
+		You can right-click on this page to view the HTML and javascript source code which 
+		contributes to all front-end interactions and shows how to use Flash-VideoIO for 
+		chatroulette type applications.
+		</p>
+		<p style="font-size: 12px; text-align: justify;">
+		One major problem of the project due to a limitation of Google App Engine is that 
+		it does not support <a href="http://en.wikipedia.org/wiki/Comet_%28programming%29" target="_blank">COMET</a>-style 
+		long-lived connections with asynchronous messaging.
+		Hence this project uses periodic polling every six seconds to check the connection status,
+		retrieve any new text messages or update the remote party. Thus, there is a delay
+		of up to 12 seconds in changing the partner's view after it has been connected, or
+		up to 6 seconds in seeing any text message the partner sent. Once Google
+		releases the <a href="http://www.youtube.com/watch?v=oMXe-xK0BWA" target="_blank">Channel API</a>
+		for the App Engine, we will update this project to work with it, so that
+		polling can be replaced by XMPP-style asynchronous messages.
+		</p>
+	</div>
+</body>
+</html>

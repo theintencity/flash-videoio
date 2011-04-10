@@ -1,0 +1,91 @@
+<!doctype html>
+<html style="width:100%; height: 100%;">
+  <head>
+    <title>I Chat Now</title>
+    <style>
+      body { margin: 0px; overflow:hidden; }
+    </style>
+  </head>
+  <body scroll="no" style="width:100%; height: 100%;">
+  <script>
+
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+
+function gup( name )
+{
+    name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    var regexS = "[\\?&]"+name+"=([^&#]*)";
+    var regex = new RegExp( regexS );
+    var results = regex.exec( window.location.href );
+    if( results == null )
+        return "";
+    else
+        return results[1];
+}
+
+
+var src = gup('src');
+var root = 'rtmfp://stratus.rtmfp.net/d1e1e5b3f17e90eb35d244fd-c711881365d9/';
+
+function publish() {
+    var stream = Math.floor(Math.random()*10000000).toString();
+    var url = window.location.href + "?src=" + root + "%3fpublish=" + stream;
+    window.open(url, "_self");
+}
+
+if (!src) {
+    document.write('<p align="justify" style="padding: 10px;">This application allows you to broadcast your audio and video after you click on the "start my video" button below. It will generate a unique link and prompt you to copy the link. Later you can send that link to your friends or family who can open it in a web browser to view your video and listen to your audio.</p>');
+    
+    document.write('<center><input type="button" value="start my video" onclick="publish()"/></center>');
+} 
+else {
+    document.write(' \
+  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" \
+		id="video1" width="100%" height="100%" \
+		codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab"> \
+		<param name="movie" value="VideoIO.swf" /> \
+		<param name="quality" value="high" />  \
+		<param name="bgcolor" value="#000000" /> \
+		<param name="allowFullScreen" value="true" /> \
+		<param name="allowScriptAccess" value="always" /> \
+		<param name="flashVars" value="controls=true" /> \
+		<embed src="VideoIO.swf" quality="high" bgcolor="#000000" \
+			width="100%" height="100%" name="video1" align="middle" \
+			play="true" loop="false" quality="high" \
+			allowFullScreen="true" \
+			allowScriptAccess="always" \
+			flashVars="controls=true" \
+			type="application/x-shockwave-flash" \
+			pluginspage="http://www.adobe.com/go/getflashplayer"> \
+		</embed> \
+	</object> \
+');
+}
+
+function onCreationComplete(event) {
+    if (src) {
+       url = src.replace('%3f', '?').replace('%26', '&');
+       getFlashMovie('video1').setProperty('src', url);
+    }
+}
+
+function onPropertyChange(event) {
+    if (event.property == "nearID") {
+      if (src.indexOf("publish=") > 0 ) {
+        if (event.objectID == "video1") {
+            var nearID = event.newValue;
+            var index = window.location.href.indexOf("?");
+            var base = window.location.href.substr(0, index);
+            var url = base + '?src=' + src.replace("publish=", "play=") + "%26farID=" + nearID;
+            prompt("copy this link and send to your friends", url);
+        }
+      }
+    }
+}
+
+  </script>
+</body>
+</html>

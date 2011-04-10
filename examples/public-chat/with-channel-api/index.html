@@ -1,0 +1,329 @@
+<html>
+<head>
+<title>Multiparty chat room</title>
+
+<script src="/_ah/channel/jsapi"></script>
+<script type="text/javascript" src="static/webtalk.js"></script>
+
+<script type="text/javascript">
+<!--
+
+function initialize() {
+	//The Adobe Stratus URL with the developer key for media connection.
+	webtalk.mediaURL = 'rtmfp://stratus.rtmfp.net/d1e1e5b3f17e90eb35d244fd-c711881365d9/';
+
+	//Update the initial name.
+	webtalk.myname = "User " + webtalk.clientId;
+
+	//The name of the VideoIO object with local publish video, if any
+	webtalk.myvideo = null;
+
+	// mapping from userId to VideoIO object name for play streams
+	webtalk.user2Video = {};
+	
+	// display item
+	setTimeout(function() {	document.getElementById("nameText").value = webtalk.myname; }, 500);
+
+	// update the location to "public"
+	webtalk.setLocation("public");
+}
+
+function escapeHTML(value) {
+	return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function joinRoom(name) {
+	if (name == null || name == "") {
+		alert("You must have a valid room name");
+		return;
+	}
+
+	name = escapeHTML(name);
+	if (name != webtalk.location) {
+		if (webtalk.myvideo) {
+			var obj = getFlashMovie(webtalk.myvideo);
+			obj.setProperty("src", null);
+			webtalk.myvideo = null;
+			webtalk.extra = null;
+			document.getElementById("publishCheck").checked = false;
+		}
+		
+		for (var s in webtalk.user2Video) {
+			var video = webtalk.user2Video[s];
+			var obj = getFlashMovie(video);
+			obj.setProperty("src", null);
+			delete webtalk.user2Video[s];
+		}
+		
+		webtalk.setLocation(name, true);
+	}
+}
+
+function changeName(name) {
+	if (name == null || name == "") {
+		alert("You must have a valid name");
+		return;
+	}
+
+	name = escapeHTML(name);
+	webtalk.myname = name;
+	webtalk.joinRoom(); // re-join the chat room
+}
+
+function send(msg) {
+	// post to the chat history
+	msg = escapeHTML(msg);
+	webtalk.postChatHistory(msg);
+	// webtalk.loadChatHistory();
+}
+
+//Get the Flash SWF object by name.
+function getFlashMovie(movieName) {
+	var isIE = navigator.appName.indexOf("Microsoft") != -1;
+	return (isIE) ? window[movieName] : document[movieName];
+}
+
+function publish(enable) {
+	var result = false;
+	if (enable) {
+		var src = webtalk.mediaURL + "?publish=" + webtalk.clientId;
+		for (var i=1; i<=6; ++i) {
+			var obj = getFlashMovie("video" + i);
+			if (obj.getProperty("src") == null) {
+				webtalk.myvideo = "video" + i;
+				result = true;
+				obj.setProperty("src", src);
+				break;
+			}
+		}
+	}
+	else {
+		for (var i=1; i<=6; ++i) {
+			var obj = getFlashMovie("video" + i);
+			var src = obj.getProperty("src");
+			if (src != null && src.indexOf("publish=") > 0) {
+				webtalk.myvideo = null;
+				webtalk.extra = null;
+				result = true;
+				obj.setProperty("src", null);
+				break;
+			}
+		}
+	}
+
+	if (result) {
+		if (!enable) {
+			webtalk.postUserList();
+			// webtalk.loadUserList();
+		}
+	}
+
+	return result;
+}
+
+function play(inputName) {
+	var userId = inputName.substr(4);
+	
+	var result = false;
+	var input = document.getElementById(inputName);
+	var enable = input.checked;
+	if (enable) {
+		var src = webtalk.userlist[userId].extra;
+		var name = null;
+		for (var i=1; i<=6; ++i) {
+			var obj = getFlashMovie("video" + i);
+			if (obj.getProperty("src") == null) {
+				result = true;
+				name = "video" + i;
+				break;
+			}
+		}
+		if (name != null) {
+			webtalk.user2Video[userId] = name;
+			obj.setProperty("src", src);
+		}
+	}
+	else {
+		result = true;
+		if (webtalk.user2Video[userId] != undefined) {
+			var name = webtalk.user2Video[userId];
+			delete webtalk.user2Video[userId];
+			var obj = getFlashMovie(name);
+			obj.setProperty("src", null);
+		}
+	}
+
+	return result;
+}
+
+function onCreationComplete(event) {
+}
+
+function onPropertyChange(event) {
+	if (event.property == "nearID" && event.objectID == webtalk.myvideo) {
+		webtalk.extra = webtalk.mediaURL + "?play=" + webtalk.clientId + "&farID=" + event.newValue;
+		webtalk.postUserList();
+		webtalk.loadUserList();
+	}
+}
+
+function getVideoTag(index, x, y, width, height) {
+	return '<div style="position: absolute; left: ' + x + 'px; top: ' + y + 'px; width: ' + width + 'px; height: ' + height + 'px;">\n\
+	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"\n\
+		id="video' + index + '" width="100%" height="100%"\n\
+		codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">\n\
+		<param name="movie" value="/static/VideoIO.swf" />\n\
+		<param name="quality" value="high" />\n\
+		<param name="bgcolor" value="#000000" />\n\
+		<param name="flashVars" value="cameraQuality=80" />\n\
+		<param name="allowScriptAccess" value="always" />\n\
+		<embed src="/static/VideoIO.swf" quality="high" bgcolor="#000000"\n\
+			width="100%" height="100%" name="video' + index + '" align="middle"\n\
+			play="true" loop="false" quality="high"\n\
+			flashVars="cameraQuality=80"\n\
+			allowScriptAccess="always"\n\
+			type="application/x-shockwave-flash"\n\
+			pluginspage="http://www.adobe.com/go/getflashplayer">\n\
+		</embed>\n\
+	</object>\n\
+</div>';	
+}
+
+webtalk.onChatHistory = function(msgs) {
+	var text = msgs ? msgs.map(function(obj) { return obj.text; }).join("") : "";
+	var chathistory = document.getElementById("chathistoryDiv");
+	var html = text.replace(/\n/g,"<br/>").replace(/\t/g,"&nbsp;&nbsp;&nbsp;&nbsp;");
+	chathistory.innerHTML = html || "&lt;empty&gt;";
+	//var chathistory = document.getElementById("historyText");
+	//chathistory.value = text != "" ? text.replace(/\t/g, "  ") : "<empty>";
+};
+
+webtalk.onUserList = function(users) {
+	try {
+		for (var userId in webtalk.user2Video) {
+			if (webtalk.userlist[userId] == undefined || !webtalk.userlist[userId].extra) {
+				var name = webtalk.user2Video[userId];
+				delete webtalk.user2Video[userId];
+				var obj = getFlashMovie(name);
+				obj.setProperty("src", null);
+			}
+		}
+	} catch (e) { }
+	
+	var colors = ['#cfcfcf', '#ffffff'];
+	var html = "";
+	
+	for (var i=0; i<users.length; ++i) {
+		var user = users[i];
+		var color = colors[i % colors.length];
+		html += '<tr bgcolor="' + color + '" height="20px"><td width="20px">';
+		if (user.extra) {
+			html += '<input id="play' + user.clientId + '" type="checkbox" autocomplete="off" value="' + user.clientId + '" ' +
+				' title="Play this video" ' + 
+				' onclick="return play(\'play' + user.clientId + '\');" ' + 
+				(webtalk.user2Video[user.clientId] != undefined ? 'checked' : '') + ' />'
+		}
+		html +=  '</td><td>' + user.name + (user.clientId == webtalk.clientId ? " (You)" : "") 
+				+ '</td></tr>';
+	}
+	var userlist = document.getElementById("userlistTable");
+	userlist.innerHTML = html || "<tr><td>&lt;empty&gt;</td></tr>";
+};
+
+webtalk.onError = function(msg, level) {
+	if (!level) level = "error";
+	var input = document.getElementById("inputText");
+	setTimeout(function() { input.value = level + ": " + msg; input.setSelectionRange(0, input.value.length); }, 100);
+};
+
+//-->
+</script>
+</head>
+
+<body onload="webtalk.load(); initialize();" onunload="webtalk.unload()">
+
+<script type="text/javascript">
+// render the VideoIO boxes with name/id as video1 to video6.
+var rows = 2;
+var cols = 3;
+var gap = 2;
+var width = 240;
+var height = 180;
+var index = 0;
+for (y=gap; y<(gap+height)*rows; y+=(height+gap)) {
+	for (x=gap; x<(gap+width)*cols; x+=(width+gap)) {
+		index += 1;
+		document.write(getVideoTag(index, x, y, width, height));
+	}
+}
+</script>
+
+<div style="position: absolute; left: 728px; top: 2px; right: 2px; height: 20px; min-width: 165px; border: 1px solid grey; font-size: 11px; padding-top: 2px;">
+	&nbsp;Room: 
+	<input id="roomText" type="text" style="width: 90px; border: 1px dotted grey; font-size: 10px;" 
+		maxlength="30" autocomplete="off" value="public"
+		title="Enter a different chat room name"
+		onkeypress="javascript: if ((event.keyCode || event.which) == 13) {
+				joinRoom(document.getElementById('roomText').value);
+				return false;
+			}"/>
+	<input type="button" value="set" style="border: 1px outset black; background-color: lightGrey;"
+		onclick="javascript: joinRoom(document.getElementById('roomText').value); return false;"/>
+</div>
+
+<div id="userlist" style="position: absolute; left: 728px; top: 28px; right: 2px; bottom: 26px; min-width: 120px; border: 1px solid grey">
+	<table id="userlistTable" style="width: 100%; top: 0px; bottom: 26px; font-size: 11px;"
+		cellspacing="0">
+	</table>
+</div>
+
+<div id="mine" style="position: absolute; left: 728px; right: 2px; bottom: 2px; height: 20px; min-width: 165px; border: 1px solid grey; font-size: 11px;">
+	<input id="publishCheck" type="checkbox" autocomplete="off"
+		title="Check to publish your audio and video"
+		onclick="return publish(document.getElementById('publishCheck').checked);" />
+	<input id="nameText" type="text" style="width: 100px; border: 1px dotted grey; font-size: 10px;" 
+		maxlength="30" autocomplete="off" value="Edit Your Name"
+		title="Edit your chat nick name"
+		onkeypress="javascript: if ((event.keyCode || event.which) == 13) {
+				changeName(document.getElementById('nameText').value);
+				return false;
+			}"/>
+	<input type="button" value="set" style="border: 1px outset black; background-color: lightGrey;"
+		onclick="javascript: changeName(document.getElementById('nameText').value); return false;"/>
+</div> 
+
+<div style="position: absolute; left: 244px; top: 366px; bottom: 26px; width: 480px; border: 1px solid grey;">
+	<div id="chathistoryDiv" style="width: 100%; height: 100%; overflow: auto; font-size: 11px;"></div>
+</div>
+
+<div id="input" style="position: absolute; left: 244px; bottom: 2px; height: 20px; width: 480px; border: 1px solid grey;">
+	<input id="inputText" type="text" style="border: none; width: 100%" autocomplete="off"
+		title="Enter a message here in this chat room"
+		value="Enter a chat message here" 
+		onclick="if (document.getElementById('inputText').value == 'Enter a chat message here') {
+				document.getElementById('inputText').value = '';
+			}"
+		onkeypress="javascript: if ((event.keyCode || event.which) == 13) {
+			send(document.getElementById('inputText').value);
+			document.getElementById('inputText').value = ''; 
+			return false; 
+		}"/>
+</div>
+
+<div style="position: absolute; left: 2px; top: 366px; bottom: 2px; width: 238px; border: 1px solid grey; overflow: auto;">
+	<span style="font-size: 12pt;">How to get started?</span>
+	<ol style="font-size: 9pt; padding-left: 20px; padding-top: 0px; padding-bottom: 0px;">
+		<li>Expand your browser window so that you see the user list on right.</li>
+		<li>Set your name on bottom-right corner.</li>
+		<li>Select the checkbox near your name on bottom-right corner to enable your video.</li>
+		<li>Select the checkbox near names of other people in user list of right corner to view their video.</li>
+		<li>Enter the text chat message in bottom-center corner in this chat room.</li>
+		<li>If needed, set your room name on top-right corner, for a private room, instead of a default room name of "public".</li>
+		<li>If needed, send private message to a particular user starting with <i>@user name:</i> before your message.</li>
+	</ol>
+	<p style="font-size: 9pt; color: #aaaaaa;">Copyright &copy; 2010, 
+		<a href="http://code.google.com/p/flash-videoio" style="text-decoration: none; color: #aaaaaa;"> Kundan Singh</a>.</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,390 @@
+<html>
+<body onunload="logout()">
+	<script src="/_ah/channel/jsapi"></script>
+	
+	<script type="text/javascript">
+	<!--
+	
+	// The unique random stream for this client, also used as ClientID for creating channel.
+    var stream = Math.floor(Math.random()*100000000).toString();
+    
+    // The name of this user, is prompted to change.
+    var me = "user" + stream;
+    
+    // The name of the person I am connected to.
+	var you = null;
+	
+    // The base URL of the application, so that absolute API URL can be formed.
+	var base_url = location.href.substring(0,location.href.lastIndexOf('/'));
+    
+	// The Adobe stratus URL for my application
+	var media_url = 'rtmfp://stratus.rtmfp.net/d1e1e5b3f17e90eb35d244fd-c711881365d9/';
+	
+	// The VideoIO play URL of my stream.
+	var src = null;
+	
+	// The VideoIO play URL of other person's stream
+	var dest = null;
+	
+	// The periodic timer to periodically login in soft-state.
+	var timer = null;
+	
+	// The periodic timer interval for login soft-state.
+	var publish_interval = 60000;
+	
+	// The socket created with channel API, created in createChannel().
+	var socket = null;
+	
+	// The channelId for the channel API for this client's ID (stream).
+	var channelId = null;
+	
+	// The channel created with channel API, created in createChannel().
+    var channel = null;
+    
+    // Create an AJAX request object based on browser type.
+	function getRequest() {
+		var ajaxRequest;  // The variable that makes Ajax possible!
+		
+		try{ // Opera 8.0+, Firefox, Safari
+			ajaxRequest = new XMLHttpRequest();
+		} catch (e) { // Internet Explorer Browsers
+			try{
+				ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+			} catch (e) {
+				try {
+					ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {
+					return false; // Something went wrong
+				}
+			}
+		}
+		return ajaxRequest;
+	}
+	  
+	// Get the Flash Movie by name, e.g., "video1" or "video2".
+	function getFlashMovie(movieName) {
+	    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+	    return (isIE) ? window[movieName] : document[movieName];
+	}
+
+	// On startup, create a channel using the channel API.
+	// Request: POST /create/?stream={stream}
+	// Response: {"token": ... }
+	// The token is used in new goog.appengine.Channel(...) to create a channel.
+	// Once connected, the server sends JSON messages, with "method" attribute
+	// of value "send" or "connect". This function invokes received() and connected()
+	// respectively for these messages.
+    function createChannel() {
+		var request = getRequest();
+		var url = base_url + "/create/?stream=" + stream;
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				if (request.status == 200) {
+					// log("response " + request.responseText);
+					data = eval("(" + request.responseText + ")");
+					channelId = data.token;
+					log("channel created");
+					channel = new goog.appengine.Channel(channelId);
+					socket = channel.open();
+
+					socket.onmessage = function(event) {
+						obj = eval("(" + event.data + ")");
+						if (obj.method == "send") {
+							received(obj.body);
+						} else if (obj.method == "connect") {
+							connected(obj.play);
+						}
+					};
+    
+					socket.onerror = function(event) {
+						log("socket error: " + event.code + " " + event.description);
+					};
+				} else {
+					log("create channel failed");
+				}
+			}
+		};
+		request.open("POST", url, true);
+		request.send('dummy');
+    }
+    
+    // When the page is launched, it creates a channel first.
+    createChannel();
+    
+    // Prompt the user for his name.
+    function promptNickname() {
+	    while (true) {
+			me = prompt("Enter your nickname\n(alphanumeric, no spaces, at most 32 characters)", me);
+			if (me == null || me.length <= 32 && me.match(/^([a-zA-Z0-9_-]+)$/)) {
+				return me;
+			}
+	    }
+    }
+
+	// When the page is launched, it prompts for user name.
+    promptNickname();
+    
+    // When VideoIO is created, and user has specified the name, start local video.
+	function onCreationComplete(event) {
+		if (event.objectID == "video1") {
+			if (me) {
+				var url = media_url + "?publish=" + stream;
+				getFlashMovie("video1").setProperty("src", url);
+			}
+		}		
+	}
+
+	// When local video's nearID is set, set our "src" property and initiate login.
+	function onPropertyChange(event) {
+		if (event.property == "nearID" && event.objectID == "video1") {
+			src = media_url + "?nickname=" + me + "&play=" + stream + "&farID=" + event.newValue;
+			setTimeout("login(true)", 1000); // first invocation after 1 second.
+			timer = setInterval("login()", publish_interval);
+		}
+	}
+
+	// Initiate the login process. If change is true, then request a change of
+	// connected person, when the user clicks on "Next Person" link.
+	// Request: /login/?stream={stream} or /login/?stream={stream}&change=true
+	// Request-body: {"publish": ...}
+	// Response-body: {"play": ...}
+	// Where publish and play are play URLs for local and remote VideoIO objects. 
+	function login(change) {
+		if (!src) {
+			alert("You must Login before publishing");
+			return;
+		}
+		
+		var request = getRequest();
+		var url = base_url + "/login/?stream=" + stream + (change ? "&change=true" : "");
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				if (request.status == 200) {
+					// log("response " + request.responseText);
+				} else {
+					log("login failed");
+				}
+			}
+		};
+		request.open("POST", url, true);
+		request.send('{"publish":"' + src + '"}');
+	}
+
+	// Logout the local user, and clear the periodic login timer.
+	// Request: POST /logout/?stream={stream}
+	function logout() {
+		if (timer)
+			clearInterval(timer);
+		
+		var request = getRequest();
+		var url = base_url + "/logout/?stream=" + stream;
+		request.open("POST", url, true);
+		request.send(src);
+	}
+
+	// Send a text chat message, if connected to other person.
+	// Request: POST /send/?stream={stream}
+	// Request-body: {"dest": ..., "body": ... }
+	// Here dest is the other person's VideoIO play URL.
+	function send() {
+		var msg = document.getElementById("input").value;
+		if (msg) {
+			document.getElementById("input").value = "";
+			
+			if (dest) {
+				log("Me: " + msg);
+				var request = getRequest();
+				var url = base_url + "/send/" + "?stream=" + stream;
+				request.open("POST", url, true);
+				request.send('{"dest":"' + dest + '", "body": "You: ' + msg + '"}');
+			}
+			else {
+				log("Me (not connected): " + msg);
+			}
+		}
+	}
+
+	// When the server says we are connected to the supplied play URL,
+	// change the remote VideoIO's "src" attribute, and update "you" and "dest".
+	function connected(play) {
+		//log("connected to " + play);
+		var olddest = dest;
+		you = "";
+		dest = play;
+		if (!dest)
+			dest = null;
+				
+		if (dest) {
+			index = dest.indexOf("?");
+			var parts = dest.substr(index+1).split("&");
+			for (var i=0; i<parts.length; ++i) {
+				var part = parts[i];
+				if (part.indexOf("nickname=") == 0) {
+					you = part.substr(9);
+				}
+			}
+		}
+		if (olddest != dest) {
+			getFlashMovie("video2").setProperty("src", dest);
+		}			
+		
+		if (you) {
+			log("connected to " + you);
+			document.getElementById("remote").innerHTML = you;
+		} else {
+			log("you are not connected");
+			document.getElementById("remote").innerHTML = "You are not connected";
+		}
+	}
+	
+	// When the server sends us a text message, just display the message.
+	function received(body) {
+		log(body);
+	}
+		
+	// When the user toggle's the Login/Logout link, set or reset the local and
+	// remote VideoIO. On logout, also invoke the logout() function. On logout, the
+	// login() function will be invoked when the local VideoIO is ready with nearId.
+	function toggleLogin() {
+		var button = document.getElementById("login");
+		if (button.innerHTML == "Logout") {
+			button.innerHTML = "Login";
+			log("logged out");
+			logout();
+			getFlashMovie("video1").setProperty("src", null);
+			getFlashMovie("video2").setProperty("src", null);
+			document.getElementById("remote").innerHTML = "You are not connected";
+			you = "";
+			src = null;
+			dest = null;
+		}
+		else {
+			if (me != null || promptNickname()) {
+				document.getElementById("local").innerHTML = "I am " + me;
+				log("logging in");
+				button.innerHTML = "Logout";
+				var url = media_url + "?publish=" + stream;
+				getFlashMovie("video1").setProperty("src", url);
+			}
+		}
+	}
+	
+	// Write a message to the chat history text area.
+	function log(msg) {
+		var obj = document.getElementById("history");
+		obj.value += (obj.value == "" ? "" : "\n") + msg; 
+	}
+
+	//-->
+	</script>	
+
+    <div style="position: absolute; left: 10px; top: 10px; width: 320px; height: 240px;">
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video1" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="/static/VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="flashVars" value="controls=true&cameraQuality=80" />
+			<param name="allowScriptAccess" value="always" />
+			<embed src="/static/VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video1" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				flashVars="controls=true&cameraQuality=80"
+				allowScriptAccess="always"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+		</object>
+    </div>
+    <div style="position: absolute; left: 10px; top: 260px; width: 320px; height: 240px;">
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video2" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="/static/VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="flashVars" value="controls=true" />
+			<param name="allowScriptAccess" value="always" />
+			<embed src="/static/VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video2" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				allowScriptAccess="always"
+				flashVars="controls=true"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+		</object>
+    </div>
+
+	<div style="position: absolute; left: 340px; top: 10px; width: 320px; height: 490px;">
+		<div style="float: right; height: 18px;">
+			<div id="local" style="float: left;"></div> &nbsp; |
+			<a id="login" href="#" onclick="javascript: toggleLogin()">Logout</script></a>
+		</div>
+		<script>
+			if (!me)
+				document.getElementById("login").innerHTML = "Login";
+			document.getElementById("local").innerHTML = me ? "I am " + me : "";
+		</script>
+		<br/> 
+		<textarea id="history" autocomplete="off"
+			style="width: 320px; height: 410px;"></textarea>
+		<br/>
+		Enter your text message: 
+		<input id="input" type="text" autocomplete="off"
+			style="width: 320px; height: 24px;"
+			onkeypress="javascript: if ((event.keyCode || event.which) == 13) { send(); return false; }"/>
+			
+		<div style="float: right; height: 18px;">
+			<div id="remote" style="float: left;">You are not connected</div> &nbsp; |
+			<a href="#" onclick="javascript: login(true); return false;">Next Person</a>
+		</div> 
+	</div>
+	
+	<div style="position: absolute; left: 670px; top: 10px; width: 320px; height: 490px; border: 1px 1px 1px 1px;">
+		<h2 style="margin-top: 0px;" >What is this?</h2>
+		
+		<p style="font-size: 12px; text-align: justify;">
+		This is a <a href="http://en.wikipedia.org/wiki/Chatroulette" target="_blank">chatroulette</a>-type 
+		application built using the
+		<a href="http://code.google.com/p/flash-videoio" target="_blank">Flash VideoIO</a> component on 
+		<a href="http://labs.adobe.com/technologies/stratus/" target="_blank">Adobe Stratus</a>
+		service and <a href="http://en.wikipedia.org/wiki/Google_App_Engine" target="_blank">Google App Engine</a>. 
+		This site is just a demonstration of how such services can be
+		built using the generic Flash-VideoIO component, and not meant for production 
+		use.</p>
+		
+		<p style="font-size: 12px; text-align: justify;">
+		When you land on this page, it prompts you for some nickname, and starts publishing 
+		your audio and video stream, after you approve the device access. 
+		It tries to connect you with another person who is 
+		also on the page publishing his or her video. The status of the connection is 
+		displayed in the chat history area. You can also type a message to send to the 
+		person you are talking with.</p>
+		
+		<p style="font-size: 12px; text-align: justify;">
+		It uses Google App Engine for all session initiation and discovery of other users,
+		and Adobe Stratus to do media negotiation for peer-to-peer media streams. The project
+		contains one HTML file with some javascript and one Python file, with about 400 lines
+		total. There is no authentication, but is easy to add using Google App Engine. 
+		You can right-click on this page to view the HTML and javascript source code which 
+		contributes to all front-end interactions and shows how to use Flash-VideoIO for 
+		chatroulette type applications.
+		</p>
+		<p style="font-size: 12px; text-align: justify;">
+		This version of the project uses the Channel API available in Google App Engine
+		for asynchronous notifications of connections, disconnections and chat messages.
+		</p>
+		<p style="font-size: 12px; text-align: justify;">
+		You can view the source code of two files: <a href="/static/index.html.txt">index.html</a>
+		and <a href="/static/main.py.txt">main.py</a> where former renders the user interface
+		and latter is the back-end service code on Google App Engine.
+		</p>
+	</div>
+</body>
+</html>
