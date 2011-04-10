@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cross-domain-policy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.adobe.com/xml/schemas/PolicyFile.xsd">
+  <allow-access-from domain="apps.facebook.com" />
+  <allow-access-from domain="myprojectguide.org" />
+  <site-control permitted-cross-domain-policies="all"/>
+</cross-domain-policy>
+
