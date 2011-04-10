@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <title>Flash-VideoIO | Flash-based audio and video communication</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+        <!--[if lt IE 7]>
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+
+<style type="text/css">
+pre { color: #606060; font-size: small; line-height: 1; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+ol { line-height: 1; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+p { text-align: justify; }
+</style>
+
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+
+
+  </head>
+  <body class="sidebar-right">
+
+<!-- Layout -->
+  <div id="header-region" class="clear-block"></div>
+
+    <div id="wrapper">
+
+    <div id="container" class="clear-block">
+
+      <div id="header">
+        <div id="logo-floater">
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        </div>
+
+                                                    
+      </div> <!-- /header -->
+
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+
+<div class="breadcrumb"><a href="/">Home</a> › <a href="index.html">Flash-VideoIO Tutorial</a></div>
+
+<div id="node-1" class="node">
+
+
+  
+  <div class="content clear-block">
+
+<h2>How to do multi-party video conference?</h2>
+  
+<p>The multi-party video conference is the natural extension of two-party video call. Please see <a href="6.html">How to do two-party video call?</a> for details. You can do multi-party live video conference by having multiple instances of VideoIO application, one per participant. One of the VideoIO instance is used to capture live camera view and microphone audio as local stream to the media server, and other instances are used to play the remote media streams of other participants from the media server. Please see <a href="3.html">How to work with media server?</a> on details of installing and configuring a media server. For illustrations in this section we assume that you have a media server running on <tt>192.1.2.3</tt> and that has an application called <tt>myapp</tt> which allows you to do live streams. Thus, your media server application should be reachable at "rtmp://192.1.2.3/myapp". In real deployment you will use the real host name or IP address of your media server.</p>
+
+<p>The <tt>src</tt> property of the VideoIO application can be set to enable the local (publish) or remote (play) mode. Each participant in the conference must use a unique stream name to publish her media. Suppose a six party conference is hosted among users Alice, Bob, Carol, Dan, Emma and Frank, and they select their stream names as "alice", "bob", "carol", "dan", "emma" and "frank", respectively. Each user publishes her own stream, and plays five streams of five other users. Thus, Carol will publish stream named "carol" and play streams "alice", "bob", "dan", "emma", "frank". Thus the remaining challenge is to convey the desired stream names to all the participants in a conference. In practice, people use variety of methods ranging from CGI web service, JavaScript, email or Jabber service to exchange such information among the participants. Whatever mechanism you decide will become the conference membership service of your system. In our tutorial we will assume that these information is exchanged out-of-band by the individuals, e.g., over instant messenging or email. The stream names for each user in our example is shown below for publish and five play instances of VideoIO.</p>
+
+<center>
+<table style="width: 200px;">
+<tr><th>stream</th><th>Alice</th><th>Bob</th><th>Carol</th><th>Dan</th><th>Emma</th><th>Frank</th</tr>
+<tr><td>publish/local</td><td>alice</td><td>bob</td><td>carol</td><td>dan</td><td>emma</td><td>frank</td></tr>
+<tr><td>play/remote1</td><td>bob</td><td>alice</td><td>alice</td><td>alice</td><td>alice</td><td>alice</td></tr>
+<tr><td>play/remote2</td><td>carol</td><td>carol</td><td>bob</td><td>bob</td><td>bob</td><td>bob</td></tr>
+<tr><td>play/remote3</td><td>dan</td><td>dan</td><td>dan</td><td>carol</td><td>carol</td><td>carol</td></tr>
+<tr><td>play/remote4</td><td>emma</td><td>emma</td><td>emma</td><td>emma</td><td>dan</td><td>dan</td></tr>
+<tr><td>play/remote5</td><td>frank</td><td>frank</td><td>frank</td><td>frank</td><td>frank</td><td>emma</td></tr>
+</table>
+</center>
+
+<p>The user interface will typically have multiple VideoIO instances - one for local video and others for remote videos. For example, user Carol will set <tt>src</tt> URL of local instance to "rtmp://192.1.2.3/myapp?publish=carol", the <tt>src</tt> URLs of first remote instance as "rtmp://192.1.2.3/myapp?play=alice", and so on. Joining a conference is equivalent to sending your stream name to all other participants and learning all other participant's stream names. Leaving a conference is equivalent to setting <tt>src</tt> URLs of all your VideoIO instances to null or "".</p>
+
+<div class="info">
+<b>Information</b>: Typically a media server allows any number of play instances for a stream name, but only one publish instance within a URL scope. Hence, the stream name must be chosen carefully to avoid conflict with other users in a call or conference.
+</div>
+
+<p>The following user interface embeds six VideoIO instances. In practice, you would want to dynamically add new VideoIO instance as more participants join. In our example, each instance is assigned a stream name, which gets set in publish or play mode when you click on the <tt>set</tt> button for your stream name. To try the demonstration, open this page in six browser instances. You can try on different machines or the same machine. On each browser instance, select one user not already selected before, and click on the <tt>set</tt> button. It will make that browser instance publish for that user stream, and play for all other streams. When you do this on all six browser instances, you effectively have a six-party video call. Just click on <tt>reset</tt> button to terminate your conference. If you are running media server on a different host than 192.1.2.3, change the URL's IP address in all text input boxes. </p>
+
+<script>
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+function set(movieName, streamName) {
+    var names = ['video1','video2','video3','video3','video5','video6'];
+    for (var i in names) {
+        var name = names[i];
+        var type = name == movieName ? "publish" : "play";
+        var obj = getFlashMovie(name);
+        obj.setProperty('src',  
+            document.getElementById('url1').value
+            + '?' + type + '=' + name);
+    }
+}
+function reset(movieName) {
+    getFlashMovie(movieName).setProperty('src', null)    
+}
+</script>
+
+<input id="url1" type="text" autocomplete="off" style="width:170px;"
+    value="rtmp://192.1.2.3/myapp"/>
+    
+<table style="width: 660;"><tr valign="top">
+<td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video1" width="240" height="180">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+</object>
+<br/>
+<center>
+Alice 
+<input value="set" type="button" onclick="set('video1','alice')"/>
+<input value="reset" type="button" onclick="reset('video1')"/> 
+</center>
+</td>
+<td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video2" width="240" height="180">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+</object>
+<br/>
+<center>
+Bob 
+<input value="set" type="button" onclick="set('video2','bob')"/>
+<input value="reset" type="button" onclick="reset('video2')"/> 
+</center>
+</td>
+<td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video3" width="240" height="180">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+</object>
+<br/>
+<center>
+Carol 
+<input value="set" type="button" onclick="set('video3','carol')"/>
+<input value="reset" type="button" onclick="reset('video3')"/> 
+</center>
+</td></tr>
+<tr valign="top"><td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video4" width="240" height="180">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+</object>
+<br/>
+<center>
+Dan 
+<input value="set" type="button" onclick="set('video4','dan')"/>
+<input value="reset" type="button" onclick="reset('video4')"/> 
+</center>
+</td>
+<td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video5" width="240" height="180">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+</object>
+<br/>
+<center>
+Emma 
+<input value="set" type="button" onclick="set('video5','emma')"/>
+<input value="reset" type="button" onclick="reset('video5')"/> 
+</center>
+</td>
+<td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video6" width="240" height="180">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+</object>
+<br/>
+<center>
+Frank 
+<input value="set" type="button" onclick="set('video6','frank')"/>
+<input value="reset" type="button" onclick="reset('video6')"/> 
+</center>
+</td></tr></table>
+
+<p>The source code for these are similar to earlier examples. You can also right-click and select "View Page Source" or equivalent menu option to see the source code.</p>
+
+<h2>Summary</h2>
+
+<p>In summary, you can use the <tt>src</tt> property with URL parameter containing <tt>publish</tt> for your stream and <tt>play</tt> for remote stream. The <tt>recording</tt> and <tt>playing</tt> properties control the current state of whether your video is transmitted or whether remote video is played.</p>
+
+<p>This tutorial is just the begining of how to do multi-party video conference. The VideoIO API is so simple that just setting the <tt>src</tt> property allows you to accomplish several use cases. There are several other properties that affect behavior of a call, e.g., you can control the camera quality or sound mute. Additionally, you can build other advanced user interface controls in JavaScript similar to how VideoIO's control panel shows in Flash.</p>
+
+<p>The video displayed in local and remote video are different. The publish mode displays the live camera view. In VideoIO the live camera view is always flipped horizontally to appear as if you are looking in a mirror, whereas the actual media stream sent to the server for recording or re-distribution appears as if the camera is looking at you. We feel that this gives the most natural behavior for live video chat or message recording.</p>
+
+</div>
+          </div>
+
+          <div id="footer">&copy; 2010-2011, Kundan Singh, All Rights Reserved.</div>
+          
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+              <div id="sidebar-right" class="sidebar">
+
+<div id="block-forum-0" class="clear-block block block-forum">
+
+  <h2>In This Project</h2>
+
+  <div class="content"><div class="item-list">
+<ul><li class="first"><a href="index.html">Project Home</a></li>
+</ul>
+<ol>
+<li class="last"><a href="1.html">Embedding</a></li>
+<li class="last"><a href="2.html">Live camera view</a></li>
+<li class="last"><a href="3.html">Media server</a></li>
+<li class="last"><a href="4.html">Record a message</a></li>
+<li class="last"><a href="5.html">Play video file</a></li>
+<li class="last"><a href="6.html">Two-party call</a></li>
+<li class="last"><a href="7.html">Video broadcast</a></li>
+<li class="last"><a href="8.html">Multi-party conference</a></li>
+<li class="last"><a href="9.html">P2P video call</a></li>
+<li class="last"><a href="10.html">VideoIO API</a></li>
+<li class="last"><a href="11.html">SIP/VoIP call</a></li>
+</ol></div></div>
+</div>
+
+<div id="block-forum-1" class="clear-block block block-forum">
+
+  <h2>References</h2>
+
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+</ul></div></div>
+</div>
+
+              </div>
+
+    </div> <!-- /container -->
+  </div>
+    </body>
+</html>

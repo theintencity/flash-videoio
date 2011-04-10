@@ -1,0 +1,508 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Video Component Demo</title>
+<style type="text/css">
+body { font-size: small; }
+td { font-size: small; }
+a { text-decoration: none; color: #000000;}
+a:hover { text-decoration: underline; color: #0000ff; }
+</style>
+</head>
+
+<body>
+
+<h2>Demonstration and testing of <a href="index.html">Flash-VideoIO</a></h2>
+ 
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+
+function isEnter(e) {
+	var key = e.keyCode || e.which;
+	return (key == 13);
+}
+
+function setString(propertyName, inputName) {
+    var obj = getFlashMovie("video1");
+    obj.setProperty(propertyName, document.getElementById(inputName).value);
+    return false;
+}
+
+function setBool(propertyName, inputName) {
+    var obj = getFlashMovie("video1");
+    obj.setProperty(propertyName, document.getElementById(inputName).checked);
+}
+
+function setNumber(propertyName, inputName) {
+    var obj = getFlashMovie("video1");
+    obj.setProperty(propertyName, parseFloat(document.getElementById(inputName).value));
+    return false;
+}
+
+function str2object(value) {
+  if (value == "true")
+     return true;
+  else if (value == "false")
+     return false;
+  else if (value.length >= 2 && value[0] == '"' && value[value.length-1] == '"') 
+     return value.substr(1, value.length-2);
+  else
+     parseFloat(value); 
+}
+
+function callMethod(inputName) {
+    var obj = getFlashMovie("video1");
+    value = document.getElementById(inputName).value;
+    r = /^(\w+)\((true|false|[\.\d]+|"[^"]*")?((\s*,\s*(true|false|[\.\d]+|"[^"]*"))*)\)$/g;
+    m = r.exec(value);
+    if (!m) {
+    	alert("Invalid method call: " + value);
+    }
+    else {
+        var methodName = m[1];
+        var arg0 = m[2];
+        var remaining = m[3];
+        var args = [methodName];
+        if (arg0) {
+            args.push(str2object(arg0));
+        }
+        while (remaining) {
+	        r1 = /^\s*,\s*(true|false|[\.\d]+|"[^"]*")/;
+	        m1 = r1.exec(remaining);
+	        if (m1) {
+	            args.push(str2object(m1[1]));
+	            remaining = remaining.substr(m1[0].length);
+	        }
+        }
+        
+        var f = obj.callProperty;
+        f.apply(obj, args);
+    }
+    return false;
+}
+
+function log(msg) {
+    var logObj = document.getElementById("log");
+    logObj.value = msg + (logObj.value ? "\n" + logObj.value : "");
+}
+
+function onCreationComplete(event) {
+    log(event.objectID + " created");
+    
+    var obj = getFlashMovie("video1");
+    var props = {
+        'preload':'boolean','autoplay':'boolean','loop':'boolean','controls':'boolean',
+        'url':'string','play':'string','publish':'string','group':'string',
+        'record':'boolean','live':'boolean','playing':'boolean','recording':'boolean','bidirection':'boolean',
+        'microphone':'boolean','codec':'string','encodeQuality':'number', 'rate':'number',
+        'framesPerPacket':'number','gain':'number','level':'number',
+        'echoSuppression':'boolean', 'silenceLevel':'number',
+        'sound':'boolean','volume':'number',
+        'camera':'boolean','cameraLoopback':'boolean','cameraWidth':'number','cameraHeight':'number',
+        'cameraFPS':'number','keyFrameInterval':'number','cameraQuality':'number',
+        'display':'boolean','videoWidth':'number','videoHeight':'number','currentFPS':'number',
+        'cameraBandwidth':'number','smoothing':'boolean','enableFullscreen':'boolean','fullscreen':'boolean',
+        'currentTime':'number','duration':'number','bytesLoaded':'number','bytesTotal':'number',
+        'quality':'number', 'bandwidth':'number',
+        'sip':'string'
+    };
+    for (var name in props) {
+        var type = props[name];
+        var comp = document.getElementById(name);
+        if (type == "number")
+            comp.value = obj.getProperty(name).toString();
+        else if (type == "boolean")
+            comp.checked = obj.getProperty(name);
+        else
+            comp.value = obj.getProperty(name);
+    }
+}
+
+function onPropertyChange(event) {
+    var obj = document.getElementById(event.property);
+    if (obj) {
+        if (typeof(event.newValue) == "boolean")
+            obj.checked = event.newValue;
+        else if (typeof(event.newValue) == "number")
+            obj.value = event.newValue.toString();
+        else 
+            obj.value = event.newValue != null ? event.newValue : "";
+    }
+    else {
+        log(event.objectID + "." + event.property + "=" + event.oldValue + "=>" + event.newValue);
+    }
+}
+
+function onCallback(event) {
+    log("onCallback() method=" + event.method + ", args=" + event.args);
+}
+
+function onPostingNotify(event) {
+    log("onPostingNotify() user=" + event.user + ", text=" + event.text);
+}
+
+function help(name) {
+    var obj = getFlashMovie("video1");
+    if (obj) {
+        data = obj.getProperty('__doc__' + name);
+        log(data)
+        var regexp = /(http|https|rtmp|rtmfp):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/g
+        var match = data.match(regexp);
+        html = "";
+        for (var i in match) {
+            var inputName = 'text1', propName = 'src';
+            if (match[i].indexOf('.jpg') >= 0) {
+                inputName = 'poster';
+                propName = 'poster';
+            }
+            html += '<a href="#" onclick="javascript:document.getElementById(\'' + inputName + '\').value=\'' + match[i] + '\'; setString(\'' + propName + '\', \'' + inputName + '\');">' + match[i] + '</a><br/>';
+        }
+        document.getElementById('urls').innerHTML = html;
+    }
+}
+
+</script>
+
+<div style="left: 10px; top: 50px; position: absolute">
+  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video1" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="allowScriptAccess" value="always" />
+			<embed src="VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video1" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				allowScriptAccess="sameDomain"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+	</object>
+</div>
+
+<div style="left: 350px; top: 50px; width: 320px; position: absolute">
+    <b>Properties</b></br>
+    
+    <form autocomplete="off">
+    <table>
+        <tr>
+            <td align="right"><a href="javascript:help('src')">src</a>:</td>
+            <td>
+                <input id="text1" type="text" style="float: right; width: 250px" 
+                    onkeypress="if (isEnter(event)) return setString('src', 'text1')"/>
+            </td>
+        </tr><tr>
+            <td align="right"><a href="javascript:help('poster')">poster</a>:</td>
+            <td>
+                <input id="poster" type="text" style="float: right; width: 250px" 
+                    onkeypress="if (isEnter(event)) return setString('poster', 'poster')"/>
+            </td>
+        </tr><tr>
+            <td colspan="2">
+                <input id="preload" type="checkbox"
+                    onclick="setBool('preload', 'preload')"/>
+                <a href="javascript:help('preload')">preload</a>,
+                
+                <input id="autoplay" type="checkbox"
+                    onclick="setBool('autoplay', 'autoplay')"/>
+                <a href="javascript:help('autoplay')">autoplay</a>, 
+                
+                <input id="loop" type="checkbox"
+                    onclick="setBool('loop', 'loop')"/>
+                <a href="javascript:help('loop')">loop</a>,
+            
+                <input id="controls" type="checkbox"
+                    onclick="setBool('controls', 'controls')"/>
+                <a href="javascript:help('controls')">controls</a>
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+
+<div id="urls" style="left: 350px; top: 150px; width: 320px; position: absolute">
+</div>
+
+<div style="left: 680px; top: 50px; width: 320px; position: absolute">
+    <b>More Properties</b></br>
+    
+    <form autocomplete="off">
+        <a href="javascript:help('url')">url</a>:
+        <input id="url" type="text" style="width: 120px" readonly/>
+            
+        <a href="javascript:help('play')">play</a>: 
+        <input id="play" type="text" style="width: 40px" readonly/>
+            
+        <a href="javascript:help('publish')">publish</a>:
+        <input id="publish" type="text" style="width: 40px" readonly/>
+        
+        <br/>
+        
+        <input id="record" type="checkbox"
+            onclick="setBool('record', 'record')"/>
+        <a href="javascript:help('record')">record</a>,
+                
+        <input id="live" type="checkbox"
+            onclick="setBool('live', 'live')"/>
+        <a href="javascript:help('live')">live</a>, 
+                
+        <input id="playing" type="checkbox"
+            onclick="setBool('playing', 'playing')"/>
+        <a href="javascript:help('playing')">playing</a>,
+            
+        <input id="recording" type="checkbox"
+            onclick="setBool('recording', 'recording')"/>
+        <a href="javascript:help('recording')">recording</a>
+            
+        <br/><br/>
+        
+        <table style="width: 300px;">
+            <tr>
+                <td>
+                    <b>Audio:</b>
+                    <input id="microphone" type="checkbox"
+                        onclick="setBool('microphone', 'microphone')"/>
+                    <a href="javascript:help('microphone')">microphone</a>
+                </td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('codec')">codec</a>:
+                    <input id="codec" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setString('codec', 'codec')"/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('rate')">rate</a>:
+                    <input id="rate" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('rate', 'rate')"/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('encodeQuality')">encodeQuality</a>:
+                    <input id="encodeQuality" type="text" style="width: 40px"  
+                        onkeypress="if (isEnter(event)) return setNumber('encodeQuality', 'encodeQuality')"/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('framesPerPacket')">framesPerPacket</a>:
+                    <input id="framesPerPacket" type="text" style="width: 40px"  
+                        onkeypress="if (isEnter(event)) return setNumber('framesPerPacket', 'framesPerPacket')"/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('gain')">gain</a>:
+                    <input id="gain" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('gain', 'gain')"/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('level')">level</a>:
+                    <input id="level" type="text" style="width: 40px" readonly/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <input id="echoSuppression" type="checkbox"
+                        onclick="setBool('echoSuppression', 'echoSuppression')"/>
+                    <a href="javascript:help('echoSuppression')">echoSuppression</a>:
+                </td>
+                <td align="right">
+                    <a href="javascript:help('silenceLevel')">silenceLevel</a>:
+                    <input id="silenceLevel" type="text" style="width: 40px"
+                        onkeypress="if (isEnter(event)) return setNumber('silenceLevel', 'silenceLevel')"/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <input id="sound" type="checkbox"
+                        onclick="setBool('sound', 'sound')"/>
+                    <a href="javascript:help('sound')">sound</a>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('volume')">volume</a>
+                    <input id="volume" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('volume', 'volume')"/>
+                </td>
+            </tr>
+        </table>
+        
+        <table style="width: 300px;">
+            <tr>
+                <td>
+                    <b>Video:</b>
+                    <input id="camera" type="checkbox"
+                        onclick="setBool('camera', 'camera')"/>
+                    <a href="javascript:help('camera')">camera</a>
+                </td>
+                <td align="right">
+                    <input id="cameraLoopback" type="checkbox"
+                        onclick="setBool('cameraLoopback', 'cameraLoopback')"/>
+                    <a href="javascript:help('cameraLoopback')">cameraLoopback</a>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('cameraWidth')">cameraWidth</a>:
+                    <input id="cameraWidth" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('cameraWidth', 'cameraWidth')"/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('cameraHeight')">cameraHeight</a>:
+                    <input id="cameraHeight" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('cameraHeight', 'cameraHeight')"/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('cameraFPS')">cameraFPS</a>:
+                    <input id="cameraFPS" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('cameraFPS', 'cameraFPS')"/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('keyFrameInterval')">keyFrameInterval</a>:
+                    <input id="keyFrameInterval" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('keyFrameInterval', 'keyFrameInterval')"/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('cameraQuality')">cameraQuality</a>:
+                    <input id="cameraQuality" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('cameraQuality', 'cameraQuality')"/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('cameraBandwidth')">cameraBandwidth</a>:
+                    <input id="cameraBandwidth" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('cameraBandwidth', 'cameraBandwidth')"/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('videoWidth')">videoWidth</a>:
+                    <input id="videoWidth" type="text" style="width: 40px" readonly/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('videoHeight')">videoHeight</a>:
+                    <input id="videoHeight" type="text" style="width: 40px" readonly/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('currentFPS')">currentFPS</a>:
+                    <input id="currentFPS" type="text" style="width: 40px" readonly/> 
+                </td>
+				<td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <input id="display" type="checkbox"
+						onclick="setBool('display', 'display')"/>
+                    <a href="javascript:help('display')">display</a>
+                </td>
+                <td align="right">
+                    <input id="smoothing" type="checkbox"
+                        onclick="setBool('smoothing', 'smoothing')"/>
+                    <a href="javascript:help('smoothing')">smoothing</a>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <input id="enableFullscreen" type="checkbox"
+                        onclick="setBool('enableFullscreen', 'enableFullscreen')"/>
+                    <a href="javascript:help('enableFullscreen')">enableFullscreen</a>
+                </td>
+                <td align="right">
+                    <input id="fullscreen" type="checkbox" disabled/>
+                    <a href="javascript:help('fullscreen')">fullscreen</a>
+                </td>
+            </tr>
+        </table>
+        
+        <table style="width: 300px;">
+            <tr>
+                <td>
+                    <b>General:</b>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('group')">group</a>:
+                    <input id="group" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setString('group', 'group')"/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('currentTime')">currentTime</a>:
+                    <input id="currentTime" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('currentTime', 'currentTime')"/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('duration')">duration</a>:
+                    <input id="duration" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('duration', 'duration')"/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('bytesLoaded')">bytesLoaded</a>:
+                    <input id="bytesLoaded" type="text" style="width: 40px" readonly/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('bytesTotal')">bytesTotal</a>:
+                    <input id="bytesTotal" type="text" style="width: 40px" readonly/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('quality')">quality</a>:
+                    <input id="quality" type="text" style="width: 40px" readonly/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('bandwidth')">bandwidth</a>:
+                    <input id="bandwidth" type="text" style="width: 40px" readonly/>
+                </td>
+            </tr>
+        </table>
+        
+        <table style="width: 300px;">
+            <tr>
+                <td>
+                    <b><a href="javascript:help('call')">Call method</a>:</b>
+                </td>
+                <td align="right">
+			        <input id="bidirection" type="checkbox"
+			            onclick="setBool('bidirection', 'bidirection')"/>
+			        <a href="javascript:help('bidirection')">bidirection</a>
+                </td>
+            </tr>
+            <tr>
+                <td align="right" colspan="2">
+                    <input id="method" type="text" style="width: 240px" value='call("invite","sip:target@localhost")' 
+                        onkeypress="if (isEnter(event)) return callMethod('method')"/>
+                    <a href="javascript:callMethod('method')">call</a>
+                </td>
+            </tr>
+        </table>
+        
+    </form>
+</div>
+
+<div style="left: 10px; top: 300px; width: 650px; height: 300px; position: absolute;">
+    <form autocomplete="off">
+        <textarea id="log" style="height: 100%" cols="80" readonly></textarea>
+    </form>
+</div>
+
+<div style="position: absolute; top: 600px;">
+    &copy; 2010-2011, <a href="http://kundansingh.com">Kundan Singh</a>. 
+    All Rights Reserved.
+</div>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <title>Flash-VideoIO | Flash-based audio and video communication</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+        <!--[if lt IE 7]>
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+
+<style type="text/css">
+pre { color: #606060; font-size: small; line-height: 1; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+ol { line-height: 1; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+p { text-align: justify; }
+</style>
+
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+
+
+  </head>
+  <body class="sidebar-right">
+
+<!-- Layout -->
+  <div id="header-region" class="clear-block"></div>
+
+    <div id="wrapper">
+
+    <div id="container" class="clear-block">
+
+      <div id="header">
+        <div id="logo-floater">
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        </div>
+
+                                                    
+      </div> <!-- /header -->
+
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+
+<div class="breadcrumb"><a href="/">Home</a> › <a href="index.html">Flash-VideoIO Tutorial</a></div>
+
+<div id="node-1" class="node">
+
+
+  
+  <div class="content clear-block">
+
+<h2>How to work with media server?</h2>
+  
+<p>Real-time publish or play in VideoIO requires a media server. The VideoIO project is compatible with RTMP-based media server. VideoIO has been tested successfuly with Adobe's Flash Media Server (FMS) and <a href="http://code.google.com/p/rtmplite">Open Source Flash RTMP server in Python (rtmplite)</a>. Adobe's FMS comes in two flavors, but for real-time interactive communication, you need to use the more expensive <a href="http://www.adobe.com/products/flashmediainteractive/">Flash Media Interactive Server</a>. VideoIO should also work with other media servers such as <a href="http://osflash.org/red5">Open Source Red5</a> and commercial <a href="http://www.wowzamedia.com/">Wowza</a>. This article is not an endorsement of one media server product over another. However, we will use <tt>rtmplite</tt> for illustrating examples in this document.</p>
+
+<p>Typically, an RTMP-based media server allows publish and playback of media stream. A Flash application uses ActionScript <tt>NetConnection</tt> and <tt>NetStream</tt> objects to initiate an RTMP connection from Flash Player to the media server, and open publish or play media stream. The connection is made using an <tt>rtmp</tt> URL, e.g., "rtmp://server/myapp/some/path". The URL path, <tt>/myapp/some/path</tt>, identifies the scope, where the first item, <tt>/myapp</tt>, usually refers to an application, and subsequent ones, <tt>/some/path</tt>, refer to specific scope. Typically, all the clients connected to the same URL are within the same application scope, and can share the media streams. However, media streams within different scopes are independent of each other. Media servers allow programmable server side scripts to control the behavior of the connection and media stream, e.g., to authenticate the connection. In Adobe's FMS, you need to explicitly create a server-side application directory to enable a specific application, e.g., <tt>myapp</tt>, whereas <tt>rtmplite</tt> can dynamically create default application when new connections are received.</p>
+
+<p>The default application behavior is to allow live chat as well as recording, as directed by the clients. If two clients are connected to the same URL, and within the same application scope, and one client publishes as stream named "stream1" then other client can play that stream by name. Similarly, the first client can play another stream named "stream2" published by the second client. This enables two-party video call between the two clients via the media server. Similarly, a media stream can be recorded by a client by stream name, and later played by another client by that same stream name, to facilitate video messaging. The media server typically stores a recorded media stream in an FLV video file. You design your server architecture to serve the recorded media files via a web server to make the playback independent of the media server. This is typically useful for record-once and play-many type of video resources.</p>
+
+<div class="info">
+<b>What is rtmplite?</b> It is a Python implementation of the Flash RTMP server with minimal support needed for real-time streaming and recording. Three main advantages are (1) it is really light weight with only a few Python files and quick to get started, (2) it interoperates with SIP/RTP standards based VoIP, and allows you to quickly set up PC-to-phone call systems, (3) it is written in Python and hence portable across several systems including Windows, Mac OS X, Linux, without having to re-compile. The main disadvantage is that it does not support AMF3 and advanced features such as remote SharedObject. Please see <a href="http://code.google.com/p/rtmplite">http://code.google.com/p/rtmplite</a> for details.
+</div>
+
+<p>In this article, we will go over setting up <tt>rtmplite</tt> as your media server on your local host so that it can be easily tested with your VideoIO based application. Eventually, in your deployment of VideoIO application you can use other media servers and replace <tt>localhost</tt> in the URLs with the host name of your media server.</p>
+
+<p>First <a href="http://code.google.com/p/rtmplite">download</a> the latest version of the <tt>rtmplite</tt> software, and go over the instructions to install it on your local machine. At the time of writing this article, version 6.0 is the lastest, and depends Python 2.6. If you do not have Python 2.6 installed, you will need to install that first. After that running the <tt>rtmplite</tt> server is as simple as running the following commands:</p>
+<pre class="code">
+$ tar -zxvf <a href="http://code.google.com/p/rtmplite/downloads/list">rtmplite-6.0.tgz</a>
+$ cd rtmplite
+$ python rtmp
+</pre>
+<p>Alternatively, you can use <tt>-d</tt> command line option for the last command above, to enable debug trace on standard output.</p>
+
+<p>As mentioned before, by default <tt>rtmplite</tt> accepts connection to any application scope, and treats all applications as default which allows live chat, recording and playback. Suppose your local machine's IP address is 192.1.2.3, then connecting to "rtmp://192.1.2.3/myapp/some/path" from Flash Player will connect to the "myapp" application with scope "/some/path" on the server. If you record a media stream with name "stream1", the server will create the file "some/path/stream1.flv" in the current directory to store the recorded media stream. In our tutorial, we will run VideoIO application on the same machine as our <tt>rtmplite</tt> server hence will use the URL of the form "rtmp://localhost/myapp/some/path".</p>
+ 
+<p>This is all the information you need to get started with <tt>rtmplite</tt> as your media server to test against your VideoIO application. Interested readers should explore more on the <tt>rtmplite</tt> software such as its command line options, how to interconnect with SIP-based systems, and how to use the command line <tt>rtmpclient</tt> for testing.</p>
+
+</div>
+          </div>
+
+          <div id="footer">&copy; 2010-2011, Kundan Singh, All Rights Reserved.</div>
+          
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+              <div id="sidebar-right" class="sidebar">
+
+<div id="block-forum-0" class="clear-block block block-forum">
+
+  <h2>In This Project</h2>
+
+  <div class="content"><div class="item-list">
+<ul><li class="first"><a href="index.html">Project Home</a></li>
+</ul>
+<ol>
+<li class="last"><a href="1.html">Embedding</a></li>
+<li class="last"><a href="2.html">Live camera view</a></li>
+<li class="last"><a href="3.html">Media server</a></li>
+<li class="last"><a href="4.html">Record a message</a></li>
+<li class="last"><a href="5.html">Play video file</a></li>
+<li class="last"><a href="6.html">Two-party call</a></li>
+<li class="last"><a href="7.html">Video broadcast</a></li>
+<li class="last"><a href="8.html">Multi-party conference</a></li>
+<li class="last"><a href="9.html">P2P video call</a></li>
+<li class="last"><a href="10.html">VideoIO API</a></li>
+<li class="last"><a href="11.html">SIP/VoIP call</a></li>
+</ol></div></div>
+</div>
+
+<div id="block-forum-1" class="clear-block block block-forum">
+
+  <h2>References</h2>
+
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+</ul></div></div>
+</div>
+
+              </div>
+
+    </div> <!-- /container -->
+  </div>
+    </body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <title>Flash-VideoIO | Flash-based audio and video communication</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+        <!--[if lt IE 7]>
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+
+<style type="text/css">
+pre { color: #606060; font-size: small; line-height: 1; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+ol { line-height: 1; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+p { text-align: justify; }
+</style>
+
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+
+
+  </head>
+  <body class="sidebar-right">
+
+<!-- Layout -->
+  <div id="header-region" class="clear-block"></div>
+
+    <div id="wrapper">
+
+    <div id="container" class="clear-block">
+
+      <div id="header">
+        <div id="logo-floater">
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        </div>
+
+                                                    
+      </div> <!-- /header -->
+
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+
+<div class="breadcrumb"><a href="/">Home</a> › <a href="index.html">Flash-VideoIO Tutorial</a></div>
+
+<div id="node-1" class="node">
+
+
+  
+  <div class="content clear-block">
+
+<h2>How to record and play a video message?</h2>
+  
+<p>You can record a video message by capturing live camera view and microphone audio, and streaming it to a media server. Please see <a href="3.html">How to work with media server?</a> on details of installing and configuring a media server. For illustrations in this section we assume that you have a media server running locally on <tt>localhost</tt> and has an application called <tt>myapp</tt> which allows you to record a media stream. Thus, your media server application should be reachable at "rtmp://localhost/myapp". In real deployment you will use the real host name or IP address of your media server.</p>
+
+<p>A screen-shot of VideoIO with record and play modes, and control panel enabled is shown below. In record mode, the control panel has buttons attached to VideoIO properties and allows you to stop/start recording, enable/disable camera, enable/disable microphone, change microphone gain, view microphone level, and show recorded time in seconds. In play mode, the control panel has buttons attached to VideoIO properties an allows you to start/stop playback, enable/disable sound, change sound volume, and see the progress of play head in the progress bar.</p>
+
+<center><img src="screen-record.png"/><img src="screen-play.png"/></center>
+
+<br/><br/><h2>How to record a message?</h2>
+
+<p>The <tt>src</tt> property of the VideoIO application can be set to enable recording. For example, if you set the <tt>src</tt> property to "rtmp://localhost/myapp?publish=file1&record=true", it initiates a media connection to <tt>url</tt> rtmp://localhost/myapp, creates a media stream with name "file1" and then publishes the local camera and microphone data to the media stream with "record" parameter. This causes the media server to record the media stream in to a media resource identified by "file1". You can reset the <tt>src</tt> property to null or "" to stop recording.</p>
+
+<p>To statically start the message recording on load, use <tt>flashVars</tt> as shown below. Additionally, if you use the <tt>controls</tt> property, the video control panel can allow the user to enable or disable the camera, microphone, gain and recording.</p>
+
+<pre class="code">
+&lt;object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video1" width="320" height="240"&gt;
+    &lt;param name="movie" value="VideoIO.swf" /&gt;
+    &lt;param name="quality" value="high" /&gt;
+    &lt;param name="bgcolor" value="#000000" /&gt;
+    &lt;param name="allowFullScreen" value="true" /&gt;
+    &lt;param name="allowScriptAccess" value="" /&gt;
+    &lt;param name="flashVars" 
+    value="controls=true&amp;<b>url=rtmp://localhost/myapp&amp;publish=file1&amp;record=true</b>" /&gt;
+&lt;/object&gt;
+</pre>
+
+
+<p>Although it is possible to start and stop recording using individual properties such as <tt>url</tt>, <tt>record</tt> and <tt>publish</tt>, it is recommended to use the <tt>src</tt> property with <tt>record</tt> and <tt>publish</tt> as URL parameters. Additionally, you can start and stop publish using the <tt>recording</tt> property. If the video control panel is visible, then <tt>recording</tt> property is also attached to the record buttons record/stop states. Since recording a message automatically sets the <tt>live</tt> property, users will need to approve the device access. Please see <a href="2.html">How to show live camera view?</a> for details.</p>
+
+<p>To programmatically set the property, use JavaScript as shown below. The example shows a text input box which allows you to enter the <tt>src</tt> URL. When you click on the button to set, the value from the text box is assigned to the <tt>src</tt> property of VideoIO object named <tt>video1</tt> to begin recording. When you click on the button to reset, the <tt>src</tt> property is reset to null to stop recording. If you are running your media server on a different host, just update the URL before clicking on set.</p>
+
+<table><tr valign="top"><td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video1" width="320" height="240">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+</object>
+<script>
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+<center>
+<input id="src1" type="text" autocomplete="off" style="width:315px;"
+    value="rtmp://localhost/myapp?publish=file1&record=true"/><br/>
+<input id="set1" value="set" type="button" 
+    onclick="getFlashMovie('video1').setProperty('src', 
+        document.getElementById('src1').value)"/>
+<input id="reset1" value="reset" type="button" 
+    onclick="getFlashMovie('video1').setProperty('src', null)"/>
+</center>
+</td><td><pre>
+&lt;object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="<b>video1</b>" width="320" height="240"&gt;
+    &lt;param name="movie" value="VideoIO.swf" /&gt;
+    &lt;param name="quality" value="high" /&gt;
+    &lt;param name="bgcolor" value="#000000" /&gt;
+    &lt;param name="allowFullScreen" value="true" /&gt;
+    &lt;param name="allowScriptAccess" value="always" /&gt;
+&lt;/object&gt;
+&lt;script&gt;
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+&lt;/script&gt;
+&lt;input id="<b>src1</b>" type="text"
+    value="rtmp://localhost/myapp?publish=file1&record=true"/&gt;
+&lt;input value="set" type="button" 
+    onclick="getFlashMovie('<b>video1</b>').setProperty('<b>src</b>', 
+        document.getElementById('<b>src1</b>').value)"/&gt;
+&lt;input value="reset" type="button" 
+    onclick="getFlashMovie('<b>video1</b>').setProperty('<b>src</b>', null)"/&gt;
+</pre>
+</td></tr></table>
+
+<p>There several related properties that interact to do message recording. For example, <tt>publish</tt> controls the name of the published stream, which eventually becomes the name of the recorded video file at the server for existing media servers. However, <tt>record</tt> property actually enables recording at the server, and without it the server will treat the published media stream as just live stream to be re-distributed to other players who request for that stream name.</p>
+
+<p>The current implementation of VideoIO application does not support "append" mode, where an existing recorded resource can later be appended. Thus every time you set <tt>recording</tt> to true for a given <tt>publish</tt> stream name, the corresponding media resource file is created, ignoring any previous recording with the same <tt>publish</tt> stream name under that application scope. Depending on feedback and requirements from developers, we may add an "append" mode in future.</p>
+
+<p>Typically, the recorded resource should be available as both real-time stream to play as well as web downloadable video file, depending on your deployment architecture, so that the user can use either streaming play mode or web-downloaded play mode.</p>
+
+<h2>How to play a message?</h2>
+
+<p>The <tt>src</tt> property of the VideoIO application can be set to enable playback of an existing media resource from the server. For example, if you set the <tt>src</tt> property to "rtmp://localhost/myapp?play=file1", it initiates a media connection and plays the stream named "file1". You can reset the <tt>src</tt> property to null or "" to disconnect the play connection.</p>
+
+<p>Similar to the the record mode, the play mode VideoIO can be set statically using <tt>flashVars</tt> by settng the <tt>url</tt> and <tt>play</tt> properties. If you do not want to start playback immediately, you should set the <tt>autoplay</tt> property to false.</p>
+
+<p>Although it is possible to start and stop play mode using individual properties such as <tt>url</tt> and <tt>play</tt>, it is recommended to use the <tt>src</tt> property with <tt>play</tt> as URL parameter. Additionally, you can start and pause play mode using the <tt>playing</tt> property. If the video control panel is visible, then <tt>playing</tt> property is also attached to the play/pause button's state.</p>
+
+<p>To programmatically set the property, use JavaScript as shown below. The example is similar to previous one where you can set the <tt>src</tt> property of the VideoIO object. The object name is different, <tt>video2</tt> to avoid conflict with the previous example. Assuming that you recorded a message with <tt>publish=file1</tt> in the previous example, you can now play it with <tt>play=file1</tt> in this example, using the same base URL of the <tt>src</tt>. Additionally, it has enabled the <tt>controls</tt> property to display the video control panel when you mouse over the application.</p>
+
+<table><tr valign="top"><td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video2" width="320" height="240">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+    <param name="flashVars" value="controls=true" />
+</object>
+<center>
+<input id="src2" type="text" autocomplete="off" style="width:315px;"
+    value="rtmp://localhost/myapp?play=file1"/><br/>
+<input value="set" type="button" 
+    onclick="getFlashMovie('video2').setProperty('src', 
+        document.getElementById('src2').value)"/>
+<input value="reset" type="button" 
+    onclick="getFlashMovie('video2').setProperty('src', null)"/>
+</center>
+</td><td><pre>
+&lt;object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="<b>video2</b>" width="320" height="240"&gt;
+    &lt;param name="movie" value="VideoIO.swf" /&gt;
+    &lt;param name="quality" value="high" /&gt;
+    &lt;param name="bgcolor" value="#000000" /&gt;
+    &lt;param name="allowFullScreen" value="true" /&gt;
+    &lt;param name="allowScriptAccess" value="always" /&gt;
+    &lt;param name="flashVars" value="<b>controls=true</b>" /&gt;
+&lt;/object&gt;
+&lt;script&gt;
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+&lt;/script&gt;
+&lt;input id="<b>src2</b>" type="text"
+    value="rtmp://localhost/myapp?play=file1"/&gt;
+&lt;input value="set" type="button" 
+    onclick="getFlashMovie('<b>video2</b>').setProperty('<b>src</b>', 
+        document.getElementById('<b>src2</b>').value)"/&gt;
+&lt;input value="reset" type="button" 
+    onclick="getFlashMovie('<b>video2</b>').setProperty('<b>src</b>', null)"/&gt;
+</pre>
+</td></tr></table>
+
+<p>This type of message playback with <tt>rtmp</tt> URL and <tt>play</tt> stream name is called <em>streaming</em> play mode. On the other hand, playback with <tt>http</tt> or <tt>https</tt> URL is called <em>web downloaded</em> play mode. The difference is that in streaming play mode the media is retrieved in real-time from the media server over RTMP, whereas in web downloaded play mode the media file is retrieved from the web server over HTTP. The web downloaded play mode wastes bandwidth if the user decides to stop the playback after seeing initial few seconds of a long message, whereas the streaming play mode stops the streaming when the user pauses the stream. We will talk about web download play mode in the next tutorial.</p>
+
+<h2>Summary</h2>
+
+<p>In summary, you can use the <tt>src</tt> property with URL parameter containing <tt>publish</tt> and <tt>record</tt> for message recording, or <tt>play</tt> for message playback. The <tt>recording</tt> and <tt>playing</tt> properties control the current state of recording or play mode.</p>
+
+<p>This tutorial is just the begining of how to record and play a message using VideoIO. There are several other properties that affect behavior of recording, e.g., you can control the camera quality, video dimension, frames-per-second and bandwidth, the microphone gain level. Additionally, you can build other advanced user interface controls in JavaScript similar to how VideoIO's control panel shows in Flash.</p>
+
+<p>The video displayed in publish and play modes are different. The publish mode displays the live camera view. In VideoIO the live camera view is always flipped horizontally to appear as if you are looking in a mirror, whereas the actual media stream sent to the server for recording or re-distribution appears as if the camera is looking at you. We feel that this gives the most natural behavior for live video chat or message recording.</p>
+
+</div>
+          </div>
+
+          <div id="footer">&copy; 2010-2011, Kundan Singh, All Rights Reserved.</div>
+          
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+              <div id="sidebar-right" class="sidebar">
+
+<div id="block-forum-0" class="clear-block block block-forum">
+
+  <h2>In This Project</h2>
+
+  <div class="content"><div class="item-list">
+<ul><li class="first"><a href="index.html">Project Home</a></li>
+</ul>
+<ol>
+<li class="last"><a href="1.html">Embedding</a></li>
+<li class="last"><a href="2.html">Live camera view</a></li>
+<li class="last"><a href="3.html">Media server</a></li>
+<li class="last"><a href="4.html">Record a message</a></li>
+<li class="last"><a href="5.html">Play video file</a></li>
+<li class="last"><a href="6.html">Two-party call</a></li>
+<li class="last"><a href="7.html">Video broadcast</a></li>
+<li class="last"><a href="8.html">Multi-party conference</a></li>
+<li class="last"><a href="9.html">P2P video call</a></li>
+<li class="last"><a href="10.html">VideoIO API</a></li>
+<li class="last"><a href="11.html">SIP/VoIP call</a></li>
+</ol></div></div>
+</div>
+
+<div id="block-forum-1" class="clear-block block block-forum">
+
+  <h2>References</h2>
+
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+</ul></div></div>
+</div>
+
+              </div>
+
+    </div> <!-- /container -->
+  </div>
+    </body>
+</html>

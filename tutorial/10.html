@@ -1,0 +1,454 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <title>Flash-VideoIO | Flash-based audio and video communication</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+        <!--[if lt IE 7]>
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+
+<style type="text/css">
+pre { color: #606060; font-size: small; line-height: 1; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+ol { line-height: 1; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+tr.d0 td { background-color: #f0f0f0; color: black; vertical-align: top; }
+tr.d1 td { background-color: #ffffff; color: black; vertical-align: top;}
+p { text-align: justify; }
+</style>
+
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+
+
+  </head>
+  <body class="sidebar-right">
+
+<!-- Layout -->
+  <div id="header-region" class="clear-block"></div>
+
+    <div id="wrapper">
+
+    <div id="container" class="clear-block">
+
+      <div id="header">
+        <div id="logo-floater">
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        </div>
+
+                                                    
+      </div> <!-- /header -->
+
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+
+<div class="breadcrumb"><a href="/">Home</a> › <a href="index.html">Flash-VideoIO Tutorial</a></div>
+
+<div id="node-1" class="node">
+
+
+  
+  <div class="content clear-block">
+
+<h2>How to use the VideoIO API?</h2>
+
+<p>The VideoIO application defines several properties, some of which are read-write to control the behavior, and others are read-only to indicate the status. When you embed VideoIO in your web page, you can statically set the values of the read-write properties using <tt>flashVars</tt>. You can also use JavaScript to set the values of these properties. Please see <a href="1.html">How to embed VideoIO in your web page?</a> for details on these techniques. This section gives a complete reference on the VideoIO API.</p>
+
+<center><a href="test.html">Go to the demonstration and testing of VideoIO API</a></center>
+
+<p>The above link takes you to a demonstration and testing page of VideoIO. It embeds the VideoIO application, and displays all the properties using HTML controls. You can click on the property name to see more information about that property. For read-write properties, you can edit the value in place and see the behavior of the VideoIO application. For example, typing a value in the edit box and pressing "enter" causes the value to be assigned to that string or number property. Selecting or unselecting a checkbox causes the value to be assigned to that boolean property. The text area shows any useful trace information. Finally, you can right-click and view source code to understand how JavaScript is used to interact with the VideoIO application.</p>
+
+<h2>Properties</h2>
+
+<table>
+<tr class="d0">
+<td>Name</td><td>Type/default&nbsp;&nbsp;</td><td>Description</td>
+</tr>
+
+<tr class="d1">
+<td>src</td><td>string</td><td>
+Represents the source URL of the VideoIO component, and controls the publish or playback mode. Allowed URL schemes are <tt>rtmp</tt>, <tt>rtmfp</tt>, <tt>http</tt> and <tt>https</tt>. The publish mode is allowed only with <tt>rtmp</tt> and <tt>rtmfp</tt> URLs. With <tt>rtmp</tt> and <tt>rtmfp</tt> URLs, additional URL parameter such as <tt>publish=stream1</tt> or <tt>play=stream2</tt> is used to specify the publish or play mode for the given stream name. Additionally, a <tt>record=true</tt> URL parameter causes the published stream to be recorded at the server as well. Thus, changing the <tt>src</tt> property can affect several other properties such as <tt>url</tt>, <tt>play</tt>, <tt>publish</tt>, <tt>live</tt>, and <tt>record</tt>. Setting <tt>src</tt> to null or "" stops any active publish or play mode. <b>When setting via <tt>flashVars</tt>, do not set <tt>src</tt> property directly, but instead set <tt>url</tt>, <tt>play</tt>, <tt>publish</tt> and <tt>record</tt> explicitly.</b>
+</td></tr>
+
+<tr class="d0">
+<td>poster</td><td>string</td><td>
+Represents the initial image to display before video is started to publish or play. This should be an <tt>http</tt> or <tt>https</tt> URL to a valid image resource. Setting <tt>poster</tt> to null or "" removes any initial image display.
+</td></tr>
+
+<tr class="d1">
+<td>preload</td><td>boolean,<br/>default false</td><td>
+Controls whether the video should be pre-loaded before it is played. This is useful only for play mode with <tt>http</tt> or <tt>https</tt> URL, where the video resource is pre-loaded hence can be played without interruption.
+</td></tr>
+
+<tr class="d0">
+<td>autoplay</td><td>boolean,<br/>default true</td><td>
+Controls whether the video should be played automatically when the <tt>src</tt> property is assigned and video is loaded, or should it wait for explicit play command using the <tt>playing</tt> property. This is useful only for play mode.
+</td></tr>
+
+<tr class="d1">
+<td>loop</td><td>boolean,<br/>default false</td><td>
+Controls whether the video should loop (rewind) to begining when it reaches the end, and start playing again. This is useful only for play mode, but not for live stream because live stream does not have an end time.
+</td></tr>
+
+<tr class="d0">
+<td>controls</td><td>boolean,<br/>default false</td><td>
+Controls whether the video control panel should be displayed or not. The VideoIO application displays a video control panel at the bottom of the user interface view. The control panel automatically hides if there is no mouse activity for some time, and the mouse is not over the control panel. If the mouse is rolled over the control panel, the control panel remains visible. Later, if the user moves the mouse anywhere on the video view, the control panel re-appears if it was hidden before. By default, a visible control panel displays various control buttons based on the current state. For example, if the <tt>play</tt> property is set, then the play/pause, speaker and volume controls are displayed, whereas if the <tt>publish</tt> property is set, then the record/stop, camera, microphone and gain controls are displayed. The video control panel allows the end user to control the behavior of the VideoIO application from within the Flash platform instead of having to build upon the JavaScript API. We recommend setting this to true for your application.
+</td></tr>
+
+<tr class="d1">
+<td>url</td><td>string</td><td>
+Represents the URL part of the <tt>src</tt> property. The url part excludes any parameters if the URL scheme is <tt>rtmp</tt> or <tt>rtmfp</tt> but includes those if the scheme is <tt>http</tt> or <tt>https</tt>. Although <tt>url</tt> is read-write, the application <b>should not</b> directly set this property using <tt>setProperty</tt>. Instead the application sets the <tt>src</tt> property, which implicitly sets the <tt>url</tt>. Setting the <tt>url</tt> property connects, disconnects or reconnects to the Flash media service in case of <tt>rtmp</tt> or <tt>rtmfp</tt> URLs, and starts load or unload of media resource in case of <tt>http</tt> or <tt>https</tt> URLs. <b>When setting via <tt>flashVars</tt> you must set <tt>url</tt> and <tt>publish</tt> or <tt>play</tt> instead of setting <tt>src</tt>.</b>
+</td></tr>
+
+<tr class="d0">
+<td>play</td><td>string</td><td>
+Represents the play stream name for streaming <tt>src</tt> value, such as <tt>rtmp</tt> or <tt>rtmfp</tt> URL. Although this is a read-write property the application should use the <tt>play</tt> parameter of the <tt>src</tt> property to set this. For example, if the <tt>src</tt> is set to "rtmp://server/path?play=live1" then the <tt>play</tt> property is automatically set to "live1". Setting this property also resets the <tt>publish</tt> and <tt>live</tt> properties and creates the media stream for the given <tt>play</tt> stream name. Resetting this property to null resets the <tt>playing</tt> property and stops the previous play stream if any.
+</td></tr>
+
+<tr class="d1">
+<td>publish</td><td>string</td><td>
+Represents the publish stream name for streaming <tt>src</tt> value, such as <tt>rtmp</tt> or <tt>rtmfp</tt> URL. Although this is a read-write property the application should use the <tt>publish</tt> parameter of the <tt>src</tt> property to set this. For example, if the <tt>src</tt> is set to "rtmp://server/path?publish=live1" then the <tt>publish</tt> property is automatically set to "live1". Setting this property also resets <tt>play</tt> and sets the <tt>live</tt> property, enables <tt>camera</tt> and <tt>microphone</tt> properties and creates the given publish stream name. Resetting this property to null resets the <tt>recording</tt>, <tt>live</tt>, <tt>camera</tt> and <tt>microphone</tt> properties and destroys the previous publish stream if any.
+</td></tr>
+
+<tr class="d0">
+<td>record</td><td>boolean,<br/>default false</td><td>
+Controls whether the publish stream is also recorded on the server, and is derived from the <tt>record</tt> parameter of the <tt>src</tt> property. For example if the <tt>src</tt> is set to "rtmp://server/path?publish=test1&record=true" then the <tt>record</tt> property is set to true. Changing this property in active publish mode changes the recording state at the server, and causes a re-publish of the media stream with new record value.
+</td></tr>
+
+<tr class="d1">
+<td>live</td><td>boolean,<br/>default false</td><td>
+Controls whether the current display mode is live camera view or not. This is implicitly set when <tt>publish</tt> property is set. This can also be set by the <tt>live</tt> parameter in the <tt>src</tt> property. For example, when the <tt>src</tt> property is set to "?live=true" then <tt>live</tt> property is set to true. This property controls the <tt>camera</tt> property, but not vice-versa. This property when set also attaches the camera to the local video display.
+</td></tr>
+
+<tr class="d0">
+<td>playing</td><td>boolean,<br/>default false</td><td>
+Represents the play or pause state of the stream. Setting this property to true causes the media to start playing. For streaming media, it also creates the media stream with the Flash media server. Resetting this property to false stops any active playback. This property is implicitly set when <tt>autoplay</tt> is set and the <tt>src</tt> property is set to indicate a play mode using the <tt>play</tt> parameter. This property is also attached to the state of play/pause button in the control panel if visible.
+</td></tr>
+
+<tr class="d1">
+<td>recording</td><td>boolean,<br/>default false</td><td>
+Represents the publish or stop state of the stream. This is useful only for a publish stream of <tt>rtmp</tt> or <tt>rtmfp</tt> URL in <tt>src</tt>. Changing this property creates or destroys the media stream with the Flash media server. This property is implicitly set when <tt>src</tt> points to a publish stream, e.g., "rtmp://server/path?publish=live1, and the stream is created. This property is also attached to the state of the record/stop button in the control panel if visible.
+</td></tr>
+
+<tr class="d0">
+<td>microphone</td><td>boolean,<br/>default false</td><td>
+Represents whether the microphone is on and capturing audio or not. This is implicitly set when <tt>publish</tt> property is set. This can be explicitly set to control the microphone on/off. This property is also attached to the microphone on/off icon on the control panel if visible.
+</td></tr>
+
+<tr class="d1">
+<td>codec</td><td>string,<br/>default "Speex"</td><td>
+Represents the microphone codec to use, and is "Speex" or "NellyMoser", as supported by Flash Player plugin. Setting the property also affects currenly publishing audio stream.
+</td></tr>
+
+<tr class="d0">
+<td>rate</td><td>number,<br/>default 16</td><td>
+Represents the microphone sampling rate to use, and is 8 or 16. This is useful only when <tt>codec</tt> is "Speex". It represents the sampling rate of the audio codec in kHz. It is not recommended to change this value unless you really need to use a different sampling rate, e.g., for interoperating with telephony network you may need 8 kHz sampling.
+</td></tr>
+
+<tr class="d1">
+<td>encodeQuality</td><td>number,<br/>default 6</td><td>
+Represents the microphone encode quality, and is a number between 0 and 10, with 10 indicating highest quality. This is useful only when <tt>codec</tt> is "Speex" and controls the bandwidth of the captured audio stream.
+</td></tr>
+
+<tr class="d0">
+<td>framesPerPacket</td><td>number,<br/>default 1</td><td>
+Represents the microphone frames per packet, and is typically a small number like 1 or 2. It is not recommended to change this value. Some versions of Flash Player are known to work well when <tt>framesPerPacket</tt> is 1 if the <tt>codec</tt> is "Speex".
+</td></tr>
+
+<tr class="d1">
+<td>gain</td><td>number,<br/>default 0.5</td><td>
+Represents the microphone gain, and is between 0 and 1, with 1 indicating maximum gain and 0 indicating mute. Since current version of Flash Player plugin does not have good acoustic echo cancellation, setting the gain to higher values causes lot of echo disturbance when used in multimedia call with speaker phone. This property is also attached to the microphone gain slider on the control panel if visible.
+</td></tr>
+
+<tr class="d0">
+<td>level</td><td>number,<br/>default 0,<br/>read-only</td><td>
+Indicates the microphone activity level, and is between 0 and 1. It is valid only when <tt>microphone</tt> is true and you are actively publishing a media stream indicating that the microphone is actively capturing the audio. This property is also attached to the microphone activity level on the control panel if visible.
+</td></tr>
+
+<tr class="d1">
+<td>echoSuppression</td><td>boolean,<br/>default true</td><td>
+Controls whether to enable or disable echo suppression on the underlying microphone object.
+</td></tr>
+
+<tr class="d0">
+<td>sileneceLevel</td><td>number,<br/>default 0</td><td>
+Represents the microphone silenece level for silence suppression, and is between 0 and 100, 0 indicating no silence suppression and 100 indicating suppress all audio. Recommended value is 2.
+</td></tr>
+
+<tr class="d1">
+<td>sound</td><td>boolean,<br/>default true</td><td>
+Controls whether the play sound is on or off. You can implement speaker mute mode by setting <tt>sound</tt> to false. This property is also attached to the speaker on/off icon on the control panel if visible. This controls the global sound volume of the application.
+</td></tr>
+
+<tr class="d0">
+<td>volume</td><td>number,<br/>default 0.5</td><td>
+Represents the play sound volume between 0 and 1, with 1 indicating full volume. This property is also attached to the speaker volume slider on the control panel if visible. This controls the global sound volume of the application.
+</td></tr>
+
+<tr class="d1">
+<td>camera</td><td>boolean,<br/>default false</td><td>
+Represents whether the camera is on and capturing video or not. This is implicitly set when <tt>live</tt> or <tt>publish</tt> property is set. This can be explicitly set to control the camera on/off. This property is also attached to the camera on/off icon on the control panel if visible. On Mac OS, when set, it tries to use the "USB Video Class Video" camera, whereas on other platforms it tries to use the default camera.
+</td></tr>
+
+<tr class="d0">
+<td>cameraLoopback</td><td>boolean,<br/>default false</td><td>
+Controls whether a local view of what the camera is capturing is compressed and decompressed (true), as it would be for live transmission, or whether the local view is uncompressed (false). Enabling this property is useful to show the compressed video quality in local view, which otherwise shows only uncompressed video. Note that the local preview video is scaled to fit to the dimensions of VideoIO object.
+ </td></tr>
+
+<tr class="d1">
+<td>cameraWidth</td><td>number,<br/>default 320</td><td>
+Represents the camera capture width in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording. The aspect ratio is always 4:3, hence setting the <tt>cameraWidth</tt> also sets the <tt>cameraHeight</tt> accordingly. Note that the local preview video is scaled to fit to the dimensions of VideoIO object.
+</td></tr>
+
+<tr class="d0">
+<td>cameraHeight</td><td>number,<br/>default 240</td><td>
+Represents the camera capture height in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording.The aspect ratio is always 4:3, hence setting the <tt>cameraHeight</tt> also sets the <tt>cameraWidth</tt> accordingly.
+</td></tr>
+
+<tr class="d1">
+<td>cameraFPS</td><td>number,<br/>default 12</td><td>
+Controls the desired frames per second for the camera. Higher value gives better quality picture but consume higher bandwidth. The application may want to increase the frames per second for higher quality recording. Note however that this is just the desired value, and the actual value may be less than this based on other constraints such as maximum bandwidth available. Use <tt>currentFPS</tt> to know the actual frames per second.
+</td></tr>
+
+<tr class="d0">
+<td>keyFrameInterval</td><td>number,<br/>default 15</td><td>
+Controls the desired key frame interval of the camera. The key or intra frame captures full image data instead of difference from previous or next frame. Key frames are useful to refresh the video when seeking or when there are packet loss on unreliable channel. Since Flash media streams run over reliable TCP transport, packet loss is not an issue unless gatewaying with some other system. A <tt>keyFrameInterval</tt> of 15 means that every 15th frame is a key frame. Allowed values are 1 to 28. We recommend not to change this value.
+</td></tr>
+
+<tr class="d1">
+<td>cameraQuality</td><td>number,<br/>default 0</td><td>
+Controls the desired frame quality of the camera and is between 0 and 100. A value of 0 means the quality can vary as needed to avoid exceeding the available <tt>cameraBandwidth</tt>. A value of 1 means lowest quality with maximum compressions and 100 means highest quality without compression. For live video communication a value between 70-90 is ideal -- more than 90 consumes too much bandwidth, and less than 70 gives blocky picture quality. Ideally only one of <tt>cameraBandwidth</tt> or <tt>cameraQuality</tt>, but not both, should be set.
+</td></tr>
+
+<tr class="d0">
+<td>cameraBandwidth</td><td>number,<br/>default 0</td><td>
+Controls the maximum bandwidth in bytes per second of the camera. A value of 0 means the camera can use as much bandwidth as needed to maintain the desired <tt>cameraQuality</tt>. Ideally only one of <tt>cameraBandwidth</tt> or <tt>cameraQuality</tt>, but not both, should be set.
+</td></tr>
+
+<tr class="d1">
+<td>videoWidth</td><td>number,<br/>default NaN,<br/>read-only</td><td>
+Represents the width in pixels of the active video display, if any, or NaN if none. This is the original unscaled width. The actual video display is scaled to fit the dimensions of VideoIO object.
+</td></tr>
+
+<tr class="d0">
+<td>videoHeight</td><td>number,<br/>default NaN,<br/>read-only</td><td>
+Represents the height in pixels of the active video display, if any, or NaN if none. This is the original unscaled height. The actual video display is scaled to fit the dimensions of VideoIO object.
+</td></tr>
+
+<tr class="d1">
+<td>currentFPS</td><td>number,<br/>default NaN,<br/>read-only</td><td>
+Represents the current frames per second of video display in live streaming mode. If unavailable, this is NaN.
+</td></tr>
+
+<tr class="d0">
+<td>smoothing</td><td>boolean,<br/>default true</td><td>
+Controls whether smoothing is applied to any video display or not. Since video smoothing algorithm consumes CPU cycles, applications may want to reset this property to reduce CPU utilization during play. The video smoothing removes pixelation effect on video if the video is scaled, e.g., the VideoIO dimension is different than actual video's width and height.
+</td></tr>
+
+<tr class="d1">
+<td>fullscreen</td><td>boolean,<br/>default false,<br/>read-only</td><td>
+Represents the full screen mode of the application. Due to restriction in Flash Player, this property can only be set in response to a mouse click or button press within Flash application. Hence setting this property by an external application has no effect. This property is also attached to the fullscreen button state in the control panel if visible, and the clicking the button toggles full screen mode. To allow full screen mode, the embedding HTML page must supply the <tt>allowFullScreen</tt> parameter as true in the <tt>object</tt> tag.
+</td></tr>
+
+<tr class="d0">
+<td>currentTime</td><td>number,<br/>default NaN</td><td>
+Represents the current play head position, in seconds, since the video started to play or record. For playback of live stream, the playhead position may start from some initial positive value if the player joins the stream after some time. If the current time is not known, the value is NaN. This property is also attached to the numeric display (as formatted duration in hh:mm:ss) on the control panel if available. Additionally, if <tt>duration</tt> is available, the <tt>currentTime</tt> controls the play head bar position on the control panel. Setting this property causes seek on media stream, if possible.
+</td></tr>
+
+<tr class="d1">
+<td>duration</td><td>number,<br/>default NaN</td><td>
+Represents the total length of the media, in seconds. For live or recorded streams, this value is unavailable or NaN. For real-time playback of the stream or downloaded video file, this value may not be available, unless set by metadata or video resource has finished playback once. If this is not available on the media stream or resource, but the application knows the duration out of band, it can set the property. This property is also attached to the length of the play head bar on the control panel if available.
+</td></tr>
+
+<tr class="d0">
+<td>bytesLoaded</td><td>number,<br/>default NaN,<br/>read-only</td><td>
+Indicates the number of bytes of data that have been loaded so far in the system. If unavailable, this is NaN.
+</td></tr>
+
+<tr class="d1">
+<td>bytesTotal</td><td>number,<br/>default NaN,<br/>read-only</td><td>
+Indicates the total size of the media resource being loaded in the system for play. If unavailable, such as for live streams, this is NaN.
+</td></tr>
+
+<tr class="d0">
+<td>quality</td><td>number,<br/>default 0,<br/>read-only</td><td>
+Indicates the quality of the play stream as a number between 0 (very low) and 1 (very high). The quality is calculated based on some combination of other metrics such as live delay of the stream. This property is also attached to the quality bars displayed in the control panel if available. In media stream play mode the control panel displays 4 quality bars indicating quality values in the range of (0, 0.25], (0.25, 0.5], (0.5, 0.75], (0.75, 1.0]), respectively.
+</td></tr>
+
+<tr class="d1">
+<td>bandwidth</td><td>number,<br/>default 0,<br/>read-only</td><td>
+Indicates the media stream bandwidth in bytes per second for live play or publish mode. It includes only the audio and video bandwidth of the stream. This property gives the rough idea of the bandwidth utilization. If unavailable, this is NaN.
+</td></tr>
+
+<tr class="d0">
+<td>bidirection</td><td>boolean,<br/>default false</td><td>
+Controls whether to allow media streams in both directions at the same time. This is applicable when setting <tt>play</tt> and <tt>publish</tt> properties. If <tt>bidirection</tt> is false, then setting <tt>play</tt> resets <tt>publish</tt> and vice-versa.
+</td></tr>
+
+
+</table>
+
+
+<h2>Property access in JavaScript</h2>
+
+<p>The VideoIO embed defines several properties to control the behavior of the application or give indication of current status as described earlier. You can dynamically set or get these properties using JavaScript. First, you use <tt>getFlashMovie</tt> function to get the reference to your VideoIO <tt>object</tt>. Then you use <tt>getProperty</tt> and <tt>setProperty</tt> of the object, to get or set a property. Note that you need to delay the invocation of <tt>getFlashMovie</tt>, <tt>setProperty</tt> and <tt>getProperty</tt> until the Flash application is loaded to avoid any run-time exception. Calling these in response to user input works well in practice.</p>
+
+<p>The following example shows a check box, which when selected will set the <tt>controls</tt> property of the VideoIO object named <tt>video1</tt>. Usually you should set <tt>autocomplete</tt> to "off" to avoid auto-completing these input controls by the browser when you refresh your page.</p>
+
+<pre class="code">
+&lt;object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="<b>video1</b>" width="320" height="240"&gt;
+
+    &lt;param name="movie" value="VideoIO.swf" /&gt;
+    ...
+    &lt;param name="allowScriptAccess" value="always" /&gt;
+&lt;/object&gt;
+
+&lt;script&gt;
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+&lt;/script&gt;
+
+&lt;input id="<b>controls1</b>" type="checkbox" autocomplete="off"
+    onclick="getFlashMovie('<b>video1</b>').setProperty('<b>controls</b>',
+        document.getElementById('<b>controls1</b>').checked)"/&gt;
+</pre>
+
+<p>Following example shows an input text box which allows the user to enter a number, which gets get to the <tt>gain</tt> property of VideoIO object named <tt>video1</tt>.</p>
+
+<pre class="code">
+&lt;input id="<b>gain1</b>" type="text" style="width: 60px" 
+    onkeypress="if ((event.keyCode || event.which) == 13) {
+        value = parseFloat(document.getElementById('<b>gain1</b>').value);
+        getFlashMovie('<b>video1</b>').setProperty('<b>gain</b>', value);
+        return false;
+    }"/&gt;
+</pre>
+
+<p>The VideoIO application allows you to call any method on the back-end RTMP server using the Flash Player's connected NetConnection object. This is similar to setting/getting property as described before, except that you use <tt>callProperty</tt> method on the flash movie. The following example shows an input box which when entered invokes the "invite" method with the entered value as the first argument.</p>
+
+<pre class="code">
+&lt;input id="<b>dest</b>" type="text" style="width: 60px" 
+    onkeypress="if ((event.keyCode || event.which) == 13) {
+        value = document.getElementById('<b>dest</b>').value;
+        getFlashMovie('<b>video1</b>').callProperty('<b>call</b>', '<b>invite</b>', value);
+        return false;
+    }"/&gt;
+</pre>
+
+<p>Actually, <tt>callProperty</tt> is a generic method which allows you to call any public method on the underlying VideoIO object. The "call" method is a public method on VideoIO object which uses <tt>NetConnection</tt>'s <tt>call</tt> method to invoke a remote function on the server.</p>
+
+<h2>Creation and change events</h2>
+
+<p>The VideoIO application invokes three JavaScript functions on certain events. These JavaScript functions, if defined, must be present in the global scope of the embedding HTML page. The <tt>onCreationComplete</tt> is invoked when the VideoIO application is created. The <tt>event</tt> parameter supplied to this function has an <tt>objectID</tt> property which you can use to identify the VideoIO <tt>object</tt>. The <tt>onPropertyChange</tt> is invoked when some property of the VideoIO application changes. The <tt>event</tt> parameter supplied to this function has <tt>objectID</tt>, <tt>property</tt>, <tt>oldValue</tt> and <tt>newValue</tt> properties. The <tt>property</tt> value stores the name of the property, e.g., "gain", which changed. The <tt>oldValue</tt> and <tt>newValue</tt> store the old and new value of that property during this change. The <tt>onCallback</tt> is invoked when the server invokes a client method on the <tt>NetConnection</tt> object. This is the reserve of the server method call, and allows the server to invoke a method on the client if needed. You may choose to ignore this method and not do anything.</p>
+
+<p>Following example shows how you can get the initial value of <tt>controls</tt> and <tt>gain</tt> properties, and update the HTML input controls to indicate the initial values. It also shows how to update the input controls display everytime the property changes.</p>
+
+<pre class="code">
+&lt;script&gt;
+function onCreationComplete(event) {
+    var obj = getFlashMovie("video1");
+    document.getElementById("controls1").checked = obj.getProperty("controls");
+    document.getElementById("gain1").value = obj.getProperty("gain").toString();
+}
+function onPropertyChange(event) {
+    if (event.property == "controls") 
+        document.getElementById("controls1").checked = event.newValue;
+    else if (event.property == "gain")
+        document.getElementById("gain1").value = event.newValue.toString();
+}
+function onCallback(event) {
+    if (event.method == "invited")
+       alert("you are getting invited: " + event.args);
+}
+&lt;/script&gt;
+</pre>
+
+<h2>Documentation</h2>
+
+<p>For each property that is defined by VideoIO, it also defines a documentation text for that property which can help you know more about the property. For example, the <tt>__doc__gain</tt> property can be accessed to see the documentation on the <tt>gain</tt> property. Using the built-in API accessible documentation allows us to keep the documentation up-to-date with the actual implementation of various properties.</p>
+
+<p>Following example shows a link which when clicked will display the documentation text for the <tt>gain</tt> property.</p>
+
+<pre class="code">
+&lt;script&gt;
+function help(name) {
+    var obj = getFlashMovie("video1");
+    alert(obj.getProperty("__doc__" + name).replace('\n', '&lt;br/&gt;'));
+}
+&lt;/script&gt;
+
+&lt;a href="javascript:help('gain')"&gt;what is gain?&lt;/a&gt;
+</pre>
+
+
+<p>You see view the source of <a href="test.html">the demonstration and testing page of VideoIO API</a> to see these functions and many others in action.
+</p>
+
+</div>
+          </div>
+
+          <div id="footer">&copy; 2010-2011, Kundan Singh, All Rights Reserved.</div>
+          
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+              <div id="sidebar-right" class="sidebar">
+
+<div id="block-forum-0" class="clear-block block block-forum">
+
+  <h2>In This Project</h2>
+
+  <div class="content"><div class="item-list">
+<ul><li class="first"><a href="index.html">Project Home</a></li>
+</ul>
+<ol>
+<li class="last"><a href="1.html">Embedding</a></li>
+<li class="last"><a href="2.html">Live camera view</a></li>
+<li class="last"><a href="3.html">Media server</a></li>
+<li class="last"><a href="4.html">Record a message</a></li>
+<li class="last"><a href="5.html">Play video file</a></li>
+<li class="last"><a href="6.html">Two-party call</a></li>
+<li class="last"><a href="7.html">Video broadcast</a></li>
+<li class="last"><a href="8.html">Multi-party conference</a></li>
+<li class="last"><a href="9.html">P2P video call</a></li>
+<li class="last"><a href="10.html">VideoIO API</a></li>
+<li class="last"><a href="11.html">SIP/VoIP call</a></li>
+</ol></div></div>
+</div>
+
+<div id="block-forum-1" class="clear-block block block-forum">
+
+  <h2>References</h2>
+
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+</ul></div></div>
+</div>
+
+              </div>
+
+    </div> <!-- /container -->
+  </div>
+    </body>
+</html>

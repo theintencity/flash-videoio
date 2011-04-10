@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <title>Flash-VideoIO | Flash-based audio and video communication</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+        <!--[if lt IE 7]>
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+
+<style type="text/css">
+pre { color: #606060; font-size: small; line-height: 1; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+ol { line-height: 1; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+p { text-align: justify; }
+</style>
+
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+
+
+  </head>
+  <body class="sidebar-right">
+
+<!-- Layout -->
+  <div id="header-region" class="clear-block"></div>
+
+    <div id="wrapper">
+
+    <div id="container" class="clear-block">
+
+      <div id="header">
+        <div id="logo-floater">
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        </div>
+
+                                                    
+      </div> <!-- /header -->
+
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+
+<div class="breadcrumb"><a href="/">Home</a> › <a href="index.html">Flash-VideoIO Tutorial</a></div>
+
+<div id="node-1" class="node">
+
+
+  
+  <div class="content clear-block">
+
+<h2>How to embed VideoIO in your web page?</h2>
+  
+<p>VideoIO.swf is a Flash application that you can embed in your web page using standard <tt>&lt;object&gt;</tt> tag, which is supported by all popular web browsers including Internet Explorer and Firefox. At the minimum you just need to specify the type, data, id, width and height attributes, and movie parameter. The following example shows how to embed VideoIO with object identifier as <tt>video1</tt>. </p>
+
+<pre class="code">
+&lt;object type="application/x-shockwave-flash" data="<b>VideoIO.swf</b>" 
+    id="<b>video1</b>" width="320" height="240"&gt;
+    &lt;param name="movie" value="<b>VideoIO.swf</b>" /&gt;
+&lt;/object&gt;
+</pre>
+
+<p>It is recommended to specify the dimension of 320x240 for the VideoIO embed. I also assume that <tt>VideoIO.swf</tt> is available in the same path as the embedding HTML page. Otherwise, you can specify the full path of <tt>http://myprojectguide.org/flash-videoio/p/VideoIO.swf</tt> in the data attribute and movie parameter. The problem with embedding Flash application of another web site is that by default you cannot interact between JavaScript within your HTML page and my Flash application if they are loaded from different web sites.</p>
+
+<div class="info">
+<b>Information</b>: The minimum dimension for VideoIO application MUST be 215x138. This is because Flash Player requires the minimum dimension of the application as 215x138 to display the device access security panel to enable access to camera and microphone. For applications smaller than this dimension, the device access is always disabled.
+</div>
+
+<p>In practice, you would want to specify the quality, bgcolor, allowFullScreen, allowScriptAccess and flashVars parameters as well. The quality attribute causes the Flash Player to use the specified quality setting when playing the movie. The bgcolor parameter defines the background color which typically is set to black for video applications. The allowFullScreen enables the full screen mode for the video application. The allowScriptAccess defines how the Flash application will interact with any JavaScript -- which I use as "always". Alternatively, you can set it to "sameDomain" for better security. Finally, the flashVars parameter defines the additional parameters sent to the application. Such additional parameters are application dependent, and the VideoIO application defines several properties that can be set using the flashVars parameter. The following example shows how to enable these parameters -- high quality, black background, full screen mode, always allow script access and enable video control panel display.</p>
+
+<pre class="code">
+&lt;object type="application/x-shockwave-flash" data="<b>VideoIO.swf</b>"
+    id="video1" width="320" height="240"&gt;
+    &lt;param name="movie" value="VideoIO.swf" /&gt;
+    &lt;param name="quality" value="high" /&gt;
+    &lt;param name="bgcolor" value="<b>#000000</b>" /&gt;
+    &lt;param name="allowFullScreen" value="<b>true</b>" /&gt;
+    &lt;param name="allowScriptAccess" value="<b>always</b>" /&gt;
+    &lt;param name="flashVars" value="<b>controls=true</b>" /&gt;
+&lt;/object&gt;
+</pre>
+
+Although, the <tt>object</tt> tag is the standard way to embed, there are certain restrictions, e.g., if the Flash Player plugin is not installed, it will not load any embed application or prompt you for plugin installation. Traditionally, Flash applications have used a combination of JavaScript, <tt>object</tt> and <tt>embed</tt> tags to implement cross browser verification of correct version and application embed. If you are paranoid about cross browser compatibility or want to allow plugin installation prompt if the plugin is missing on user's computer, you can use the following example. 
+
+<pre class="code">
+&lt;<b>object</b> classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+    id="video1" width="320" height="240"
+    codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab"&gt;
+    &lt;param name="movie" value="VideoIO.swf" /&gt;
+    &lt;param name="quality" value="high" /&gt;
+    &lt;param name="bgcolor" value="#000000" /&gt;
+    &lt;param name="allowFullScreen" value="true" /&gt;
+    &lt;param name="allowScriptAccess" value="always" /&gt;
+    &lt;param name="flashVars" value="controls=true" /&gt;
+    &lt;<b>embed</b> src="VideoIO.swf" quality="high" bgcolor="#000000"
+        width="320" height="240" name="video1" align="middle"
+        play="true" loop="false" quality="high"
+        allowFullScreen="true"
+        allowScriptAccess="sameDomain"
+        flashVars="controls=true"
+        type="application/x-shockwave-flash"
+        pluginspage="http://www.adobe.com/go/getflashplayer"&gt;
+            Please install Flash Player version 10 or later!
+    &lt;/embed&gt;
+&lt;/object&gt;
+</pre>
+
+<p>You need to use both these tags. The Microsoft's web browser interprets the outer <tt>object</tt> tag whereas Mozilla compatible ones ignore it because of classid and codebase attributes. Instead, Mozilla browsers fallback to nested <tt>embed</tt> tag to load the Flash application. If the plugin is missing the nested text is displayed which prompts the user to install the Flash Player plugin. Alternatively, you can use the popular <a href="http://code.google.com/p/swfobject/">SWFobject.js</a> script to programmatically include the Flash application.</p>
+
+<p>The nested <tt>object</tt> and <tt>embed</tt> tag is needed to enable communication from your Flash application to JavaScript embedded on your HTML page using ExternalInterface. Please see <a href="10.html">How to use the VideoIO API?</a> for details on the <tt>onCreationComplete</tt> and <tt>onPropertyChange</tt> event handlers in JavaScript to capture the events of the VideoIO application. If you need to use these events in your JavaScript, you must use the nested tags or <tt>SWFobject.js</tt>, otherwise the ExternalInterface cannot correctly identify the Flash application's name, and hence VideoIO disables invoking JavaScript function.</p>
+
+<div class="info"><b>Information</b>: All our future examples use the standard <tt>object</tt> tag, unless we need event handlers in JavaScript. Feel free to replace it with the combination of <tt>object</tt>, <tt>embed</tt> and <tt>SWFobject.js</tt> in your web site as explained above based on your requirements. You will need to make sure that any change in the object parameter must also be reflected in the corresponding change in the embed attribute for cross browser compatibility.</div>
+
+<p>The VideoIO embed defines several properties to control the behavior of the application or give indication of current status. Please see <a href="#10">How to use the VideoIO API?</a> for details of these properties. You can set these properties statically using the <tt>flashVars</tt> parameter as mentioned before, or dynamically using JavaScript. The following example script allows you get a reference to the VideoIO object named <tt>video1</tt> embedded in your HTML page.</p>
+
+<pre class="code">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+obj = getFlashMovie("<b>video1</b>");
+</pre>
+
+<p>Once you have a reference to the VideoIO application, you can set its properties programmatically. The following example shows a check box, which when selected will set the <tt>controls</tt> property of the VideoIO object named <tt>video1</tt>. Setting the <tt>controls</tt> property results in display of video control panel. Note that you need to delay the invocation of <tt>getFlashMovie</tt> and <tt>setProperty</tt> until the Flash application is loaded to avoid any run-time exception. Calling these in response to user input works well in practice</p>
+
+<table><tr valign="top"><td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video1" width="320" height="240">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+</object>
+</td><td><pre>
+&lt;object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="<b>video1</b>" width="320" height="240"&gt;
+    &lt;param name="movie" value="VideoIO.swf" /&gt;
+    &lt;param name="quality" value="high" /&gt;
+    &lt;param name="bgcolor" value="#000000" /&gt;
+    &lt;param name="allowFullScreen" value="true" /&gt;
+    &lt;param name="allowScriptAccess" value="always" /&gt;
+&lt;/object&gt;
+
+&lt;script&gt;
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+&lt;/script&gt;
+
+&lt;input id="<b>controls1</b>" type="checkbox" autocomplete="off"
+    onclick="getFlashMovie('<b>video1</b>').setProperty('<b>controls</b>',
+        document.getElementById('<b>controls1</b>').checked)"/&gt;
+</pre>
+<input id="controls1" type="checkbox" autocomplete="off"
+    onclick="getFlashMovie('video1').setProperty('controls',
+        document.getElementById('controls1').checked)"/>
+select to enable control panel
+</td></tr></table>
+
+<p>The above running example, as well as several others later, allow you to quickly see the demonstration, as well as allows you to copy the right-side HTML code to include it in your web page. Once you are able to embed VideoIO in your web page, you should try testing compatibility across various web browsers. Subsequent examples assume that you have already learned how to embed VideoIO and have included the <tt>getFlashMovie</tt> function in your JavaScript.</p>
+
+</div>
+          </div>
+
+          <div id="footer">&copy; 2010-2011, Kundan Singh, All Rights Reserved.</div>
+          
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+              <div id="sidebar-right" class="sidebar">
+
+<div id="block-forum-0" class="clear-block block block-forum">
+
+  <h2>In This Project</h2>
+
+  <div class="content"><div class="item-list">
+<ul><li class="first"><a href="index.html">Project Home</a></li>
+</ul>
+<ol>
+<li class="last"><a href="1.html">Embedding</a></li>
+<li class="last"><a href="2.html">Live camera view</a></li>
+<li class="last"><a href="3.html">Media server</a></li>
+<li class="last"><a href="4.html">Record a message</a></li>
+<li class="last"><a href="5.html">Play video file</a></li>
+<li class="last"><a href="6.html">Two-party call</a></li>
+<li class="last"><a href="7.html">Video broadcast</a></li>
+<li class="last"><a href="8.html">Multi-party conference</a></li>
+<li class="last"><a href="9.html">P2P video call</a></li>
+<li class="last"><a href="10.html">VideoIO API</a></li>
+<li class="last"><a href="11.html">SIP/VoIP call</a></li>
+</ol></div></div>
+</div>
+
+<div id="block-forum-1" class="clear-block block block-forum">
+
+  <h2>References</h2>
+
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+</ul></div></div>
+</div>
+
+              </div>
+
+    </div> <!-- /container -->
+  </div>
+
+<!-- /layout -->
+
+<!--
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Video Component Demo</title>
+<style type="text/css">
+body, td { font-family: "Times New Roman"; font-size: small; }
+pre { color: #606060; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+</style>
+
+</head>
+
+<body>
+
+<table><tr><td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video1" width="320" height="240">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+    <param name="flashVars" value="controls=true" />
+</object>
+</td><td><pre>
+&lt;object type="application/x-shockwave-flash" data="<b>VideoIO.swf</b>"
+    id="<b>video1</b>" width="320" height="240"&gt;
+    &lt;param name="movie" value="<b>VideoIO.swf</b>" /&gt;
+    &lt;param name="bgcolor" value="#000000" /&gt;
+    &lt;param name="allowFullScreen" value="true" /&gt;
+    &lt;param name="allowScriptAccess" value="always" /&gt;
+        Please install Adobe Flash Player version 10 or later!
+&lt;/object&gt;
+</pre></td></tr></table>
+
+
+ 
+
+
+You can display live video feed from camera by setting the "live" to
+"true" in flashVars. Additionally you can set "controls" to true"
+to enable the video control panel.
+
+<table><tr><td>
+</td><td><pre>
+&lt;object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+    id="video1" width="320" height="240"
+    codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab"&gt;
+    &lt;param name="movie" value="VideoIO.swf" /&gt;
+    &lt;param name="quality" value="high" /&gt;
+    &lt;param name="bgcolor" value="#000000" /&gt;
+    &lt;param name="allowFullScreen" value="true" /&gt;
+    &lt;param name="allowScriptAccess" value="always" /&gt;
+    &lt;param name="flashVars" value="controls=true&amp;<b>live=true</b>" /&gt;
+    &lt;embed src="VideoIO.swf" quality="high" bgcolor="#000000"
+        width="320" height="240" name="video1" align="middle"
+        play="true" loop="false" quality="high"
+        allowFullScreen="true"
+        allowScriptAccess="sameDomain"
+        flashVars="controls=true&amp;<b>live=true</b>"
+        type="application/x-shockwave-flash"
+        pluginspage="http://www.adobe.com/go/getflashplayer"&gt;
+    &lt;/embed&gt;
+&lt;/object&gt;
+</pre></td></tr></table>
+
+<br/><hr/>
+&copy; 2010, <a href="http://kundansingh.com">Kundan Singh</a>. 
+All Rights Reserved. Visit <a href="http://code.google.com/p/flash-videoio">Flash-VideoIO project page</a>.
+
+</body>
+</html>
+
+-->
+
+    </body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <title>Flash-VideoIO | Flash-based audio and video communication</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+        <!--[if lt IE 7]>
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+
+<style type="text/css">
+pre { color: #606060; font-size: small; line-height: 1; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+ol { line-height: 1; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+p { text-align: justify; }
+</style>
+
+  </head>
+  <body class="sidebar-right">
+
+<!-- Layout -->
+  <div id="header-region" class="clear-block"></div>
+
+    <div id="wrapper">
+
+    <div id="container" class="clear-block">
+
+      <div id="header">
+        <div id="logo-floater">
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        </div>
+
+                                                    
+      </div> <!-- /header -->
+
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+
+<div class="breadcrumb"><a href="/">Home</a> › <a href="index.html">Flash-VideoIO Tutorial</a></div>
+
+<div id="node-1" class="node">
+
+
+  
+  <div class="content clear-block">
+
+<h2>How to embed VideoIO in your Flex/Flash application?</h2>
+  
+<p>You can embed VideoIO.swf as a child SWF using <tt>SWFLoader</tt> in your Flex application using Flex/Flash Builder or Flex SDK. This tutorial assumes that you are familar with Flex Builder integrated development environment (IDE) or know how to use the Flex SDK version 3 or later to build a Flex application. You can see the complete application source code example for <a href="flex-embed.mxml.txt">Flex Builder 3/SDK 3</a> or <a href="flex4-embed.mxml.txt">Flash Builder 4/SDK 4</a>. </p>
+
+<p>Starting with version 1.5 of VideoIO, it can detect whether it is being embedded as top-level application from HTML/Javascript or another top-level Flex application. When VideoIO is embedded from HTML/Javascript, it uses the ExternalInterface to communicate with the HTML/Javascript page. When VideoIO is embedded from another Flex/ActionScript application, it uses the regular ActionScript properties, methods and events to communicate with your top-level application.</p>
+
+<p>Whether you embed VideoIO in web page using HTML/JavaScript or within another Flash application using MXML/ActionScript, the VideoIO API is same, i.e., the properties, methods and events are similar. Please see <a href="1.html">How to embed VideoIO in your web page?</a> to know about default width and height, and controls properties. Please see <a href="10.html">How to use the VideoIO API?</a> to see a list of available properties, methods and events.</p>
+
+<p>First, you will need to use <tt>SWFLoader</tt> to load <tt>VideoIO.swf</tt> as shown below. It shows how to embed child SWF of VideoIO with id <tt>video1</tt> and dimension of 320x240. It invokes an ActionScript event handler method <tt>completeHandler</tt> when the application is initialized.</tt>
+
+<pre class="code">
+&lt;mx:SWFLoader id="<b>video1</b>" source="VideoIO.swf" width="320" height="240"
+       init="<b>completeHandler</b>(event)"/&gt;
+</pre>
+
+<p>The event handler needs to be defined in the <tt>Script</tt> part of your MXML application as follows. It creates a new <tt>SystemManager</tt> for the child application, and another event handler on the <tt>SystemManager</tt> to handle completion or update of the application. When the application is complete, the <tt>application</tt> property of the system manager is valid and refers to the child SWF's <tt>Application</tt> object.</p>
+<pre class="code">
+&lt;mx:Script&gt;
+  &lt;![CDATA[
+    import mx.events.DynamicEvent;
+    import mx.events.FlexEvent;
+    import mx.core.IUIComponent;
+    import mx.managers.SystemManager;
+
+    private var _systemManager1:SystemManager;
+    private var _innerApplication1:Object;
+
+    private function <b>completeHandler</b>(event:Event):void 
+    {
+      _systemManager1 = SystemManager(<b>video1</b>.content);
+      _systemManager1.addEventListener(FlexEvent.APPLICATION_COMPLETE, applicationCompleteHandler);
+      _systemManager1.addEventListener(FlexEvent.UPDATE_COMPLETE, applicationCompleteHandler);
+    }
+
+    private function applicationCompleteHandler(event:Event):void 
+    {
+      <b>_innerApplication1</b> = _systemManager.application;
+      // now _innerApplication1 represents the Application of VideoIO.swf
+    }
+  ]]&gt;
+&lt;/mx:Script&gt;
+</pre>
+
+<p>This <tt>application</tt> object has all the properties, methods and events that are available in the VideoIO API. Similar to the various callback methods in Javascript that receive events from VideoIO, you can define the event handlers in ActionScript to receive events as shown below. This must be done after the <tt>application</tt> is complete. As mentioned before, the names and arguments of these callbacks are similar to VideoIO's Javascript API.</p>
+
+<pre class="code">
+&lt;mx:Script&gt;
+  &lt;![CDATA[
+    ...
+    private function applicationCompleteHandler(event:Event):void 
+    {
+      <b>_innerApplication1</b> = _systemManager.application;
+      _innerApplication1.addEventListener("onPropertyChange", propertyChangeHandler);
+      _innerApplication1.addEventListener("onCreationComplete", creationCompleteHandler);
+      _innerApplication1.addEventListener("onCallback", callbackHandler);
+	  ...
+    }
+    private function propertyChangeHandler(event:DynamicEvent):void
+    {
+      // event has property, oldValue, newValue
+      trace("onPropertyChange: " + event.property + " " + event.oldValue + "=>" + event.newValue);
+    }
+    private function creationCompleteHandler(event:Event):void
+    {
+      // event has nothing
+      trace("onCreationComplete");
+    }
+    private function callbackHandler(event:DynamicEvent):void
+    {
+      // event has method, args
+      trace("onCallback: " + event.method + " " + event.args);
+    }
+    ...	
+  ]]&gt;
+&lt;/mx:Script&gt;
+</pre>
+
+<p>Similarly you can set the various properties of the VideoIO object using the <tt>setProperty</tt> method. This must be done after the application is complete. The following example shows how to set the <tt>controls</tt> and <tt>live</tt> properties to <tt>true</tt> to enable local camera view in your application.</p>
+<pre class="code">
+&lt;mx:Script&gt;
+  &lt;![CDATA[
+    ...
+    private function applicationCompleteHandler(event:Event):void 
+    {
+	  ...
+      _innerApplication1.setProperty("controls", true);
+      _innerApplication1.setProperty("live", true);
+    }
+    ...	
+  ]]&gt;
+&lt;/mx:Script&gt;
+</pre>
+
+<p>You can set the <tt>src</tt> and other properties to achieve various use cases such as video chat and message recording and playback as explained in other tutorial pages. Embedding VideoIO in your Flash Builder 4 or SDK 4 application is similar, except with some differences. For example, you will need to set the <tt>scaleContent</tt> and <tt>loadForCompatibility</tt> attributes of <tt>SWFLoader</tt>, and change the data type of system manager to <tt>Object</tt> instead of <tt>SystemManager</tt> to avoid type error #1034.</p>
+
+<p>The complete example MXML application source code is available for <a href="flex-embed.mxml.txt">Flex Builder 3/SDK 3</a> and <a href="flex4-embed.mxml.txt">Flash Builder 4/SDK 4</a>. Note that there are some compatibility issues with Flash Builder 4/SDK 4, because VideoIO.swf has been compiled using SDK 3. In particular, the sizes of the buttons and control bars are different when you embed from your application using SDK 4. Secondly, I couldn't yet get the event handlers from VideoIO to work from VideoIO's SDK 3 to your SDK 4 application.</p>
+</div>
+          </div>
+
+          <div id="footer">&copy; 2010-2011, Kundan Singh, All Rights Reserved.</div>
+          
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+              <div id="sidebar-right" class="sidebar">
+
+<div id="block-forum-0" class="clear-block block block-forum">
+
+  <h2>In This Project</h2>
+
+  <div class="content"><div class="item-list">
+<ul><li class="first"><a href="index.html">Project Home</a></li>
+</ul>
+<ol>
+<li class="last"><a href="1.html">Embedding</a></li>
+<li class="last"><a href="2.html">Live camera view</a></li>
+<li class="last"><a href="3.html">Media server</a></li>
+<li class="last"><a href="4.html">Record a message</a></li>
+<li class="last"><a href="5.html">Play video file</a></li>
+<li class="last"><a href="6.html">Two-party call</a></li>
+<li class="last"><a href="7.html">Video broadcast</a></li>
+<li class="last"><a href="8.html">Multi-party conference</a></li>
+<li class="last"><a href="9.html">P2P video call</a></li>
+<li class="last"><a href="10.html">VideoIO API</a></li>
+<li class="last"><a href="11.html">SIP/VoIP call</a></li>
+</ol></div></div>
+</div>
+
+<div id="block-forum-1" class="clear-block block block-forum">
+
+  <h2>References</h2>
+
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+</ul></div></div>
+</div>
+
+              </div>
+
+    </div> <!-- /container -->
+  </div>
+
+
+    </body>
+</html>

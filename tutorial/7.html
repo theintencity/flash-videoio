@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <title>Flash-VideoIO | Flash-based audio and video communication</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+        <!--[if lt IE 7]>
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+
+<style type="text/css">
+pre { color: #606060; font-size: small; line-height: 1; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+ol { line-height: 1; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+p { text-align: justify; }
+</style>
+
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+
+
+  </head>
+  <body class="sidebar-right">
+
+<!-- Layout -->
+  <div id="header-region" class="clear-block"></div>
+
+    <div id="wrapper">
+
+    <div id="container" class="clear-block">
+
+      <div id="header">
+        <div id="logo-floater">
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        </div>
+
+                                                    
+      </div> <!-- /header -->
+
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+
+<div class="breadcrumb"><a href="/">Home</a> › <a href="index.html">Flash-VideoIO Tutorial</a></div>
+
+<div id="node-1" class="node">
+
+
+  
+  <div class="content clear-block">
+
+<h2>How to do one-to-many video broadcast?</h2>
+  
+<p>You can do one-to-many live video broadcast by having the broadcaster user publish live camera view and microphone to a media stream, and all other listeners play that media stream from the media server. Please see <a href="3.html">How to work with media server?</a> on details of installing and configuring a media server. For illustrations in this section we assume that you have a media server running on <tt>192.1.2.3</tt> and that has an application called <tt>myapp</tt> which allows you to record a media stream. Thus, your media server application should be reachable at "rtmp://192.1.2.3/myapp". In real deployment you will use the real host name or IP address of your media server.</p>
+
+<p>The one-to-many video broadcast requires all the listeners to know the media server URL to connect to and the stream name to listen and play. The broadcaster user picks a stream name, say, "myrant", and sets the <tt>src</tt> property of his VideoIO application to enable publish as "rtmp://192.1.2.3/myapp?publish=myrant". The broadcaster informs the listeners about the <tt>src</tt> URL. A listener who wants to listen to this broadcast, replaces the <tt>publish</tt> with <tt>play</tt> and assigns the <tt>src</tt> property of her VideoIO to "rtmp://192.1.2.3/myapp?play=myrant". The broadcaster can stop the stream by setting <tt>src</tt> to null or "". Similarly a listener can stop by setting <tt>src</tt> to null or "".</p>
+
+<p>In a broadcast session, the broadcaster user is publishing his stream whereas other listeners are playing his stream. Thus the remaining challenge is to convey the desired stream URL to the listeners. In practice, people use variety of methods ranging from CGI web service or static web sites to list all the broadcast URLs, or announcing via email or Jabber service. Whatever mechanism you decide will become the broadcast announcement service of your system. In our tutorial we will assume that these information is sent out-of-band to the individuals, e.g., over instant messenging or email.</p>
+
+<div class="info">
+<b>Information</b>: Typically a media server allows any number of play instances for a stream name, but only one publish instance within a URL scope. Hence, the stream name must be chosen carefully by the broadcaster user to avoid conflict with other broadcasters.
+</div>
+
+<p>The user interface for broadcaster will typically be different than that of the listener. A broadcaster will typically have a VideoIO instance and perhaps a text-based feedback from the listeners. A listener will typically have a listing of all the broadcast sessions, an ability to join a session, and a VideoIO instance when he joins a session. Additionally, there may be a text-based input box to allow sending questions or feedback to the broadcaster.</p>
+
+
+<p>The following user interface embeds a VideoIO instance which can be used by broadcaster as well as listener. To try the demonstration, open this page in multiple browser instances. You can try on different machines or the same machine. On the first browser instance, select "publish" in the drop-down box to act as a broadcaster, before clicking on the <tt>set</tt> button. On other browser instances, keep the default "play" in the drop-down box and click on the <tt>set</tt> button to act as listeners. If you are running media server on a different host than 192.1.2.3, change the URL's IP address in all text input boxes.</p>
+
+<script>
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+
+<center>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video1" width="320" height="240">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+</object>
+<br/>
+<input id="src1" type="text" autocomplete="off" style="width:155px;"
+    value="rtmp://192.1.2.3/myapp"/>
+?
+<select name="type" style="width: 70px;">
+    <option value="publish">publish</option>
+    <option value="play" selected>play</option>
+</select>
+=
+<input id="publish1" type="text" autocomplete="off" style="width:50px;"
+    value="myrant"/>
+<br/>
+<input value="set" type="button" 
+    onclick="getFlashMovie('video1').setProperty('src', 
+        document.getElementById('src1').value
+        + '?' + document.getElementById("type").value 
+        + '=' + document.getElementById('publish1').value)"/>
+<input value="reset" type="button" 
+    onclick="getFlashMovie('video1').setProperty('src', null)"/>
+</center>
+
+<p>The source code for this is similar to earlier examples. You can also right-click and select "View Page Source" or equivalent menu option to see the source code.</p>
+
+<h2>Summary</h2>
+
+<p>In summary, you can use the <tt>src</tt> property with URL parameter containing <tt>publish</tt> for broadcast user's stream and <tt>play</tt> for listener user's stream. The <tt>recording</tt> and <tt>playing</tt> properties control the current state of whether your video is transmitted or whether remote video is played.</p>
+
+<p>This tutorial is just the begining of how to do one-to-many video broadcast. The VideoIO API is so simple that just setting the <tt>src</tt> property allows you to accomplish several use cases. There are several other properties that affect behavior of a call, e.g., you can control the camera quality or sound mute. Additionally, you can build other advanced user interface controls in JavaScript similar to how VideoIO's control panel shows in Flash.</p>
+
+</div>
+          </div>
+
+          <div id="footer">&copy; 2010-2011, Kundan Singh, All Rights Reserved.</div>
+          
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+              <div id="sidebar-right" class="sidebar">
+
+<div id="block-forum-0" class="clear-block block block-forum">
+
+  <h2>In This Project</h2>
+
+  <div class="content"><div class="item-list">
+<ul><li class="first"><a href="index.html">Project Home</a></li>
+</ul>
+<ol>
+<li class="last"><a href="1.html">Embedding</a></li>
+<li class="last"><a href="2.html">Live camera view</a></li>
+<li class="last"><a href="3.html">Media server</a></li>
+<li class="last"><a href="4.html">Record a message</a></li>
+<li class="last"><a href="5.html">Play video file</a></li>
+<li class="last"><a href="6.html">Two-party call</a></li>
+<li class="last"><a href="7.html">Video broadcast</a></li>
+<li class="last"><a href="8.html">Multi-party conference</a></li>
+<li class="last"><a href="9.html">P2P video call</a></li>
+<li class="last"><a href="10.html">VideoIO API</a></li>
+<li class="last"><a href="11.html">SIP/VoIP call</a></li>
+</ol></div></div>
+</div>
+
+<div id="block-forum-1" class="clear-block block block-forum">
+
+  <h2>References</h2>
+
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+</ul></div></div>
+</div>
+
+              </div>
+
+    </div> <!-- /container -->
+  </div>
+    </body>
+</html>

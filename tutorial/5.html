@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <title>Flash-VideoIO | Flash-based audio and video communication</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+        <!--[if lt IE 7]>
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+
+<style type="text/css">
+pre { color: #606060; font-size: small; line-height: 1; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+ol { line-height: 1; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+p { text-align: justify; }
+</style>
+
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+
+
+  </head>
+  <body class="sidebar-right">
+
+<!-- Layout -->
+  <div id="header-region" class="clear-block"></div>
+
+    <div id="wrapper">
+
+    <div id="container" class="clear-block">
+
+      <div id="header">
+        <div id="logo-floater">
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        </div>
+
+                                                    
+      </div> <!-- /header -->
+
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+
+<div class="breadcrumb"><a href="/">Home</a> › <a href="index.html">Flash-VideoIO Tutorial</a></div>
+
+<div id="node-1" class="node">
+
+
+  
+  <div class="content clear-block">
+
+<h2>How to play a video file?</h2>
+
+<p>Using VideoIO you can publish using real-time streaming (only <tt>rtmp</tt> or <tt>rtmfp</tt> URLs) but play using streaming (<tt>rtmp</tt> or <tt>rtmfp</tt>) as well as web download mode (<tt>http</tt> or <tt>https</tt>). Please see <a href="4.html">How to record and play a video message?</a> for details on the streaming play mode. This tutorial will walk you through details on the web downloaded play mode.</p>
+
+<p>If you want to play a video file that is already available on some web server, you can just set the <tt>src</tt> property with the URL of the FLV file. For example, there are some free FLV files <a href="http://www.mediacollege.com/adobe/flash/video/tutorial/example-flv.html">here</a>.</p>
+
+<p>If you want to play your video files, e.g., the ones you recorded using <a href="4.html">VideoIO</a>, you will need to serve your files from a web server. There are many free and commercial web servers in the market, e.g., Apache httpd. Information about how to set up a web server is beyond the scope of this tutorial.</p>
+
+<p>Python comes with a built-in web server named <tt>SimpleHTTPServer</tt> that can server any file from your current directory or sub-directory. Suppose you have your video files in the current directory, you can start a web server as follows, then open a browser and point it to <tt>http://localhost:8080</tt> to see the list of files in the directory where you ran this command.</p>
+
+<pre class="code">
+$ python -m SimpleHTTPServer 8080
+</pre>
+
+<p>Suppose you have a video file named <tt>file1.flv</tt> which you can now reach using <tt>http://localhost:8080/file1.flv</tt> from a browser. For playing this file using VideoIO, just set this URL to the <tt>src</tt> property.</p>
+
+<p>To programmatically set the property, use JavaScript as shown below. The example is similar to the one in <a href="4.html">How to record and play a video message?</a> where you can set the <tt>src</tt> property of the VideoIO object named <tt>video1</tt>. </p>
+
+<table><tr valign="top"><td>
+<object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="video1" width="320" height="240">
+    <param name="movie" value="VideoIO.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+    <param name="flashVars" value="controls=true" />
+</object>
+<script>
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+<center>
+<input id="src1" type="text" autocomplete="off" style="width:315px;"
+    value="http://www.mediacollege.com/video-gallery/testclips/20051210-w50s.flv"/><br/>
+<input value="set" type="button" 
+    onclick="getFlashMovie('video1').setProperty('src', 
+        document.getElementById('src1').value)"/>
+<input value="reset" type="button" 
+    onclick="getFlashMovie('video1').setProperty('src', null)"/>
+</center>
+</td><td><pre>
+&lt;object type="application/x-shockwave-flash" data="VideoIO.swf"
+    id="<b>video1</b>" width="320" height="240"&gt;
+    &lt;param name="movie" value="VideoIO.swf" /&gt;
+    &lt;param name="quality" value="high" /&gt;
+    &lt;param name="bgcolor" value="#000000" /&gt;
+    &lt;param name="allowFullScreen" value="true" /&gt;
+    &lt;param name="allowScriptAccess" value="always" /&gt;
+    &lt;param name="flashVars" value="<b>controls=true</b>" /&gt;
+&lt;/object&gt;
+&lt;script&gt;
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+&lt;/script&gt;
+&lt;input id="<b>src1</b>" type="text"/&gt;
+&lt;input value="set" type="button" 
+    onclick="getFlashMovie('<b>video1</b>').setProperty('<b>src</b>', 
+        document.getElementById('<b>src1</b>').value)"/&gt;
+&lt;input value="reset" type="button" 
+    onclick="getFlashMovie('<b>video1</b>').setProperty('<b>src</b>', null)"/&gt;
+</pre>
+</td></tr></table>
+
+<p>This type of message playback with <tt>http</tt> or <tt>https</tt> URL is called web downloaded play mode. The control panel allows you to pause or play the media, or seek to a new position of the total duration is available using the play head bar. You can create your own JavaScript and HTML based user interface to control these properties of VideoIO.</p>
+
+</div>
+          </div>
+
+          <div id="footer">&copy; 2010-2011, Kundan Singh, All Rights Reserved.</div>
+          
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+              <div id="sidebar-right" class="sidebar">
+
+<div id="block-forum-0" class="clear-block block block-forum">
+
+  <h2>In This Project</h2>
+
+  <div class="content"><div class="item-list">
+<ul><li class="first"><a href="index.html">Project Home</a></li>
+</ul>
+<ol>
+<li class="last"><a href="1.html">Embedding</a></li>
+<li class="last"><a href="2.html">Live camera view</a></li>
+<li class="last"><a href="3.html">Media server</a></li>
+<li class="last"><a href="4.html">Record a message</a></li>
+<li class="last"><a href="5.html">Play video file</a></li>
+<li class="last"><a href="6.html">Two-party call</a></li>
+<li class="last"><a href="7.html">Video broadcast</a></li>
+<li class="last"><a href="8.html">Multi-party conference</a></li>
+<li class="last"><a href="9.html">P2P video call</a></li>
+<li class="last"><a href="10.html">VideoIO API</a></li>
+<li class="last"><a href="11.html">SIP/VoIP call</a></li>
+</ol></div></div>
+</div>
+
+<div id="block-forum-1" class="clear-block block block-forum">
+
+  <h2>References</h2>
+
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+</ul></div></div>
+</div>
+
+              </div>
+
+    </div> <!-- /container -->
+  </div>
+    </body>
+</html>

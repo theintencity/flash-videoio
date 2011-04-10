@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <title>Flash-VideoIO | Flash-based audio and video communication</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+        <!--[if lt IE 7]>
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+
+<style type="text/css">
+pre { color: #606060; font-size: small; line-height: 1; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+ol { line-height: 1; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+p { text-align: justify; }
+</style>
+
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+
+
+  </head>
+  <body class="sidebar-right">
+
+<!-- Layout -->
+  <div id="header-region" class="clear-block"></div>
+
+    <div id="wrapper">
+
+    <div id="container" class="clear-block">
+
+      <div id="header">
+        <div id="logo-floater">
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        </div>
+
+                                                    
+      </div> <!-- /header -->
+
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+
+<div class="breadcrumb"><a href="/">Home</a> › <a href="index.html">Flash-VideoIO Tutorial</a></div>
+
+<div id="node-1" class="node">
+
+
+  
+  <div class="content clear-block">
+
+<h2>How to do peer-to-peer video call?</h2>
+  
+  
+<p>Flash Player version 10 or later allows you to do peer-to-peer media streams instead of going through a media server. The VideoIO application exposes this feature in the API where you can just set its <tt>src</tt> property to the correct URL to enable peer-to-peer video calls.</p>
+
+<p>Instead of <tt>rtmp</tt> URL which enables client-server media streams, the application uses <tt>rtmfp</tt> URL. Our previous tutorials discussed how to use RTMP along with a media server to enable video calls where all media streams go through the media server. The new protocol, RTMFP, enables secure end-to-end media streams among different instances of Flash Player without going through a media server. This makes low-latency audio and video communication possible over the web. However, it still needs a rendezvous server, which is used by the Flash Player instances to negotiate media and transport attributes, and to create end-to-end media streams. Please see <a href="http://p2p-sip.blogspot.com/2009/02/rtmfp-vs-sip.html">RTMFP vs SIP</a> on how peer-to-peer of Flash Player is actually end-to-end media.</p>
+
+<p>Fortunately, Adobe also hosts a free service for developers to facilitate such peer-to-peer rendezvous. In particular, developers can signup for <a href="http://labs.adobe.com/technologies/stratus/">Stratus</a> developer key, and then build applications that use their service. Once you sign-up, you get a developer key and an <tt>rtmfp</tt> URL for the service. We have signed up for our VideoIO application with the following URL.</p> 
+
+<pre>
+rtmfp://stratus.rtmfp.net/d1e1e5b3f17e90eb35d244fd-c711881365d9/
+</pre>
+
+<p>There are some similarities and differences with client-server video call described in <a href="6.html">How to do two-party video call?</a>. Instead of setting the <tt>src</tt> URL to your media server, we will set it to this URL for doing peer-to-peer video call. The use of <tt>publish</tt> and <tt>play</tt> URL parameters is similar. However, peer-to-peer mode also needs a secure identifier of the publishing end available to the playing end. Flash Player defines a <tt>nearID</tt> attribute, which we expose in our API. Please see <a href="10.html">How to use the VideoIO API?</a> for details.</p>
+
+<p>Suppose Alice and Bob wants to do a peer-to-peer video call. Both ends have two instances each of the VideoIO application -- one for capturing live camera view and microphone audio as local stream, and other for playing audio and video of the remote stream. When Alice is connects to the Stratus service, her local VideoIO instance gets the <tt>nearID</tt>, which looks like a random string. Alice can then publish a stream by name, say <tt>alice</tt>. When Bob wants to listen to Alice's stream, he also connects to the Stratus service, and uses the play stream name, <tt>alice</tt>, in the remote VideoIO instance. Additionally, Bob sets the <tt>farID</tt> parameter to that of Alice's local <tt>nearID</tt> property. Thus, the listening side, Bob, needs to know both the stream name and the <tt>nearID</tt> attribute of the publishing side, Alice's local VideoIO. Similarly, Bob gives his local <tt>nearID</tt> property and publish stream name, <tt>bob</tt>, to Alice, so that Alice can use these properties as parameters <tt>play</tt> and <tt>farID</tt> in the remote VideoIO of play mode.</p>
+
+<p>For illustrations in this section we assume our Stratus developer key to connect to the service. In practice you should obtain and use your own developer key. Suppose Alice wants to call Bob. As mentioned before, both ends have two instances of VideoIO application, a local/publish mode and a remote/play mode. First Alice picks her stream name, <tt>alice</tt>, and sets the <tt>src</tt> property of local VideoIO to "rtmfp://stratus.rtmfp.net/d1..d9/?publish=alice". The developer key part in the URL is shortened for brevity, but in practice you will need to use the full developer key. Once Alice's local VideoIO is connected to the service, it gets the <tt>nearID</tt> property. You can capture this by defining <tt>onPropertyChange</tt> JavaScript function in your embedding HTML page.</p>
+<pre class="code">
+&lt;script;&gt;
+function onPropertyChange(event) {
+    if (event.property == "nearID") {
+        if (event.objectID == "video1") {
+            // ... event.newValue is the "nearID" of 
+            // local VideoIO named "video1"
+        }
+    }
+}
+&lt;/script;&gt;
+</pre>
+
+<p>The <tt>nearID</tt> is typically a large random string, that identifies this connection. Once Alice knows the <tt>publish</tt> stream name and <tt>nearID</tt> of local VideoIO, she sends these information, along with the service URL to Bob. For example, she can send a single URL as "rtmfp://stratus.rtmfp.net/d1..d9/?publish=alice&amp;nearID=a3..ac". The <tt>nearID</tt> parameter value is shortened for brevity, but in practice you will need to use the full value. When Bob receives the URL, he replaces <tt>publish</tt> with <tt>play</tt> and <tt>nearID</tt> with <tt>farID</tt>, and assigns the <tt>src</tt> property of the remote VideoIO application as "rtmfp://stratus.rtmfp.net/d1..d9/?play=alice&amp;farID=a3..ac". The reverse direction stream is similar. Bob picks his own stream name, bob, connects his local VideoIO application by setting <tt>src</tt> property to "rtmfp://stratus.rtmfp.net/d1..d9/?publish=bob", obtains the <tt>nearID</tt> of the local VideoIO, and sends his URL to Alice to accept the call as "rtmfp://stratus.rtmfp.net/d1..d9/?publish=bob&amp;nearID=b3..bc". Alice, replaces <tt>publish</tt> and <tt>nearID</tt> as before, and sets the <tt>src</tt> of remote VideoIO as "rtmfp://stratus.rtmfp.net/d1..d9/?play=bob&amp;farID=b3..bc". Now both Alice and Bob are exchanging low latency peer-to-peer media stream without going through a media server. Terminating the call is same as setting <tt>src</tt> to null or "" for both VideoIO instances.</p>
+
+<p>The remaining challenge is to convey the URL containing stream name and <tt>nearID</tt> to the other end in a call. In practice, people use variety of methods ranging from CGI web service, JavaScript or Jabber service to exchange such information. Whatever mechanism you decide will become the call initiation service of your system. In our tutorial we will assume that these information is exchanged out-of-band by the individuals, e.g., over instant messenging or email.</p>
+
+<center>
+<table style="width: 400px;">
+<tr><th>stream, ID</th><th>Alice</th><th>Bob</th></tr>
+<tr><td>publish/local</td><td>alice, nearID=id1</td><td>bob, nearID=id2</td></tr>
+<tr><td>play/remote</td><td>bob, farID=id2</td><td>alice, nearID=id1</td></tr>
+</table>
+</center>
+
+<p>The following user interface embeds two VideoIO instances. The left one is for local video and right one for remote video. To try the demonstration, open this page in two browser instances. You can try on two different machines on the same machine. On first keep your default publish stream name as "alice" and play as "bob". On second swap the stream name so that publish is "bob" and play is "alice". First, click on first browser's left VideoIO's <tt>set</tt> button to publish the local stream. This will populate the <tt>nearID</tt> property. Copy that value from the text input box, and paste it in the second browser's right VideoIO's <tt>farID</tt> text input box. Then click on the <tt>set</tt> button of right VideoIO to play the stream. Similarly, on second browser, click on the <tt>set</tt> button of left VideoIO to publish his stream. This populates the <tt>nearID</tt> property, which you copy and paste to the first browser's second VideoIO's <tt>farID</tt> parameter, before clicking on its <tt>set</tt> button. Now you will have two-party peer-to-peer video call between these two browser instances.</p>
+
+<script>
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+
+function onCreationComplete(event) {
+}
+
+function onPropertyChange(event) {
+    if (event.property == "nearID") {
+        if (event.objectID == "video1") {
+            document.getElementById("nearID1").value = event.newValue;
+        }
+    }
+}
+</script>
+
+<table style="width: 640px;">
+<tr><td colspan="2">
+<input id="url1" type="text" value="rtmfp://stratus.rtmfp.net/d1e1e5b3f17e90eb35d244fd-c711881365d9/" style="width:640px;"/>
+</td></tr>
+<tr valign="top">
+<td>
+  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video1" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="allowScriptAccess" value="always" />
+			<param name="flashVars" value="controls=true" />
+			<embed src="VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video1" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				allowScriptAccess="always"
+                flashVars="controls=true"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+	</object>
+<center>
+?publish=
+<input id="publish1" type="text" autocomplete="off" style="width:50px;"
+    value="alice"/>
+<br/>
+nearID=<input id="nearID1" type=Text" autocomplete="off" style="width:250px;"/>
+<br/>
+<input value="set" type="button" 
+    onclick="getFlashMovie('video1').setProperty('src', 
+        document.getElementById('url1').value
+        + '?publish=' + document.getElementById('publish1').value)"/>
+<input value="reset" type="button" 
+    onclick="getFlashMovie('video1').setProperty('src', null)"/>
+</center>
+</td>
+<td>
+  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video2" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="allowScriptAccess" value="always" />
+			<param name="flashVars" value="controls=true" />
+			<embed src="VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video2" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				allowScriptAccess="always"
+                flashVars="controls=true"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+	</object>
+<center>
+?play=
+<input id="play2" type="text" autocomplete="off" style="width:50px;"
+    value="bob"/>
+&amp;
+<br/>
+farID=
+<input id="farID2" type="text" autocomplete="off" style="width:250px;"/>
+<br/>
+<input value="set" type="button" 
+    onclick="getFlashMovie('video2').setProperty('src', 
+        document.getElementById('url1').value
+        + '?play=' + document.getElementById('play2').value
+        + '&amp;farID=' + document.getElementById('farID2').value)"/>
+<input value="reset" type="button" 
+    onclick="getFlashMovie('video2').setProperty('src', null)"/>
+</center>
+
+</td></tr></table>
+
+<p>The source code for these are similar to earlier examples. The main difference is that it uses the nested <tt>object</tt> and <tt>embed</tt> tags instead of a single <tt>object</tt> tag, so that the ExternalInterface can invoke event handlers <tt>onPropertyChange</tt> from VideoIO application to JavaScript of the HTML page. Please see <a href='1.html'>How to embed VideoIO in your web page?</a> for more details on this. You can also right-click and select "View Page Source" or equivalent menu option to see the source code.</p>
+
+<p>Earlier for client-server video call, as long as you decide on the stream names before hand, you can set the <tt>src</tt> properties in any order. Hence, you can set the play <tt>src</tt> before the corresponding publish <tt>src</tt> is set on the other end. It worked. However, now there is a need to transfer <tt>nearID</tt> property along with the stream name to the other end. Since the <tt>nearID</tt> property is dynamically generated every time you connect to the Stratus service, there are some constraints in the order of setting the <tt>src</tt> properties. You MUST first set the <tt>src</tt> property of the local/publish VideoIO, get the <tt>nearID</tt>, and then can set the other end's <tt>src</tt property of the remote/play VideoIO with correct <tt>play</tt> and <tt>farID</tt> parameters to play that stream. </p>
+
+<div class="info">
+<b>Information:</b> If you reset <tt>src</tt> of the publish VideoIO, and then set <tt>src</tt> again to the same value, it still generates a new <tt>nearID</tt>, which needs to be sent again to all the playing streams.
+</div><br/>
+
+<h2>Summary</h2>
+
+<p>In summary, you can use the <tt>src</tt> property with URL parameter containing <tt>publish</tt> for your stream and <tt>play</tt> for remote stream. The <tt>recording</tt> and <tt>playing</tt> properties control the current state of whether your video is transmitted or whether remote video is played.</p>
+
+<p>This tutorial is just the begining of how to do peer-to-peer video call. This peer-to-peer mode can be easily extended to one-to-many video broadcast as well as multi-party conference by combining what you learned in this tutorial, in <a href="7.html">How to do one-to-many video broadcast?</a> and <a href="8.html">How to do multi-party video conference?</a>. However, we do not recommend using peer-to-peer mode for multi-party or broadcast use cases in VideoIO because it will consume huge uplink bandwidth on users computers -- proportional to the number of other participants in a multi-party conference, or number of listeners for a broadcast user. In future, we will extend VideoIO to include peer-to-peer groups available in Flash Player 10.1 or later.</p>
+
+<p>The VideoIO API is so simple that just setting the <tt>src</tt> property allows you to accomplish several use cases. There are several other properties that affect behavior of a call, e.g., you can control the camera quality or sound mute. Additionally, you can build other advanced user interface controls in JavaScript similar to how VideoIO's control panel shows in Flash.</p>
+
+<p>The video displayed in local and remote video are different. The publish mode displays the live camera view. In VideoIO the live camera view is always flipped horizontally to appear as if you are looking in a mirror, whereas the actual media stream sent to the server for recording or re-distribution appears as if the camera is looking at you. We feel that this gives the most natural behavior for live video chat or message recording.</p>
+
+<p>Finally, you must use nested <tt>object</tt> and <tt>embed</tt> tags or <tt>SWFobject.js</tt> instead of a single <tt>object</tt> tag for enabling peer-to-peer video call because you need to dynamically listen for change in the <tt>nearID</tt> property using <tt>onPropertyChange</tt> event handler, and convey it to the other end. The event handler works well only with nested tags.</p>
+
+</div>
+          </div>
+
+          <div id="footer">&copy; 2010-2011, Kundan Singh, All Rights Reserved.</div>
+          
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+              <div id="sidebar-right" class="sidebar">
+
+<div id="block-forum-0" class="clear-block block block-forum">
+
+  <h2>In This Project</h2>
+
+  <div class="content"><div class="item-list">
+<ul><li class="first"><a href="index.html">Project Home</a></li>
+</ul>
+<ol>
+<li class="last"><a href="1.html">Embedding</a></li>
+<li class="last"><a href="2.html">Live camera view</a></li>
+<li class="last"><a href="3.html">Media server</a></li>
+<li class="last"><a href="4.html">Record a message</a></li>
+<li class="last"><a href="5.html">Play video file</a></li>
+<li class="last"><a href="6.html">Two-party call</a></li>
+<li class="last"><a href="7.html">Video broadcast</a></li>
+<li class="last"><a href="8.html">Multi-party conference</a></li>
+<li class="last"><a href="9.html">P2P video call</a></li>
+<li class="last"><a href="10.html">VideoIO API</a></li>
+<li class="last"><a href="11.html">SIP/VoIP call</a></li>
+</ol></div></div>
+</div>
+
+<div id="block-forum-1" class="clear-block block block-forum">
+
+  <h2>References</h2>
+
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+</ul></div></div>
+</div>
+
+              </div>
+
+    </div> <!-- /container -->
+  </div>
+    </body>
+</html>

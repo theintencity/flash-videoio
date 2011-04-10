@@ -1,0 +1,485 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <title>Flash-VideoIO | Flash-based audio and video communication</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+        <!--[if lt IE 7]>
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+
+<style type="text/css">
+pre { color: #606060; font-size: small; line-height: 1; }
+pre.code { margin-left: 40px; margin-right: 40px; border: 1px dotted grey; padding: 4px 4px 4px 4px; color: #606060; }
+b { color: #000000; }
+ol { line-height: 1; }
+div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding: 4px 4px 4px 4px;}
+p { text-align: justify; }
+</style>
+
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+</script>
+
+
+  </head>
+  <body class="sidebar-right">
+
+<!-- Layout -->
+  <div id="header-region" class="clear-block"></div>
+
+    <div id="wrapper">
+
+    <div id="container" class="clear-block">
+
+      <div id="header">
+        <div id="logo-floater">
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        </div>
+
+                                                    
+      </div> <!-- /header -->
+
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+
+<div class="breadcrumb"><a href="/">Home</a> › <a href="index.html">Flash-VideoIO Tutorial</a></div>
+
+<div id="node-1" class="node">
+
+
+  
+  <div class="content clear-block">
+
+<h2>How to do SIP-based VoIP call?</h2>
+  
+<p>You can use the VideoIO component to build the front-end for a VoIP phone that talks to the backend server capable of translating between RTMP and SIP. In particular, it can work with the API defined by the <a href="http://code.google.com/p/siprtmp">Open Source SIP-RTMP gateway (siprtmp)</a>. The siprtmp module is actually part of the <a href="http://code.google.com/p/rtmplite">Open Source Flash RTMP server in Python (rtmplite)</a> described in <a href="3.html">How to work with media server?</a>. The <tt>siprtmp</tt> API is documented in <a href="http://code.google.com/p/rtmplite/source/browse/trunk/siprtmp.py">siprtmp.py</a> source code. If another backend server can perform similar translation between RTMP and SIP, then you can use VideoIO with that server as well. Additionally, you need a SIP user agent and a SIP proxy and registration server. In this article, we will use the same example set up as described in <tt>siprtmp</tt> web page for illustrations.</p>
+
+<div class="info">
+This article requires <a href="http://code.google.com/p/flash-videoio/downloads/list">version 1.2</a> or later of VideoIO.swf that includes support for methods and events.
+</div>
+<br/>
+
+<h3>Download and install additional software</h3>
+
+<p>First step is to download the latest source code version of <tt>p2p-sip</tt> and <tt>rtmplite</tt> if you have not already done so. The <tt>p2p-sip</tt> software contains a SIP server for our demonstration, which you can replace with any other SIP server of your choice. The <tt>rtmplite</tt> software contains the <tt>siprtmp.py</tt> module for SIP-RTMP gateway.</p>
+
+<p>On first terminal, download <tt>p2p-sip</tt> and run its <tt>sipd.py</tt> module as follows. This will run <tt>sipd</tt> on port 5060 by default.</p>
+<pre class="code">
+$ svn checkout http://p2p-sip.googlecode.com/svn/trunk/ p2p-sip-read-only
+$ cd p2p-sip-read-only/src
+$ PYTHONPATH=app:external:.
+$ export PYTHONPATH
+$ python app/sipd.py -d
+</pre>
+
+<p>On second terminal, download <tt>rtmplite</tt> and run its <tt>siprtmp</tt> module as follows. This will run <tt>siprtmp</tt> on port 1935 by default.</p>
+<pre class="code">
+$ svn checkout http://rtmplite.googlecode.com/svn/trunk/ rtmplite-read-only
+$ cd rtmplite-read-only
+$ PYTHONPATH=../p2p-sip-read-only/src:.
+$ export PYTHONPATH
+$ python siprtmp.py -d
+</pre>
+
+<p>Install a SIP user agent such as <tt>X-lite</tt> and register a user account with <tt>sipd</tt> server. In my example I run X-lite on local host for testing -- configure user name to "kunxlite", password to "mypass", authorization user name to "kunxlite", domain to "localhost", check to register with domain and receive incoming calls, set proxy to "127.0.0.1:5060", remove check for voice mail, set IP address to use local IP address and STUN server to use specified server without giving a server, and presence mode to peer-to-peer. These settings are needed to test X-lite in local host mode and to register with local server.</p>
+
+<h3>Creating and embedding web phone</h3>
+
+<p>The last software piece in this illustration is the web phone embedded in this page. It is just a VideoIO application which connects to <tt>siprtmp</tt> gateway to register user, and make and receive SIP calls. You can view source of this page to see how javascript and HTML are used to embed the VideoIO for web phone and how various properties, methods and indications are handled.</p>
+
+<p>The VideoIO application itself is with white background and hence does not show any user interface. You can right-click on the empty area below to see the VideoIO application properties. Also the <tt>controls</tt> property is not set hence there is no VideoIO control panel. All the user interface is via HTML and javascript.</p>
+
+<script>
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+
+function onCreationComplete(event) {
+}
+
+function onPropertyChange(event) {
+}
+
+</script>
+
+<table style="width: 640px; background-color: #cfcfcf;"">
+<tr valign="top">
+<td>
+  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="phone1" width="215" height="138"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#ffffff" />
+			<param name="allowScriptAccess" value="always" />
+			<param name="wmode" value="transparent" />
+			<embed src="VideoIO.swf" quality="high" bgcolor="#ffffff"
+				width="215" height="138" name="phone1" align="middle"
+				play="true" loop="false" quality="high"
+				allowScriptAccess="always"
+				type="application/x-shockwave-flash"
+				wmode="transparent"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+	</object>
+    
+<center>
+<table style="width: 80px;">
+    <caption><i>Dialpad</i>:</caption>
+    <tr><td>
+    <input value="1" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '1')"/>
+    </td><td>
+    <input value="2" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '2')"/>
+    </td><td>
+    <input value="3" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '3')"/>
+    </td></tr><tr><td>
+    <input value="4" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '4')"/>
+    </td><td>
+    <input value="5" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '5')"/>
+    </td><td>
+    <input value="6" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '6')"/>
+    </td></tr><tr><td>
+    <input value="7" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '7')"/>
+    </td><td>
+    <input value="8" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '8')"/>
+    </td><td>
+    <input value="9" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '9')"/>
+    </td></tr><tr><td>
+    <input value="*" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '*')"/>
+    </td><td>
+    <input value="0" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '0')"/>
+    </td><td>
+    <input value="#" type="button" 
+        onclick="getFlashMovie('phone1').callProperty('call', 'sendDTMF', '#')"/>
+    </td></tr>
+</table>
+</center>
+    
+</td>
+<td>
+<i>Property</i>:<br/>
+
+src=
+<input id="url1" type="text" autocomplete="off" style="width:150px;" value="rtmp://localhost/sip" title="url should point to the siprtmp gateway"/>
+/
+<input id="path1" type="text" autocomplete="off" style="width:150px;" value="kunweb@localhost" title="path should include your SIP address-of-record"/>
+<br/>
+?rate=
+<input id="rate1" type="text" autocomplete="off" style="width:10px;" value="8" title="rate should 8 for narrowband Speex"/>
+&amp;bidirection=
+<input id="bidirection1" type="text" autocomplete="off" style="width:30px;" value="true" title="bidirection must be true for SIP calls"/>
+&amp;arg=
+<input id="arg1" type="text" autocomplete="off" style="width:50px;" value="kunweb" title="1st name should be your authentication username"/>
+&amp;arg=
+<input id="arg2" type="text" autocomplete="off" style="width:50px;" value="mypass" title="2nd argument should be your authentication password"/>
+&amp;arg=
+<input id="arg3" type="text" autocomplete="off" style="width:100px;" value="Kundan Singh" title="3rd argument should be your display name"/>
+&amp;arg=
+<input id="arg4" type="text" autocomplete="off" style="width:80px;" value="narrowband" title="4th argument should be narrowband for 8kHz speex"/>
+<script>
+function getSrc() {
+    var value = document.getElementById('url1').value 
+      + '/' + document.getElementById('path1').value 
+      + '?rate=' + document.getElementById('rate1').value 
+      + '&bidirection=' + document.getElementById('bidirection1').value 
+      + '&arg=' + document.getElementById('arg1').value 
+      + '&arg=' + document.getElementById('arg2').value 
+      + '&arg=' + document.getElementById('arg3').value 
+      + '&arg=' + document.getElementById('arg4').value;
+    return value;
+}
+</script>
+
+<input value="set" type="button" 
+    onclick="getFlashMovie('phone1').setProperty('src', getSrc())"/> 
+<input value="reset" type="button" 
+    onclick="getFlashMovie('phone1').setProperty('src', null)"/>
+<br/>
+
+<i>Method</i>:<br/>
+
+<input value="do" type="button"
+    onclick="getFlashMovie('phone1').callProperty('call', 'invite', document.getElementById('sip1').value)"/>
+call("invite", "
+<input id="sip1" type="text" autocomplete="off" style="width:140px;" value="sip:kunxlite@localhost"/>
+") 
+<br/>
+
+<input value="do" type="button"
+    onclick="getFlashMovie('phone1').callProperty('call', 'accept')"/>
+call("accept") 
+<br/>
+
+<input value="do" type="button"
+    onclick="getFlashMovie('phone1').callProperty('call', 'reject', document.getElementById('reason1').value)"/>
+call("reject", "
+<input id="reason1" type="text" autocomplete="off" style="width:80px;" value="603 Decline"/>
+") 
+<br/>
+
+<input value="do" type="button"
+    onclick="getFlashMovie('phone1').callProperty('call', 'bye');
+             getFlashMovie('phone1').setProperty('publish', null);
+             getFlashMovie('phone1').setProperty('play', null);"/>
+call("bye") 
+
+<br/>
+
+<i>Indication:</i><br/>
+
+<textarea id="log" style="height: 50px" cols="50" readonly></textarea>
+
+<script>
+function log(msg) {
+    var logObj = document.getElementById("log");
+    logObj.value = msg + (logObj.value ? "\n" + logObj.value : "");
+}
+
+function onCallback(event) {
+    log(event.method + "(" + event.args + ")");
+    if (event.method == "accepted") {
+        getFlashMovie('phone1').setProperty('publish', 'local');
+        getFlashMovie('phone1').setProperty('play', 'remote');
+    } 
+    if (event.method == "byed") {
+        getFlashMovie('phone1').setProperty('publish', null);
+        getFlashMovie('phone1').setProperty('play', null);
+    }
+}
+</script>
+
+</td></tr></table>
+
+<p>The following example shows how to embed the VideoIO application with white background suitable for a web phone use case. The object identifier and name are <tt>phone1</tt>. Since this does not need video, we set the dimension to 215x138, which is the minimum dimension needed by Flash Player to display the device access security prompt.</p>
+
+<pre class="code">
+&lt;object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+    id="<b>phone1</b>" width="<b>215</b>" height="<b>138</b>"
+    codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab"&gt;
+    &lt;param name="movie" value="VideoIO.swf" /&gt;
+    &lt;param name="quality" value="high" /&gt;
+    &lt;param name="bgcolor" value="<b>#ffffff</b>" /&gt;
+    &lt;param name="wmode" value="<b>transparent</b>" /&gt;
+    &lt;param name="allowScriptAccess" value="always" /&gt;
+    &lt;embed src="VideoIO.swf" quality="high" bgcolor="<b>#ffffff</b>"
+        width="<b>215</b>" height="<b>138</b>" name="<b>phone1</b>" align="middle"
+        play="true" loop="false" quality="high" wmode="<b>transparent</b>"
+        allowScriptAccess="always"
+        type="application/x-shockwave-flash"
+        pluginspage="http://www.adobe.com/go/getflashplayer"&gt;
+    &lt;/embed&gt;
+&lt;/object&gt;
+</pre>
+
+<p>The following Javascript code shows the definition of <tt>getFlashMovie</tt> function, and couple of other callback methods, <tt>onCreationComplete</tt> and <tt>onPropertyChange</tt>, with empty function definitions, which are invoked by VideoIO application when the application is created and property changes, respectively.</p>
+
+<pre class="code">
+&lt;script&gt;
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+function onCreationComplete(event) {  } // nothing
+function onPropertyChange(event) {  } // nothing
+&lt;/script&gt;
+</pre>
+
+<h3>User registration or login</h3>
+
+<p>The first step for a user is to register or login to the SIP server using the web phone. This is done by setting the <tt>src</tt> property by clicking on <tt>set</tt> button. For connection to <tt>siprtmp</tt> to register, the value of the <tt>src</tt> property should be as follows.</p>
+
+<pre class="code">
+rtmp://<i>siprtmp-server</i>/sip/<i>username</i>@<i>domain</i>
+  ?rate=<i>8</i>&amp;bidirection=true&amp;arg=<i>authuser</i>&amp;arg=<i>authpass</i>&amp;arg=<i>Kundan Singh</i>&amp;arg=<i>narrowband</i>
+</pre>
+
+<p>Here <i>siprtmp-server</i> is the host name or IP address of the machine running the <tt>siprtmp</tt> gateway, and providing the <tt>sip</tt> application. The <i>username@domain</i> is your SIP address-of-record with which you want to register. Generally the <i>domain</i> part is your SIP server host name or IP address. There are additional arguments of <i>rate</i> and <i>bidirection</i> supplied to the VideoIO application. The <i>rate=8</i> enables interoperability with 8kHz Speex end-points, and <i>bidirection=true</i> is needed so that VideoIO can enable both <tt>play</tt> and <tt>publish</tt>. Additionally, the <tt>siprtmp</tt> gateway's API requires that you supply additional authentication and media parameters to the underlying <tt>NetConnection</tt>'s <tt>connect</tt> method. The <tt>connect</tt> method takes four arguments: authentication username, authentication password, display name and rate of either <i>narrowband</i> or <i>wideband</i>. With <i>rate=8</i> you must use last argument as <i>narrowband</i>.</p>
+
+<p>Once you set this to the <tt>src</tt> property, the VideoIO attempts the connection to <tt>siprtmp</tt> gateway which in turn performs SIP registration on your behalf to the SIP server. Unregistration is done by resetting the property to <tt>null</tt> when you click on the <tt>reset</tt> button. This also disconnect the VideoIO application from the <tt>siprtmp</tt> gateway.</p>
+
+<p>The following Javascript code shows how to set the <tt>src</tt> property using other attributes:</p>
+
+<pre class="code">
+&lt;script&gt;
+var server = "localhost";
+var user = "kunweb@localhost";
+var authname = "kunweb";
+var authpass = "mypass";
+var displayname = "Kundan Singh";
+var rate = 8;
+var rate_name = "narrowband";
+var src_value = "rtmp://" +server+ "/sip/" +user+ "?rate=" +rate+ "&amp;bidirection=true"
+      + "&amp;arg=" +authname+ "&amp;arg=" +authpass+ "&amp;arg=" +displayname+ "&amp;arg=" +rate_name;
+getFlashMovie('phone1').setProperty('src', src_value);
+&lt;/script&gt;
+</pre>
+
+<h3>Call setup and termination</h3>
+
+<p>Once the VideoIO application is connected to the <tt>siprtmp</tt> gateway, you can invoke various API calls on the gateway server to initiate, accept, reject or terminate a call. Each connection represents a single SIP user agent on the gateway. The application provides methods and indications for various actions and events. For example, methods are available to initiate (<tt>invite</tt>) and terminate (<tt>bye</tt>) a call, <tt>accept</tt> or <tt>reject</tt> an incoming call, and to send touch-tone digits (<tt>sendDTMF</tt>) in a call. Indications are available for events: incoming call invitation (<tt>invited</tt>), call termination (<tt>byed</tt>), and outgoing call <tt>accepted</tt> or <tt>rejected</tt>. These methods and indications allow you to build your call control state in the application itself using Javascript.</p>
+
+<p>To initiate an outbound call, use the <tt>call</tt> method of VideoIO as follows.</p>
+
+<pre class="code">
+var dest_value = "sip:kunxlite@localhost";
+getFlashMovie('phone1').callProperty('call', '<b>invite</b>', dest_value);
+</pre>
+
+<p>This will request the <tt>siprtmp</tt> gateway to send a SIP call invitation to the given destination address. If your X-lite client is registered with <tt>sip:kunxlite@localhost</tt> then it will receive the call, which you can accept or reject. The result indication is dispatched to your Javascript application via the <tt>onCallback</tt> function as shown below.</p>
+
+<pre class="code">
+function onCallback(event) {
+    if (event.method == "<b>accepted</b>") {
+        // call is accepted by destination
+    } 
+    if (event.method == "<b>rejected</b>") {
+        // call is rejected by destination.
+        // <b>event.args[0]</b> contains the reason for rejection.
+    }
+    ...
+}
+</pre>
+
+<p>When the call is accepted, you should set the <tt>publish</tt> and <tt>play</tt> properties to start sending and receiving media. The <tt>siprtmp</tt> gateway's API requires the stream names to be <tt>local</tt> and <tt>remote</tt> for publish and play, respectively. Since we already set <tt>bidirection</tt> to true, we can set both <tt>publish</tt> and <tt>play</tt> stream names.</p>
+
+<pre class="code">
+    ...
+    if (event.method == "<b>accepted</b>") {
+        getFlashMovie('phone1').setProperty('publish', '<b>local</b>');
+        getFlashMovie('phone1').setProperty('play', '<b>remote</b>');
+    } 
+    ...
+</pre>
+
+<p>To terminate the call from web side, you can again use the <tt>call</tt> method as follows. When terminating the call, you should also reset the publish and play properties.</p>
+
+<pre class="code">
+getFlashMovie('phone1').callProperty('call', '<b>bye</b>');
+getFlashMovie('phone1').setProperty('publish', <b>null</b>);
+getFlashMovie('phone1').setProperty('play', <b>null</b>);
+</pre>
+
+<p>An inbound call set up works as follows. From your SIP user agent, call the user <tt>kunweb</tt> via that SIP server, so that the call is received by your web phone which registered with this user name. You will receive the incoming <tt>invited</tt> indication in <tt>onCallback</tt> Javascript function, which you can use to display the indication to the user. Similarly, cancellation of incoming invitation before the local web user accepts the call is indicated using the <tt>cancelled</tt> method.</p>
+
+<pre class="code">
+    ...
+    if (event.method == "<b>invited</b>") {
+        // incoming call invitation received.
+        // <b>event.args[0]</b> is caller address, e.g., sip:kunxlite@localhost
+        // <b>event.args[1]</b> is callee address, e.g., sip:kunweb@localhost
+    } 
+    if (event.method == "<b>cancelled</b>") {
+        // incoming call invitation is cancelled by caller.
+        // event.args[0] is caller address, same as corresponding "invited".
+        // event.args[1] is callee address, same as corresponding "invited".
+    }
+    ...
+</pre>
+
+<p>To accept or reject an incoming call invitation indicated by the <tt>invited</tt> event method, you can use the <tt>call</tt> method of VideoIO as follows.</p>
+
+<pre class="code">
+getFlashMovie('phone1').callProperty('call', '<b>accept</b>'); // To accept
+getFlashMovie('phone1').callProperty('call', '<b>reject</b>', '486 Busy Here'); // to reject
+</pre>
+
+<p>When rejecting a call, you can specify the SIP reason code as shown above. After accepting the call, the <tt>accepted</tt> indication is received by your <tt>onCallback</tt> Javascript function, similar to the outbound call scenario. As mentioned before, on <tt>accepted</tt> indication, you should set <tt>publish</tt> to <tt>local</tt> and <tt>play</tt> to <tt>remote</tt> so that your VideoIO's audio is connected with the call.</p>
+
+<p>When the remote side terminates a call, you receive a <tt>byed</tt> indication. When the call is closed, you should reset the <tt>publish</tt> and <tt>play</tt> properties.</p>
+
+<pre class="code">
+    if (event.method == "<b>byed</b>") {
+        getFlashMovie('phone1').setProperty('publish', <b>null</b>);
+        getFlashMovie('phone1').setProperty('play', <b>null</b>);
+    }
+</pre>
+
+<h3>Summary</h3>
+
+<p>Ideally, VideoIO should be used for either play or publish stream at a time, but not both. For example, in a multi-party video conference, your application has multiple instances of VideoIO, one with publish of local video and others with play of remote participants videos. Each instance of VideoIO has a connection to the server.</p>
+
+<p>The existing SIP-RTMP gateway, <tt>siprtmp</tt>, defines an API where single connection to the server represents a single SIP user registration, and can be in at most one SIP call. The existing API does not allow co-ordination among multiple connections for the same call, where one connection represents publish stream and another represents play stream. Due to this reason, I modified VideoIO, so that it could have both play and publish stream in the same connection under this special scenario.</p>
+
+<p>The new property, <tt>bidirection=true</tt> is needed to enable the modified behavior. However, only one of publish or play can be attached to the local displayed video object in VideoIO. Since the SIP-RTMP gateway will be used for interoperability with audio-only SIP devices or telephony gateways, I think this limitation is not a problem.</p>
+
+<p>Additionally, I modified VideoIO to allow method invocation and event indication, so that it can be used to implement on top of the <tt>siprtmp</tt> API. The goal is to keep the SIP-specific changes to minimum in VideoIO, and implement all such SIP-specific call control behavior in your Javascript application and the <tt>siprtmp</tt> gateway.</p>
+
+<p>We suggest you use the existing <tt>VideoPhone</tt> Flash application that comes with <tt>siprtmp</tt> to work with the gateway if possible. However, if you need to build your own front-end, e.g., white-labelled web-based phone, you should use the VideoIO application as described in this article.</p>
+
+<p>In future, I will try to refactor <tt>siprtmp</tt> implementation, so that it separates the signaling from media, and allows co-ordinating among multiple RTMP connections for the same SIP call.</p>
+
+</div>
+          </div>
+
+          <div id="footer">&copy; 2010-2011, Kundan Singh, All Rights Reserved.</div>
+          
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+              <div id="sidebar-right" class="sidebar">
+
+<div id="block-forum-0" class="clear-block block block-forum">
+
+  <h2>In This Project</h2>
+
+  <div class="content"><div class="item-list">
+<ul><li class="first"><a href="index.html">Project Home</a></li>
+</ul>
+<ol>
+<li class="last"><a href="1.html">Embedding</a></li>
+<li class="last"><a href="2.html">Live camera view</a></li>
+<li class="last"><a href="3.html">Media server</a></li>
+<li class="last"><a href="4.html">Record a message</a></li>
+<li class="last"><a href="5.html">Play video file</a></li>
+<li class="last"><a href="6.html">Two-party call</a></li>
+<li class="last"><a href="7.html">Video broadcast</a></li>
+<li class="last"><a href="8.html">Multi-party conference</a></li>
+<li class="last"><a href="9.html">P2P video call</a></li>
+<li class="last"><a href="10.html">VideoIO API</a></li>
+<li class="last"><a href="11.html">SIP/VoIP call</a></li>
+</ol></div></div>
+</div>
+
+<div id="block-forum-1" class="clear-block block block-forum">
+
+  <h2>References</h2>
+
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+</ul></div></div>
+</div>
+
+              </div>
+
+    </div> <!-- /container -->
+  </div>
+    </body>
+</html>
