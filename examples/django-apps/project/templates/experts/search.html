@@ -1,0 +1,60 @@
+{% extends "experts/base_site.html" %}
+{% load adminmedia admin_list i18n %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/forms.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/changelists.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/rating.css" />
+        <script type="text/javascript" src="/admin/jsi18n/"></script>
+        <script type="text/javascript" src="{% load adminmedia %}{% admin_media_prefix %}js/core.js"></script>
+        <script type="text/javascript" src="{% load adminmedia %}{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script> 
+        
+        {{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs"><a href="/experts">{% trans 'Home' %}</a> &rsaquo; 
+  {% trans 'Search' %}</div>
+  
+  {% if status %}
+        <ul class="messagelist"><li>{{ status }}</li></ul>
+  {% endif %}
+  {% if error_message %}
+         <p class="errornote">{{ error_message }}</p>
+  {% endif %}
+{% endblock %}
+
+{% block content_title %}
+<h1>
+        {% trans 'Search Results' %}
+</h1>
+                
+{% endblock %}
+
+{% block content %}
+        <div id="content-main">
+        	
+            <form action="search" method="GET">
+            	<caption>You searched for:</caption>
+                <input type="text" name="q" value="{{ query|escape }}">
+                <input type="submit" value="Search">
+            </form>
+            
+            <hr/>
+            {% if result %}
+	            <ol>
+	            	{% for item in result %}
+	            		{{ item }}
+	            	{% endfor %}
+    	        </ol>
+            {% else %}
+            	<p style="margin-top: 10px; color: #808080;">No search results found.</p>
+            {% endif %}
+        </div>
+{% endblock %}

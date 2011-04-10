@@ -1,0 +1,26 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} {% trans 'Talk to Experts!' %}{% endblock %}
+{% block content_title %}{% if title %}
+{% endif %}{% endblock %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/experts">{% trans 'Home' %}</a></div>{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">{% trans 'Talk to Experts!' %}</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block footer %}<div id="footer">
+	<hr/>
+	<div style="float: left; color: #aaaaaa; font-size: 8pt;">
+		Copyright &copy; 2010, <a href="http://kundansingh.com" style="color: #aaaaaa; font-size: 8pt;">Kundan Singh</a>. 
+		All rights reserved.
+	</div>
+    <div style="float: right;">
+        <a href="/static/terms.html" style="color: #aaaaaa; font-size: 8pt;">Terms of service</a>
+    </div>
+  
+  </div>{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "experts/base_site.html" %}
+{% load adminmedia admin_list i18n %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/forms.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/changelists.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/rating.css" />
+    <script type="text/javascript" src="/admin/jsi18n/"></script>
+    <script type="text/javascript" src="{% load adminmedia %}{% admin_media_prefix %}js/core.js"></script>
+    <script type="text/javascript" src="{% load adminmedia %}{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script> 
+        
+    {{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs"><a href="/experts">{% trans 'Home' %}</a> &rsaquo; 
+  <a href="/experts/{{ account }}/profile">{{ account }}</a> &rsaquo; 
+  {% trans 'Profile' %}
+  
+    <div style="float: right;">
+        <a href="/experts/{{ account }}/talk">Talk</a> 
+      | <a href="/experts/{{ account }}/calendar">Calendar</a>
+    </div>
+  
+  </div>
+  
+  {% if status %}
+        <ul class="messagelist"><li>{{ status }}</li></ul>
+  {% endif %}
+  {% if error_message %}
+         <p class="errornote">{{ error_message }}</p>
+  {% endif %}
+{% endblock %}
+
+{% block content_title %}
+<h1>
+    {% trans 'User Profile: ' %} {{ profile.name }}
+</h1>
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        <div class="module">
+        	<h2>{% trans 'Profile Summary' %}</h2>
+        	<div style="padding: 4px;">
+	        	{% if profile.phone_number %}
+    	    		Phone Number: {{ profile.phone_number }}<br/>
+        		{% endif %}
+        		{% if profile.address %}
+	        		Address: {{ profile.address }}<br/>
+    	    	{% endif %}
+    	    	{% if profile.description %}
+        			<br/>{{ profile.description }}<br/>
+        		{% endif %}
+        	</div>
+	    </div>
+        {% if profile.website %}
+	    <br/>
+        <div class="module">
+        	<h2>{% trans 'Homepage:' %} <a href="{{ profile.website }}"><font color="#ffffff">{{ profile.website }}</font></a></h2>
+        	<iframe style="border: none; width:100%;" height="600px;" src="{{ profile.website }}">
+        	</iframe>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+    <div id="content-related">
+        <div class="module">
+            <h2>{% trans 'Expertise' %}</h2>
+            <div style="padding: 4px;">
+	            {% for item in profile.tags %}
+    	        	{{ item }},
+        	    {% endfor %}
+        	</div>
+        </div>
+        <br/>
+        <div class="module">
+            <h2>{% trans 'Rating' %}</h2>
+            <div style="padding: 4px;">
+            	<table><tr><td>
+            	<div class="rating_bar">
+          			<div style="width:{{ rating_percent }}%"></div>
+        		</div></td><td>
+            	{{ rating }} stars of {{ profile.rating_count }} reviews
+            	</td></tr></table>
+            	
+            	{% if allow_review %}
+	               <form action="" method="post" style="width: 200px;">
+	            	   Rate this expert!
+	                   <select name="rating" style="width: 100px;">
+	                      <option value="5">***** 5 star</option>
+	                      <option value="4">**** 4 star</option>
+	                      <option value="3"selected>*** 3 star</option>
+	                      <option value="2">** 2 star</option>
+	                      <option value="1">* 1 star</option>
+	                      <option value="0">No star</option>
+	                   </select>
+	                   <br/>
+	                   <textarea name="review" style="width: 195px;">Write review here!</textarea>
+	                   <br/>
+                       <input type="submit" value="Post Review"/>
+                   </form>
+            	{% endif %}
+            	
+        	</div>
+        </div>
+
+		<br/>
+        <div class="module">
+        	<h2>{{ reviews|length }} {% trans 'User Reviews' %}</h2>
+        	<div style="padding: 4px;">
+        		{% if reviews %}
+		            {% for item in reviews %}
+		            	<div class="rating_bar" style="right: float;">
+        		  			<div style="width:{{ item.rating_percent }}%"></div>
+        				</div>
+        				{{ item.description }}
+        				<br/><hr/>
+        		    {% endfor %}
+        		{% else %}
+        			No reviews available.
+        		{% endif %}
+        	</div>
+	    </div>
+
+    </div>
+{% endblock %}
+

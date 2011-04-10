@@ -1,0 +1,531 @@
+<html>
+<head>
+<title>Video Office</title>
+<style>
+body {
+	margin: 0px;
+}
+div.heading {
+	width: 100%; 
+	height: 30px; 
+	background-color: #cfcfff;
+}
+div.menu {
+	float: right;
+	font-size: 10pt;
+	padding: 4px;
+}
+div.menu a {
+	text-decoration: none;
+	font-size: 10pt;
+	padding-left: 4px;
+}
+div.footer, div.footer a {
+	width: 100%;
+	height: 20px;
+	font-size: 9pt;
+	color: #a0a0ff;
+	text-decoration: none;
+	margin-top: 1px;
+	border-top: solid 1px #a0a0ff;
+	text-align: right;
+}
+div.waiting-list {
+	width: 310px; 
+	height: 65px; 
+	border: solid 1px #a0a0ff; 
+	padding: 4px; 
+	overflow: auto; 
+	color: #a0a0a0;
+	font-size: 10pt; 
+	margin-bottom: 4px;
+}
+div.waiting-list td {
+	color: #a0a0a0;
+	font-size: 10pt;
+}
+div.button-bar {
+	color: #a0a0a0;
+	font-size: 10pt;
+	width: 318px; 
+	height: 20px;
+	border: solid 1px #a0a0ff;
+	padding-top: 2px; 
+	margin-top: 3px;
+	margin-bottom: 4px; 
+}
+
+h1 {
+	padding: 4px;
+	font-size: 16pt;
+}
+textarea {
+	border: solid 1px #a0a0ff;
+}
+input {
+	border: solid 1px #a0a0ff;
+}
+</style>
+</head>
+
+<body>
+<script src="/_ah/channel/jsapi"></script>
+<script type="text/javascript">
+
+	// the stream name for local VideoIO to publish
+    var stream = "{{ stream }}";
+    
+    // the clientId for channel API
+    var clientId = stream;
+    
+    // the token to create a channel using channel API
+    var token = "{{ token }}";
+    
+    // the local email and name
+    var my_email = "{% if user_email %}{{ user_email }}{% else %}anonymous{% endif %}";
+    var my_name = "{% if user_email %}{{ user_email }}{% else %}User {{ stream }}{% endif %}";
+    var purpose = "";
+    
+    // the local and remove video's url
+	var src = null; 
+	var dest = null;
+	
+	{% if is_my_office %}
+	// collection of visitor objects of form {"clientId":..., "name":..., "url":...}
+	// indexed by clientId value.
+	var visitors = {}; 
+	{% endif %}
+	
+	// base URL for this script as well as VideoIO's base URL
+	var base_url = location.href.substring(0,location.href.lastIndexOf('/'));
+	var media_url = 'rtmfp://stratus.rtmfp.net/d1e1e5b3f17e90eb35d244fd-c711881365d9/';
+	
+	// periodic publish timer
+	var timer = null;
+	var publish_interval = 60000;
+	
+	// help text to display on waiting-list box for owner
+	var waiting_list_help = "This box will display waiting list of visitors. You can select a visitor that you want to talk to from the list.";
+
+	// help text to display on waiting-list box for visitor
+	var visitor_help = "The owner has been informed about your visit. Please wait for the owner to join.";
+	
+	// Create a channel and socket using the channel API
+	var channel = new goog.appengine.Channel(token);
+	var socket = channel.open();
+
+	// incoming message is JSON object with method attribute as
+	// "connect" => invoke connected(...) to handle connection change.
+	// "send"    => invoke received(...) to handle incoming text message.
+	// "userlist"=> invoke changeUserList(...) to handle change in visitor list.
+	
+	socket.onmessage = function(event) {
+		obj = eval("(" + event.data + ")");
+		if (obj.method == "connect") {
+			connected(obj);
+		} else if (obj.method == "send") {
+			received(obj);
+		}
+		{% if is_my_office %}
+			if (obj.method == "userlist")
+				changeUserList(obj.added, obj.removed);
+		{% endif %}
+	};
+
+	socket.onerror = function(event) {
+		log("Socket error (" + event.code + " " + event.description + ")");
+	};
+
+	function getRequest() {
+		var ajaxRequest;  // The variable that makes Ajax possible!
+		
+		try{ // Opera 8.0+, Firefox, Safari
+			ajaxRequest = new XMLHttpRequest();
+		} catch (e) { // Internet Explorer Browsers
+			try{
+				ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+			} catch (e) {
+				try {
+					ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {
+					return false; // Something went wrong
+				}
+			}
+		}
+		return ajaxRequest;
+	}
+	  
+	function getFlashMovie(movieName) {
+	    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+	    return (isIE) ? window[movieName] : document[movieName];
+	}
+
+	function onCreationComplete(event) {
+		if (event.objectID == "video1") {
+			var url = media_url + "?publish=" + stream;
+			getFlashMovie("video1").setProperty("src", url);
+		}		
+	}
+
+	function onPropertyChange(event) {
+		if (event.property == "nearID" && event.objectID == "video1") {
+			src = media_url + "?nickname=" + my_email + "&play=" + stream + "&farID=" + event.newValue;
+			{% if is_my_office %}
+				startPublish();
+			{% endif %}
+		}
+	}
+
+	function startPublish() {
+		{% if not is_my_office %}
+			my_name = document.getElementById("my-name").value;
+			if (!my_name) { 
+				alert("You must enter your name before visiting the office");
+				return;
+			}
+			purpose = document.getElementById("purpose").value;
+			
+			document.getElementById("waiting-list").innerHTML = visitor_help;
+			
+		{% endif %}
+		setTimeout("publish()", 1000); // first invocation after 1 second.
+		timer = setInterval("publish()", publish_interval);
+	}
+	
+	function publish() {
+		var request = getRequest();
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				if (request.status == 200) {
+					// log("body=" + request.responseText);
+					{% if is_my_office %}
+						var obj = eval("(" + request.responseText + ")");
+						if (obj.userlist != undefined) {
+							changeUserList(obj.userlist, []);
+						}
+						if (obj.chathistory != undefined) {
+							for (var i=0; i<obj.chathistory.length; ++i) {
+								received(obj.chathistory[i]);
+							}
+						}
+					{% endif %}
+				} else {
+					log("publish failed (" + request.status + " " + request.responseText + ")");
+				}
+			}
+		}
+		request.open("POST", base_url + "/publish/", true);
+		{% if is_my_office %}
+			var data = '{"clientId":"' + clientId + '", "name":"' + my_name + '", "url":"' + src + '"}';
+		{% else %}
+			var data = '{"clientId":"' + clientId + '", "name":"' + my_name + '", "url":"' + src + '", "purpose":"' + purpose + '"}';
+		{% endif %}
+//
+//		log("sending publish " + clientId);
+		request.send(data);
+	}
+	
+	function connected(user) {
+		var obj = getFlashMovie('video2');
+		if (user.url != undefined && user.url) {
+			dest = user.url;
+			log("Connected to " + user.name);
+		} else {
+			dest = null;
+			log("Disconnected");
+		}
+		obj.setProperty("src", dest);
+		
+		{% if is_my_office %}
+			if (dest)
+				setPartnerCheckbox(user.clientId, true);
+			else
+				setPartnerCheckbox(0, false);
+		{% endif %}
+	}
+	
+	{% if is_my_office %}
+
+//
+//	setTimeout("changeUserList([{'clientId':'10000','name':'user 10000','url':'someurl'}, {'clientId':'20000', 'name':'user 20000', 'url':'anotherurl'}], []);", 2000);
+	
+	function changeUserList(added, removed) {
+		for (var i=0; i<removed.length; ++i) {
+			var user = removed[i];
+			if (visitors[user.clientId] != undefined) {
+				user = visitors[user.clientId];
+				log('Visitor left: ' + user.name);
+				delete visitors[user.clientId];
+			}
+		}
+		for (var j=0; j<added.length; ++j) {
+			var user = added[j];
+			if (visitors[user.clientId] == undefined) {
+				log('Visitor arrived: ' + user.name);
+			}
+			visitors[user.clientId] = user;
+		}
+		
+		pending = [];
+		for (var s in visitors) {
+			var user = visitors[s];
+			if (dest == user.url) {
+				pending.push('<input type="checkbox" id="visitor-' + user.clientId + '" value="' + user.clientId + '" autocomplete="off" checked="checked" onclick="return acceptVisitor(checked, value);"/> ' + escapeHTML(user.name) + ' (' + escapeHTML(user.purpose) + ')');
+			} else {
+				pending.push('<input type="checkbox" id="visitor-' + user.clientId + '" value="' + user.clientId + '" autocomplete="off" onclick="return acceptVisitor(checked, value);"/> ' + escapeHTML(user.name) + ' (' + escapeHTML(user.purpose) + ')');
+			}
+		}
+		
+		document.getElementById("waiting-list").innerHTML = 
+			(pending.length > 0 ? pending.join("<br/>") : waiting_list_help);
+	}
+	
+	function printVisitors() {
+		var str = "";
+		for (var s in visitors) 
+			str += " " + s;
+		log("indexes = " + str);
+	}
+	
+	function acceptVisitor(accept, visitorId) {
+		var user = visitors[visitorId] != undefined ? visitors[visitorId] : null;
+		if (user == null) {
+			log("Cannot accept this visitor as it is not in the list: " + visitorId);
+			return;
+		}
+		
+		var request = getRequest();
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				if (request.status == 200) {
+//
+//					log("Change is successful");
+				} else {
+					log("accept/reject failed (" + request.status + " " + request.responseText + ")");
+//					document.getElementById('content-main').innerHTML = '<pre>' 
+//						+ 'exception in accept/reject: ' + request.status 
+//						+ '\n' + request.responseText + '</pre>';
+				}
+			}
+		}
+		if (accept) {
+			log("Connecting to " + user.name);
+			setPartnerCheckbox(user.clientId, true);
+			request.open("POST", base_url + "/accept/", true);
+		}	
+		else {
+			log("Disconnecting...");
+			setPartnerCheckbox(user.clientId, false);
+			request.open("POST", base_url + "/reject/", true);
+		}
+		var data = '{"clientId":"' + clientId + '", "targetId":"' + user.clientId + '"}';
+		request.send(data);
+		return false;
+	}
+	
+	function setPartnerCheckbox(clientId, checked) {
+		if (checked) {
+			var waitinglist = document.getElementById("waiting-list");
+			var checkboxes = waitinglist.getElementsByTagName("input");
+			for (var i=0; i<checkboxes.length; ++i) {
+				var checkbox = checkboxes[i];
+				checkbox.checked = (checkbox.value == clientId ? true : false);
+			}
+		} else {
+			if (clientId) {
+				document.getElementById("visitor-" + clientId).checked = false;
+			} else {
+				var waitinglist = document.getElementById("waiting-list");
+				var checkboxes = waitinglist.getElementsByTagName("input");
+				for (var i=0; i<checkboxes.length; ++i) {
+					var checkbox = checkboxes[i];
+					checkbox.checked = false;
+				}
+			}
+		}
+	}
+	
+	{% endif %}
+	
+	function send() {
+		var msg = document.getElementById("input").value;
+		if (msg) {
+			document.getElementById("input").value = "";
+			if (dest)
+				log("Me: " + msg);
+			else
+				log("Me (not connected): " + msg);
+			
+			var request = getRequest();
+			request.open("POST", base_url + "/send/", true);
+			var data = null;
+			if (dest)
+				data = '{"senderId":"' + clientId + '","senderName":"' + my_name + '", "text":"' + msg + '", "receiver":"' + dest + '"}';
+			else
+				data = '{"senderId":"' + clientId + '","senderName":"' + my_name + '", "text":"' + msg + '", "owner":"{{ owner }}"}';
+			request.send(data);
+		}
+	}
+
+	function received(chat) {
+		log(chat.senderName + ': ' + chat.text);
+	}
+	
+	function leave(change_to_profile) {
+		if (timer) {
+			clearInterval(timer);
+			timer = null;
+		}
+		
+		log("leaving this video office");
+		var request = getRequest();
+		if (change_to_profile == true) {
+			request.onreadystatechange = function() {
+				if (request.readyState == 4) {
+					window.location = "http://code.google.com/p/flash-videoio";
+				}
+			};
+		}
+		request.open("POST", base_url + "/end/", true);
+		var data = '{"clientId":"' + clientId + '"}';
+		request.send(data);
+	}
+	
+	window.onunload = leave;
+
+	function showVideo(inputName, videoName) {
+		var input  = document.getElementById(inputName);
+		var obj = getFlashMovie(videoName);
+		var value = input.checked;
+		if (videoName == "video1") {
+			obj.setProperty("recording", value);
+			obj.setProperty("camera", value);
+			obj.setProperty("microphone", value);
+		} else {
+			obj.setProperty("playing", value);
+		}
+		return true;
+	}
+	
+	function escapeHTML(value) {
+		return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	}
+
+	function log(msg) {
+		var obj = document.getElementById("history");
+		obj.value = (obj.value != "" ? obj.value + "\n" : "") + msg;
+		obj.scrollTop = obj.scrollHeight;
+	}
+
+</script>	
+
+<div class="menu">
+	{% if not user_email %}
+		<a href="{{ login_url }}" title="Login using your Gmail account">Login</a>
+	{% else %}
+		Welcome, <a href="../{{ user_email }}/">{{ user_email }}</a> <a href="{{ logout_url }}" title="Logout from your Gmail account">Logout</a>
+	{% endif %}
+</div>
+
+<div class="heading">
+<h1>Video Office: {{ owner }}</h1>
+</div>
+
+<table><tr valign="top"><td>
+  <table><tr><td>
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video2" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="/static/VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="flashVars" value="controls=true" />
+			<param name="allowScriptAccess" value="always" />
+			<embed src="/static/VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video2" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				allowScriptAccess="always"
+				flashVars="controls=true"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+		</object>
+  </td></tr><tr><td>
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video1" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="/static/VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="flashVars" value="controls=true" />
+			<param name="allowScriptAccess" value="always" />
+			<embed src="/static/VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video1" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				allowScriptAccess="always"
+				flashVars="controls=true"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+		</object>
+  </td></tr></table>
+</td><td>
+		<div class="button-bar">
+			<input id="show-you" type="checkbox" checked onclick="return showVideo('show-you', 'video2');" autocomplete="off"/>
+			show other &nbsp;&nbsp;&nbsp;&nbsp;
+			<input id="show-me" type="checkbox" checked onclick="return showVideo('show-me', 'video1');" autocomplete="off"/>
+			show me  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="#" onClick="window.onunload=null; leave(true); return false;" 
+				style="text-decoration: underline;">Leave office</a>
+		</div>
+		
+		<div id="waiting-list" class="waiting-list">
+			{% if not is_my_office %}
+				<table><tr><td>Your name?</td><td> 
+						<input id="my-name" type="text" style="width: 200px; height: 18px;" value="{{ user_email }}" autocomplete="off" />
+					</td></tr><tr><td>Purpose of visit?</td><td>
+						<input id="purpose" type="text" style="width: 200px; height: 18px;" autocomplete="off" />
+					</td></tr><tr><td></td><td align="right">
+						<a href="#" onclick="return startPublish();">Visit office &gt;&gt;</a>
+				</td></tr></table>
+			{% endif %}
+		</div>
+		
+		<textarea id="history" autocomplete="off" style="width: 320px; height: 331px;"></textarea>
+
+		<script type="text/javascript">
+			{% if is_my_office %}
+				document.getElementById("waiting-list").innerHTML = waiting_list_help;
+				document.getElementById("history").value = "You are in your own video office.\n\
+1) Please accept the Google chat invitation from flash-videoio, if not already done so, so that you can receive visitors notifications on your Google chat.\n\
+2) Please check the \"Show me\" box above to enable your video stream when you talk to a visitor."
+			{% else %}
+				document.getElementById("history").value = "You are in video office of {{ owner }}\n\
+1) Please enter your name and purpose of visit, and click on the \"Visit office\" link above to inform the owner about your visit.\n\
+2) If this is your video office, please login to identify yourself using the link on top-right.\n\
+3) To open own video office, please login first and then click on your email on top-right."
+
+			{% endif %}
+		</script>
+		
+		<br/>
+		Enter your text message: <br/>
+		<input id="input" type="text" autocomplete="off"
+			style="width: 320px; height: 24px; font-size: 12pt;"
+			onkeypress="javascript: if ((event.keyCode || event.which) == 13) { send(); return false; }"/>
+
+
+</td></tr></table>
+	
+<div class="footer">
+Copyright &copy; 2010, <a href="http://code.google.com/p/flash-videoio">Kundan Singh</a>. 
+All rights reserved. 
+<a href="/static/terms.html">Terms of Service</a>.
+</div>
+
+</body>
+</html>

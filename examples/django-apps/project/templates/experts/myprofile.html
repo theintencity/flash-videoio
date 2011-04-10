@@ -1,0 +1,82 @@
+{% extends "experts/base_site.html" %}
+{% load adminmedia admin_list i18n %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/forms.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/changelists.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />
+    <script type="text/javascript" src="/admin/jsi18n/"></script>
+    <script type="text/javascript" src="{% load adminmedia %}{% admin_media_prefix %}js/core.js"></script>
+    <script type="text/javascript" src="{% load adminmedia %}{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script> 
+    
+    {{ form.media }}
+    
+    <style>
+    	input#id_name, #id_phone_number, #id_address, #id_website {
+    	    width: 100%;
+    	}
+    	textarea#id_description {
+    	    width: 100%;
+    	    height: 100px;
+    	}
+    	textarea#id_tags, #id_availability {
+    	    width: 100%;
+    	}
+    </style>
+{% endblock %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs"><a href="/experts">{% trans 'Home' %}</a> &rsaquo; 
+  <a href="/experts/{{ account }}/profile">{{ account }}</a> &rsaquo; 
+  {% trans 'Profile' %}
+  
+    <div style="float: right;">
+        <a href="/experts/{{ account }}/talk">Talk</a> 
+      | <a href="/experts/{{ account }}/calendar">Calendar</a>
+    </div>
+  
+  </div>
+  
+  {% if status %}
+        <ul class="messagelist"><li>{{ status }}</li></ul>
+  {% endif %}
+  {% if error_message %}
+         <p class="errornote">{{ error_message }}</p>
+  {% endif %}
+{% endblock %}
+
+{% block content_title %}
+<h1>
+    {% trans 'Edit My Profile' %}
+</h1>
+                
+{% endblock %}
+
+{% block content %}
+        <div id="content-main">
+          <table><tr valign="top"><td>
+            <div class="module" style="width: 340px;">     
+	            <form action="" method="post">
+                    <table>
+                        {{ form.as_table }}
+                     </table>
+                     <input type="submit" value="Save changes"/>
+             	</form>
+            </div>
+          </td><td>
+          	{% if website %}
+              <div class="module" style="width: 480px;">
+                <h2>Homepage: {{ website }}</h2>
+                <iframe style="border: none; width: 480px; height: 400px;" src="{{ website }}">
+                   Your browser does not support iframe to display your homepage!
+                </iframe>
+              </div>
+            {% endif %}
+          </td></tr></table> 
+        </div>
+{% endblock %}

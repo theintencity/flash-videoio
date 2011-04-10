@@ -1,0 +1,449 @@
+{% extends "experts/base_site.html" %}
+{% load adminmedia admin_list i18n %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/forms.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/changelists.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />
+	<script src="/_ah/channel/jsapi"></script>
+	<!--
+    <script type="text/javascript" src="/admin/jsi18n/"></script>
+	-->
+    <script type="text/javascript" src="{% load adminmedia %}{% admin_media_prefix %}js/core.js"></script>
+    <script type="text/javascript" src="{% load adminmedia %}{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script> 
+        
+    {{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs"><a href="/experts">{% trans 'Home' %}</a> &rsaquo; 
+  <a href="/experts/{{ account }}/profile">{{ account }}</a> &rsaquo; 
+  {% trans 'Talk' %}
+  
+    <div style="float: right;">
+      <a href="/experts/{{ account }}/calendar">Calendar</a>
+    </div>
+  
+  </div>
+  
+  {% if status %}
+        <ul class="messagelist"><li>{{ status }}</li></ul>
+  {% endif %}
+  {% if error_message %}
+         <p class="errornote">{{ error_message }}</p>
+  {% endif %}
+{% endblock %}
+
+{% block content_title %}
+<!--h1>
+    {% trans 'Talk' %}
+</h1-->
+                
+{% endblock %}
+
+{% block content %}
+        <div id="content-main">
+        
+<script type="text/javascript">
+	// the stream name for local VideoIO to publish
+    var stream = "{{ stream }}";
+    
+    // the clientId for channel API
+    var clientId = stream;
+    
+    // the token to create a channel using channel API
+    var token = "{{ token }}";
+    
+    // the local email and name
+    var my_email = "{% if user.email %}{{ user.email }}{% else %}anonymous{% endif %}";
+    var my_name = "{% if user.email %}{{ user.name }}{% else %}User {{ stream }}{% endif %}";
+    
+    // the local and remove video's url
+	var src = null; 
+	var dest = null;
+	
+	{% if is_my_office %}
+	// collection of visitor objects of form {"clientId":..., "name":..., "url":...}
+	// indexed by clientId value.
+	var visitors = {}; 
+	{% endif %}
+	
+	// base URL for this script as well as VideoIO's base URL
+	var base_url = location.href.substring(0,location.href.lastIndexOf('/'));
+	var media_url = 'rtmfp://stratus.rtmfp.net/d1e1e5b3f17e90eb35d244fd-c711881365d9/';
+	
+	// periodic publish timer
+	var timer = null;
+	var publish_interval = 60000;
+	
+	// help text to display on visitor box
+	var waiting_list_help = "This box will display waiting list of visitors. You can select a visitor that you want to talk to from the list.";
+
+	// Create a channel and socket using the channel API
+	var channel = new goog.appengine.Channel(token);
+	var socket = channel.open();
+
+	// incoming message is JSON object with method attribute as
+	// "connect" => invoke connected(...) to handle connection change.
+	// "send"    => invoke received(...) to handle incoming text message.
+	// "userlist"=> invoke changeUserList(...) to handle change in visitor list.
+	
+	socket.onmessage = function(event) {
+		obj = eval("(" + event.data + ")");
+		if (obj.method == "connect") {
+			connected(obj);
+		} else if (obj.method == "send") {
+			received(obj);
+		}
+		{% if is_my_office %}
+			if (obj.method == "userlist")
+				changeUserList(obj.added, obj.removed);
+		{% endif %}
+	};
+
+	socket.onerror = function(event) {
+		log("Socket error (" + event.code + " " + event.description + ")");
+	};
+
+	function getRequest() {
+		var ajaxRequest;  // The variable that makes Ajax possible!
+		
+		try{ // Opera 8.0+, Firefox, Safari
+			ajaxRequest = new XMLHttpRequest();
+		} catch (e) { // Internet Explorer Browsers
+			try{
+				ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+			} catch (e) {
+				try {
+					ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {
+					return false; // Something went wrong
+				}
+			}
+		}
+		return ajaxRequest;
+	}
+	  
+	function getFlashMovie(movieName) {
+	    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+	    return (isIE) ? window[movieName] : document[movieName];
+	}
+
+	function onCreationComplete(event) {
+		if (event.objectID == "video1") {
+			var url = media_url + "?publish=" + stream;
+			getFlashMovie("video1").setProperty("src", url);
+		}		
+	}
+
+	function onPropertyChange(event) {
+		if (event.property == "nearID" && event.objectID == "video1") {
+			src = media_url + "?nickname=" + my_email + "&play=" + stream + "&farID=" + event.newValue;
+			setTimeout("publish()", 1000); // first invocation after 1 second.
+			timer = setInterval("publish()", publish_interval);
+		}
+	}
+
+	function publish() {
+		var request = getRequest();
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				if (request.status == 200) {
+					// log("body=" + request.responseText);
+					{% if is_my_office %}
+						var obj = eval("(" + request.responseText + ")");
+						if (obj.userlist != undefined) {
+							changeUserList(obj.userlist, []);
+						}
+						if (obj.chathistory != undefined) {
+							for (var i=0; i<obj.chathistory.length; ++i) {
+								received(obj.chathistory[i]);
+							}
+						}
+					{% endif %}
+				} else {
+					log("publish failed (" + request.status + " " + request.responseText + ")");
+//					document.getElementById('content-main').innerHTML = request.responseText;
+				}
+			}
+		}
+		request.open("POST", base_url + "/publish/", true);
+		var data = '{"clientId":"' + clientId + '", "name":"' + my_name + '", "url":"' + src + '"}';
+//
+//		log("sending publish " + clientId);
+		request.send(data);
+	}
+	
+	function connected(user) {
+		var obj = getFlashMovie('video2');
+		if (user.url != undefined && user.url) {
+			dest = user.url;
+			log("Connected to " + user.name);
+		} else {
+			dest = null;
+			log("Disconnected");
+		}
+		obj.setProperty("src", dest);
+		
+		{% if is_my_office %}
+			if (dest)
+				setPartnerCheckbox(user.clientId, true);
+			else
+				setPartnerCheckbox(0, false);
+		{% endif %}
+	}
+	
+	{% if is_my_office %}
+
+//
+//	setTimeout("changeUserList([{'clientId':'10000','name':'user 10000','url':'someurl'}, {'clientId':'20000', 'name':'user 20000', 'url':'anotherurl'}], []);", 2000);
+	
+	function changeUserList(added, removed) {
+		for (var i=0; i<removed.length; ++i) {
+			var user = removed[i];
+			if (visitors[user.clientId] != undefined) {
+				log('Visitor left: ' + user.name + ' (' + user.clientId + ')');
+				delete visitors[user.clientId];
+			}
+		}
+		for (var j=0; j<added.length; ++j) {
+			var user = added[j];
+			if (visitors[user.clientId] == undefined) {
+				log('Visitor arrived: ' + user.name + ' (' + user.clientId + ') ');
+			}
+			visitors[user.clientId] = user;
+		}
+		
+		pending = [];
+		for (var s in visitors) {
+			var user = visitors[s];
+			if (dest == user.url) {
+				pending.push('<input type="checkbox" id="visitor-' + user.clientId + '" value="' + user.clientId + '" autocomplete="off" checked="checked" onclick="return acceptVisitor(checked, value);"/> ' + user.name + ' (' + user.clientId + ')');
+			} else {
+				pending.push('<input type="checkbox" id="visitor-' + user.clientId + '" value="' + user.clientId + '" autocomplete="off" onclick="return acceptVisitor(checked, value);"/> ' + user.name + ' (' + user.clientId + ')');
+			}
+		}
+		
+		document.getElementById("waiting-list").innerHTML = 
+			(pending.length > 0 ? pending.join("<br/>") : waiting_list_help);
+	}
+	
+	function printVisitors() {
+		var str = "";
+		for (var s in visitors) 
+			str += " " + s;
+		log("indexes = " + str);
+	}
+	
+	function acceptVisitor(accept, visitorId) {
+		var user = visitors[visitorId] != undefined ? visitors[visitorId] : null;
+		if (user == null) {
+			log("Cannot accept this visitor as it is not in the list: " + visitorId);
+			return;
+		}
+		
+		var request = getRequest();
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				if (request.status == 200) {
+//
+//					log("Change is successful");
+				} else {
+					log("accept/reject failed (" + request.status + " " + request.responseText + ")");
+//					document.getElementById('content-main').innerHTML = '<pre>' 
+//						+ 'exception in accept/reject: ' + request.status 
+//						+ '\n' + request.responseText + '</pre>';
+				}
+			}
+		}
+		if (accept) {
+			log("Connecting to " + user.name + " (" + user.clientId + ") ...");
+			setPartnerCheckbox(user.clientId, true);
+			request.open("POST", base_url + "/accept/", true);
+		}	
+		else {
+			log("Disconnecting...");
+			setPartnerCheckbox(user.clientId, false);
+			request.open("POST", base_url + "/reject/", true);
+		}
+		var data = '{"clientId":"' + clientId + '", "targetId":"' + user.clientId + '"}';
+		request.send(data);
+		return false;
+	}
+	
+	function setPartnerCheckbox(clientId, checked) {
+		if (checked) {
+			var waitinglist = document.getElementById("waiting-list");
+			var checkboxes = waitinglist.getElementsByTagName("input");
+			for (var i=0; i<checkboxes.length; ++i) {
+				var checkbox = checkboxes[i];
+				checkbox.checked = (checkbox.value == clientId ? true : false);
+			}
+		} else {
+			if (clientId) {
+				document.getElementById("visitor-" + clientId).checked = false;
+			} else {
+				var waitinglist = document.getElementById("waiting-list");
+				var checkboxes = waitinglist.getElementsByTagName("input");
+				for (var i=0; i<checkboxes.length; ++i) {
+					var checkbox = checkboxes[i];
+					checkbox.checked = false;
+				}
+			}
+		}
+	}
+	
+	{% endif %}
+	
+	function send() {
+		var msg = document.getElementById("input").value;
+		if (msg) {
+			document.getElementById("input").value = "";
+			if (dest)
+				log("Me: " + msg);
+			else
+				log("Me (not connected): " + msg);
+			
+			var request = getRequest();
+			request.open("POST", base_url + "/send/", true);
+			var data = null;
+			if (dest)
+				data = '{"senderId":"' + clientId + '","senderName":"' + my_name + '", "text":"' + msg + '", "receiver":"' + dest + '"}';
+			else
+				data = '{"senderId":"' + clientId + '","senderName":"' + my_name + '", "text":"' + msg + '", "owner":"{{ account }}"}';
+			request.send(data);
+		}
+	}
+
+	function received(chat) {
+		log(chat.senderName + ': ' + chat.text);
+	}
+	
+	function leave(change_to_profile) {
+		if (timer) {
+			clearInterval(timer);
+			timer = null;
+		}
+		
+		log("leaving this video office");
+		var request = getRequest();
+		if (change_to_profile == true) {
+			request.onreadystatechange = function() {
+				if (request.readyState == 4) {
+					window.location = "/experts/{{ account }}/profile";
+				}
+			};
+		}
+		request.open("POST", base_url + "/end/", true);
+		var data = '{"clientId":"' + clientId + '"}';
+		request.send(data);
+	}
+	
+	window.onunload = leave;
+
+	function showVideo(inputName, videoName) {
+		var input  = document.getElementById(inputName);
+		var obj = getFlashMovie(videoName);
+		var value = input.checked;
+		if (videoName == "video1") {
+			obj.setProperty("recording", value);
+			obj.setProperty("camera", value);
+			obj.setProperty("microphone", value);
+		} else {
+			obj.setProperty("playing", value);
+		}
+		return true;
+	}
+	
+	function log(msg) {
+		var obj = document.getElementById("history");
+		obj.value = (obj.value != "" ? obj.value + "\n" : "") + msg;
+		obj.scrollTop = obj.scrollHeight;
+	}
+
+</script>	
+
+<table><tr valign="top"><td>
+  <table><tr><td>
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video2" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="/static/VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="flashVars" value="controls=true" />
+			<param name="allowScriptAccess" value="always" />
+			<embed src="/static/VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video2" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				allowScriptAccess="always"
+				flashVars="controls=true"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+		</object>
+  </td></tr><tr><td>
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="video1" width="320" height="240"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="/static/VideoIO.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#000000" />
+			<param name="allowFullScreen" value="true" />
+			<param name="flashVars" value="controls=true" />
+			<param name="allowScriptAccess" value="always" />
+			<embed src="/static/VideoIO.swf" quality="high" bgcolor="#000000"
+				width="320" height="240" name="video1" align="middle"
+				play="true" loop="false" quality="high"
+				allowFullScreen="true"
+				allowScriptAccess="always"
+				flashVars="controls=true"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+		</object>
+  </td></tr></table>
+</td><td>
+		<div style="width: 320px; height: 20px;">
+			<input id="show-you" type="checkbox" checked onclick="return showVideo('show-you', 'video2');"/>
+			show other &nbsp;&nbsp;&nbsp;&nbsp;
+			<input id="show-me" type="checkbox" checked onclick="return showVideo('show-me', 'video1');"/>
+			show me  &nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="#" onClick="window.onunload=null; leave(true); return false;" 
+				style="text-decoration: underline;">Leave this video office</a>
+		</div>
+		
+		{% if is_my_office %}
+			<div id="waiting-list" style="width: 318px; height: 55px; border: solid 1px #cfcfcf; padding: 4px; overflow: auto; color: #888888;">
+			</div>
+			<script type="text/javascript">
+				document.getElementById("waiting-list").innerHTML = waiting_list_help;
+			</script>
+		{% endif %}
+
+		{% if is_my_office %}
+			<textarea id="history" autocomplete="off" style="width: 320px; height: 360px;">Welcome to video office of {{ user.name }}!
+My stream ID is {{ stream }}</textarea>
+		{% else %}
+			<textarea id="history" autocomplete="off" style="width: 320px; height: 420px;">Welcome to my video office!
+My stream ID is {{ stream }}</textarea>
+		{% endif %}
+		<br/>
+		Enter your text message: <br/>
+		<input id="input" type="text" autocomplete="off"
+			style="width: 320px; height: 24px; font-size: 12pt;"
+			onkeypress="javascript: if ((event.keyCode || event.which) == 13) { send(); return false; }"/>
+
+
+</td></tr></table>
+	
+        
+        </div>
+{% endblock %}

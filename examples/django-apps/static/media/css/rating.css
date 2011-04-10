@@ -1,0 +1,9 @@
+div.rating_bar {
+  width: 55px;
+  background: url(/static/media/img/admin/star_x_grey.gif) 0 0 repeat-x;
+}
+
+div.rating_bar div {
+  height: 12px;
+  background: url(/static/media/img/admin/star_x_orange.gif) 0 0 repeat-x;
+}

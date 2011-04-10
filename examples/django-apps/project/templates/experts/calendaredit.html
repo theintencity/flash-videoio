@@ -1,0 +1,45 @@
+{% extends "experts/base_frame.html" %}
+{% load adminmedia admin_list i18n %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+    	input#id_subject, #id_start_time, #id_end_time {
+    	    width: 100%;
+    	}
+    	textarea#id_description {
+    	    width: 100%;
+    	    height: 100px;
+    	}
+    </style>
+{% endblock %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block breadcrumbs %}
+  {% if status %}
+        <ul class="messagelist"><li>{{ status }}</li></ul>
+  {% endif %}
+  {% if error_message %}
+         <p class="errornote">{{ error_message }}</p>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+		<h2>Edit your appointment with {{ person }}</h2>
+        <div id="content-main">
+            <div class="module" style="width: 340px;">     
+	            <form action="" method="post">
+                    <table>
+                        <tr><th><label for="id_subject">Subject:</label></th><td>{{ form.subject }}</td></tr>
+						<tr><th><label for="id_description">Description:</label></th><td>{{ form.description }}</td></tr>
+						<tr><th><label for="id_start_time">Start time:</label></th><td>{% if is_my_calendar %}{{ form.start_time }}{% else %}{{ start_time }}{% endif %}</td></tr>
+						<tr><th><label for="id_end_time">End time:</label></th><td>{% if is_my_calendar %}{{ form.end_time }}{% else %}{{ end_time }}{% endif %}</td></tr>
+                     </table>
+                     <input type="submit" value="Save changes"/>
+             	</form>
+            </div>
+        </div>
+{% endblock %}

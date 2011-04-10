@@ -1,0 +1,80 @@
+{% extends "experts/base_frame.html" %}
+{% load adminmedia admin_list i18n %}
+
+{% block extrastyle %}
+    <style>
+    	table.month td {
+    		min-width: 74px;
+    		height: 70px;
+    		border: solid 1px #cfcfcf;
+    	}
+    	table.month td.today {
+    	    background-color: #cdcdcd;
+    	}
+    	table.month th.month {
+    		text-align: center;
+    	}
+    	table.month th.sun, th.sat, td.sun, td.sat {
+    		color: #808080;
+    	}
+    </style>
+{% endblock %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block breadcrumbs %}
+  {% if status %}
+        <ul class="messagelist"><li>{{ status }}</li></ul>
+  {% endif %}
+  {% if error_message %}
+         <p class="errornote">{{ error_message }}</p>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+        <div id="content-main">
+        	<table><tr><td>
+	        	{{ calendar }}
+	        </td><td>
+        		<table style="width: 300px;">
+        			<tr><th><center>{{ date }}</center></th></tr>
+        			<tr><td>
+			        	Availability: {{ availability }}
+        			</td></tr>
+        			<tr><td>
+        			  {% if user.email %}
+        				<form action="" method="POST">
+        					Quick add event at time:
+        					<input type="text" name="time" value="10:00 am" style="width: 57px;"/>
+        					<input type="text" name="duration" value="1hr" style="width: 32px;"/><br/> 
+        					Subject <input type="text" name="subject" style="width: 150px;" value="I need your expert advice!"/>
+        					<input type="hidden" name="add_event" value="true"/>
+        					<input type="submit" style="width: 38px; height: 20px;" value="Add"/><br/>
+        					<textarea name="description" style="width: 234px; height: 20px;"></textarea>
+        				</form>
+        			  {% else %}
+        			    Please login to add an appointment!
+        			  {% endif %}
+        			</td></tr>
+        			{% for item in appointments %}
+        				<tr><td>
+        					{{ item.time }}
+        					{% if item.is_my_event %}
+        						<a href="/experts/{{ item.person }}/profile">{{ item.person }}</a>
+        						<div style="float: right;">
+		        					<a href="edit/{{ item.key }}"><img src="/static/media/img/admin/icon_changelink.gif"></img></a>
+    	    						<a href="?delete={{ item.key }}"><img src="/static/media/img/admin/icon_deletelink.gif"></img></a>
+        						</div>
+        						<br/>
+        						<div style="color: #888888; padding-left: 30px;">{{ item.description }}</div>
+        					{% else %}
+        						Busy
+        					{% endif %}
+        				</td></tr>
+        			{% endfor %}
+        		</table>
+	        </td></tr></table>
+        </div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "experts/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">{% trans 'Home' %}
+  
+  {% if user.email %}
+    <div style="float: right;">
+        My <a href="/experts/{{ user.email }}/profile">Profile</a> 
+      | <a href="/experts/{{ user.email }}/talk">Office</a> 
+      | <a href="/experts/{{ user.email }}/calendar">Calendar</a>
+    </div>
+  {% endif %}
+  
+  </div>
+  
+  {% if status %}
+        <ul class="messagelist"><li>{{ status }}</li></ul>
+  {% endif %}
+  {% if error_message %}
+         <p class="errornote">{{ error_message }}</p>
+  {% endif %}
+{% endblock %}
+
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        <div class="module" style="padding: 4px; text-align: justify;">
+            This web site allows you to connect to experts on various topics. 
+            If you are an expert on some topic, login using your Google account and share your expertise 
+            using real-time video call.
+        </div>
+        <div class="module">
+        	<h2>Start Talking to an Expert</h2>
+        	<ol style="padding-left: 10px;">
+        		<li>{% if user.is_active %}<img src="/static/media/img/admin/icon-yes.gif"></img>{% endif %}
+        			Login using your Google account.</li>
+        		<li>Search experts by topics: e.g., python programming</li>
+        		<li>Choose an expert, and click to talk, or schedule an appointment in his/her calendar.</li>
+        		<li>Provide rating and review feedback for an expert after talking to him/her.</li>
+    	    </ol>
+        </div>
+        <div class="module">
+        	<h2>Get Started as an Expert</h2>
+        	<ol style="padding-left: 10px;">
+        		<li>{% if user.is_active %}<img src="/static/media/img/admin/icon-yes.gif"></img>{% endif %}
+        			Login using your Google account.</li>
+        		<li>{% if user.name %}<img src="/static/media/img/admin/icon-yes.gif"></img>{% endif %}
+        			Edit your profile, expertise, etc.</li>
+        		<li>Optionally edit your calendar to open talk invitations from other users.</li>
+        		<li>Go to your video office, so that other users can talk to you now!</li>
+    	    </ol>
+        </div>
+        <div class="module">
+        	<h2>Get Paid as an Expert (coming soon)</h2>
+        	<div style="padding: 4px 10px 4px 10px; font-size: 8pt; text-align: justify;">
+        		You can get paid for giving expert advices. Just signup for Google Checkout's merchant account,
+        		decide your hourly rate, and put the "buy" button on your profile. Visitors who need your
+        		advice, will need to pay you via Google Checkout to schedule an appointment, and get service.
+        		All the money matters are between the expert and the visitor using Google Checkout, and
+        		our web site is not part of it and we do not take any commission!
+        	</div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+    <div id="content-related">
+        <div class="module">
+            <h2>{% trans 'Search' %}</h2>
+            <form action="search" method="GET" style="padding: 2px;">
+                <input type="text" name="q" value="{{ query|escape }}" style="width: 164px;">
+                <input type="submit" value="Go">
+            </form>
+        </div>
+        
+        {% if popular_topics %}
+        <div class="module">
+            <h2>{% trans 'Popular topics' %}</h2>
+            <div style="padding: 4px;">
+	            {% for topic in popular_topics %}
+    	        	<a href="search/?q={{ topic }}">{{ topic }}</a>,
+        	    {% endfor %}
+        	    ...
+        	</div>
+        </div>
+        {% endif %}
+        
+        {% if user.email %}
+        <div class="module">
+            <h2>{% trans 'Popular links' %}</h2>
+            <ul>
+            	<li><a href="/experts/{{ user.email }}/profile">My profile, expertise</a></li>
+            	<li><a href="/experts/{{ user.email }}/calendar">My calendar</a></li>
+            	<li><a href="/experts/{{ user.email }}/talk">My video office</a></li>
+            </ul>
+        </div>
+        {% endif %}
+        
+        {% if featured_experts %}
+        <div class="module">
+        	<h2>{% trans 'Featured experts' %}</h2>
+        	<div style="padding: 4px; font-size: 8pt;">
+        		{% for item in featured_experts %}
+        			<a href="/experts/{{ item.email }}/profile"><b>{{ item.name }}</b></a>
+        			{{ item.tags }}
+        			<br/>
+        		{% endfor %}
+        	</div>
+       	</div>
+       	{% endif %}
+        
+    </div>
+{% endblock %}
+
+        

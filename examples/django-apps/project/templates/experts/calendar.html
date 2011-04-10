@@ -1,0 +1,70 @@
+{% extends "experts/base_site.html" %}
+{% load adminmedia admin_list i18n %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/forms.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/changelists.css" />
+    <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />
+        <script type="text/javascript" src="/admin/jsi18n/"></script>
+        <script type="text/javascript" src="{% load adminmedia %}{% admin_media_prefix %}js/core.js"></script>
+        <script type="text/javascript" src="{% load adminmedia %}{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script> 
+        
+    <style>
+    	table.month td {
+    		width: 80px;
+    		height: 80px;
+    		border: solid 1px #cfcfcf;
+    	}
+    	table.month th.month {
+    		text-align: center;
+    	}
+    	table.month th.sun, th.sat, td.sun, td.sat {
+    		color: #ff0000;
+    	}
+    </style>
+    
+        {{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs"><a href="/experts">{% trans 'Home' %}</a> &rsaquo; 
+  <a href="/experts/{{ account }}/profile">{{ account }}</a> &rsaquo; 
+  {% trans 'Calendar' %}
+  
+    <div style="float: right;">
+        <a href="/experts/{{ account }}/talk">Talk</a> 
+    </div>
+  
+  </div>
+  
+  {% if status %}
+        <ul class="messagelist"><li>{{ status }}</li></ul>
+  {% endif %}
+  {% if error_message %}
+         <p class="errornote">{{ error_message }}</p>
+  {% endif %}
+{% endblock %}
+
+{% block content_title %}
+<!--h1>
+	{% trans 'Calendar' %}
+</h1-->
+                
+{% endblock %}
+
+{% block content %}
+        <div id="content-main">
+        	<iframe id="calendar" style="border: none; width: 100%; min-width: 930px; height: 600px";">
+        		Your browser does not support iframe to display this calendar!
+        	</iframe>
+        	<script type="text/javascript">
+        		document.getElementById('calendar').src = "/experts/{{ account }}/calendar/" +
+        			(new Date()).getTimezoneOffset() + "/now/"; 
+        	</script>
+        </div>
+{% endblock %}
