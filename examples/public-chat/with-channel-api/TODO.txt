@@ -1,0 +1,17 @@
++ Links posted in chat should be clickable.
++ should not allow checking your own name in user list
++ automatically connect video of new members.
+  added a new auto=true URL parameter, which is used.
++ by default enable your video on join, without clicking.
+  is done only when auto=true is supplied on URL.
++ user list on left. 
++ panels with existing controls on top.
+- settings/preferences control (for later).
++ automatically set name if name= supplied on URL parameter.
+- bug: checkbox becomes unclicked on name change.
++ tool tips for all elements on right/top panels.
++ move instructions to a [?] control in the top panel.
++ co-ordinated black/grey/white color. 
++ keep mostly simple 'as is' to fit for mobiles.
+- install 10.3 to test echo.
++ make it work on IE.

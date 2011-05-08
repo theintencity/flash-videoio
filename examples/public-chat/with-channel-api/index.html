@@ -1,3 +1,5 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Multiparty chat room</title>
@@ -8,12 +10,26 @@
 <script type="text/javascript">
 <!--
 
+function getParameter(name)
+{
+	name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+	var regexS = "[\\?&]"+name+"=([^&#]*)";
+	var regex = new RegExp( regexS );
+	var results = regex.exec(window.location.href);
+	if( results == null )
+		return "";
+	else
+		return results[1];
+}
+
+var auto = getParameter("auto") == "true";
+
 function initialize() {
 	//The Adobe Stratus URL with the developer key for media connection.
 	webtalk.mediaURL = 'rtmfp://stratus.rtmfp.net/d1e1e5b3f17e90eb35d244fd-c711881365d9/';
 
 	//Update the initial name.
-	webtalk.myname = "User " + webtalk.clientId;
+	webtalk.myname = getParameter("name") || ("User " + webtalk.clientId);
 
 	//The name of the VideoIO object with local publish video, if any
 	webtalk.myvideo = null;
@@ -29,7 +45,7 @@ function initialize() {
 }
 
 function escapeHTML(value) {
-	return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, '&quot;');
 }
 
 function joinRoom(name) {
@@ -70,9 +86,15 @@ function changeName(name) {
 	webtalk.joinRoom(); // re-join the chat room
 }
 
+function replaceLinks(text) {
+	var exp = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+	return text.replace(exp,"<a href='$1' target='_blank'>$1</a>"); 
+}
+
 function send(msg) {
 	// post to the chat history
 	msg = escapeHTML(msg);
+	msg = replaceLinks(msg);
 	webtalk.postChatHistory(msg);
 	// webtalk.loadChatHistory();
 }
@@ -126,8 +148,12 @@ function play(inputName) {
 	
 	var result = false;
 	var input = document.getElementById(inputName);
-	var enable = input.checked;
-	if (enable) {
+	if (input && input.checked) {
+		if (userId == webtalk.clientId) {
+			if (!window.confirm("Enabling your own video will cause loopback. Proceed?")) {
+				return false;
+			}
+		}
 		var src = webtalk.userlist[userId].extra;
 		var name = null;
 		for (var i=1; i<=6; ++i) {
@@ -156,7 +182,43 @@ function play(inputName) {
 	return result;
 }
 
+// auto-mode defines whether to automatically join all videos of all participants as applicable?
+
+function onAutoInit() {
+	document.getElementById("publishCheck").checked = true;
+	publish(true);
+	
+	for (var clientId in webtalk.userlist) {
+		if (clientId != webtalk.clientId)
+			onAutoAdd(webtalk.userlist[clientId]);
+	}
+}
+
+function onAutoAdd(user) {
+	if (user.clientId != webtalk.clientId && user.extra) {
+		var input = document.getElementById("play" + user.clientId);
+		input.checked = true;
+		input.checked = play("play" + user.clientId);
+	}
+}
+
+webtalk.onUserListAdded = function(user) {	
+	if (created_videos == 6 && auto == true) {
+		onAutoAdd(user);
+	}
+};
+
+
+// when all 6 videos are created in auto-mode, join the conference,
+// and join the other users whose videos are enabled.
+
+var created_videos = 0;
+
 function onCreationComplete(event) {
+	created_videos += 1;
+	if (auto == true && created_videos == 6) {
+		onAutoInit();
+	}
 }
 
 function onPropertyChange(event) {
@@ -190,12 +252,17 @@ function getVideoTag(index, x, y, width, height) {
 }
 
 webtalk.onChatHistory = function(msgs) {
-	var text = msgs ? msgs.map(function(obj) { return obj.text; }).join("") : "";
+	var text = "";
+	if (msgs && msgs.map) {
+			text = msgs.map(function(obj) { return obj.text; }).join("");
+	} else { // IE doesn't have Array.map
+		for (var i in msgs) {
+			text += msgs[i].text;
+		}
+	}
 	var chathistory = document.getElementById("chathistoryDiv");
 	var html = text.replace(/\n/g,"<br/>").replace(/\t/g,"&nbsp;&nbsp;&nbsp;&nbsp;");
 	chathistory.innerHTML = html || "&lt;empty&gt;";
-	//var chathistory = document.getElementById("historyText");
-	//chathistory.value = text != "" ? text.replace(/\t/g, "  ") : "<empty>";
 };
 
 webtalk.onUserList = function(users) {
@@ -211,23 +278,64 @@ webtalk.onUserList = function(users) {
 	} catch (e) { }
 	
 	var colors = ['#cfcfcf', '#ffffff'];
-	var html = "";
 	
-	for (var i=0; i<users.length; ++i) {
-		var user = users[i];
-		var color = colors[i % colors.length];
-		html += '<tr bgcolor="' + color + '" height="20px"><td width="20px">';
-		if (user.extra) {
-			html += '<input id="play' + user.clientId + '" type="checkbox" autocomplete="off" value="' + user.clientId + '" ' +
-				' title="Play this video" ' + 
-				' onclick="return play(\'play' + user.clientId + '\');" ' + 
-				(webtalk.user2Video[user.clientId] != undefined ? 'checked' : '') + ' />'
+	if (navigator.appName == "Microsoft Internet Explorer") {
+		var userlist = document.getElementById("userlistTable");
+		while (userlist.firstChild) {
+			userlist.removeChild(userlist.firstChild);
 		}
-		html +=  '</td><td>' + user.name + (user.clientId == webtalk.clientId ? " (You)" : "") 
-				+ '</td></tr>';
+		for (var i=0; i<users.length; ++i) {
+			var user = users[i];
+			var color = colors[i % colors.length];
+			var tr = document.createElement("tr");
+			tr.setAttribute("bgcolor", color);
+			tr.setAttribute("height", "20px");
+			var td1 = document.createElement("td");
+			td1.setAttribute("width", "20px");
+			if (user.extra) {
+				var input = document.createElement("input");
+				input.id = "play" + user.clientId;
+				input.setAttribute("type", "checkbox");
+				input.setAttribute("autocomplete", "off");
+				input.setAttribute("value", user.clientId);
+				input.setAttribute("title", "Play this video");
+				input.checked = webtalk.user2Video[user.clientId] != undefined;
+				input.onclick = function() {
+					return play(input.id);
+				};
+				td1.appendChild(input);
+			}
+			tr.appendChild(td1);
+			var td2 = document.createElement("td");
+			td2.appendChild(document.createTextNode(user.name + (user.clientId == webtalk.clientId ? " (You)" : "")));
+			tr.appendChild(td2);
+			userlist.appendChild(tr);
+		}
+		if (users.length == 0) {
+			var tr = document.createElement("tr");
+			var td = document.createElement("td");
+			td.appendChild(document.createTextNode("<empty>"));
+			tr.appendChild(td);
+			userlist.appendChild(tr);
+		}
+	} else {
+		var html = "";
+		for (var i=0; i<users.length; ++i) {
+			var user = users[i];
+			var color = colors[i % colors.length];
+			html += '<tr bgcolor="' + color + '" height="20px"><td width="20px">';
+			if (user.extra) {
+				html += '<input id="play' + user.clientId + '" type="checkbox" autocomplete="off" value="' + user.clientId + '" ' +
+					' title="Play this video" ' + 
+					' onclick="return play(\'play' + user.clientId + '\');" ' + 
+					(webtalk.user2Video[user.clientId] != undefined ? 'checked' : '') + ' />'
+	 		}
+			html +=  '</td><td>' + user.name + (user.clientId == webtalk.clientId ? " (You)" : "") 
+					+ '</td></tr>';
+		}
+		var userlist = document.getElementById("userlistTable");
+		userlist.innerHTML = html || "<tr><td>&lt;empty&gt;</td></tr>";
 	}
-	var userlist = document.getElementById("userlistTable");
-	userlist.innerHTML = html || "<tr><td>&lt;empty&gt;</td></tr>";
 };
 
 webtalk.onError = function(msg, level) {
@@ -236,6 +344,23 @@ webtalk.onError = function(msg, level) {
 	setTimeout(function() { input.value = level + ": " + msg; input.setSelectionRange(0, input.value.length); }, 100);
 };
 
+function showHelp() {
+	document.getElementById("help").style.visibility = "visible";
+	document.getElementById("hiddenHelp").style.visibility = "hidden";
+	document.getElementById("room").style.top = "366px";
+	document.getElementById("mine").style.top = "392px";
+	document.getElementById("userlist").style.top = "416px";
+	return false;
+}
+
+function hideHelp() {
+	document.getElementById("help").style.visibility = "hidden";
+	document.getElementById("hiddenHelp").style.visibility = "visible";
+	document.getElementById("room").style.top = "26px";
+	document.getElementById("mine").style.top = "52px";
+	document.getElementById("userlist").style.top = "76px";
+	return false;
+}
 //-->
 </script>
 </head>
@@ -253,51 +378,51 @@ var index = 0;
 for (y=gap; y<(gap+height)*rows; y+=(height+gap)) {
 	for (x=gap; x<(gap+width)*cols; x+=(width+gap)) {
 		index += 1;
-		document.write(getVideoTag(index, x, y, width, height));
+		document.write(getVideoTag(index, 242 + x, y, width, height));
 	}
 }
 </script>
 
-<div style="position: absolute; left: 728px; top: 2px; right: 2px; height: 20px; min-width: 165px; border: 1px solid grey; font-size: 11px; padding-top: 2px;">
+<div id="room" style="position: absolute; left: 2px; top: 26px; width: 238px; height: 20px; border: 1px solid grey; font-size: 11px; padding-top: 2px;">
 	&nbsp;Room: 
-	<input id="roomText" type="text" style="width: 90px; border: 1px dotted grey; font-size: 10px;" 
+	<input id="roomText" type="text" style="width: 150px; border: 1px dotted grey; font-size: 10px;" 
 		maxlength="30" autocomplete="off" value="public"
 		title="Enter a different chat room name"
 		onkeypress="javascript: if ((event.keyCode || event.which) == 13) {
 				joinRoom(document.getElementById('roomText').value);
 				return false;
 			}"/>
-	<input type="button" value="set" style="border: 1px outset black; background-color: lightGrey;"
+	<input type="button" value="set" style="width: 40px; height: 18px; border: 1px outset black; background-color: lightGrey;"
 		onclick="javascript: joinRoom(document.getElementById('roomText').value); return false;"/>
 </div>
 
-<div id="userlist" style="position: absolute; left: 728px; top: 28px; right: 2px; bottom: 26px; min-width: 120px; border: 1px solid grey">
-	<table id="userlistTable" style="width: 100%; top: 0px; bottom: 26px; font-size: 11px;"
-		cellspacing="0">
-	</table>
-</div>
-
-<div id="mine" style="position: absolute; left: 728px; right: 2px; bottom: 2px; height: 20px; min-width: 165px; border: 1px solid grey; font-size: 11px;">
+<div id="mine" style="position: absolute; left: 2px; width: 238px; top: 52px; height: 20px; border: 1px solid grey; font-size: 11px;">
 	<input id="publishCheck" type="checkbox" autocomplete="off"
 		title="Check to publish your audio and video"
 		onclick="return publish(document.getElementById('publishCheck').checked);" />
-	<input id="nameText" type="text" style="width: 100px; border: 1px dotted grey; font-size: 10px;" 
+	<input id="nameText" type="text" style="width: 161px; border: 1px dotted grey; font-size: 10px;" 
 		maxlength="30" autocomplete="off" value="Edit Your Name"
 		title="Edit your chat nick name"
 		onkeypress="javascript: if ((event.keyCode || event.which) == 13) {
 				changeName(document.getElementById('nameText').value);
 				return false;
 			}"/>
-	<input type="button" value="set" style="border: 1px outset black; background-color: lightGrey;"
+	<input type="button" value="set" style="width: 40px; height: 18px; border: 1px outset black; background-color: lightGrey;"
 		onclick="javascript: changeName(document.getElementById('nameText').value); return false;"/>
 </div> 
 
-<div style="position: absolute; left: 244px; top: 366px; bottom: 26px; width: 480px; border: 1px solid grey;">
+<div id="userlist" style="position: absolute; left: 2px; top: 76px; width: 238px; bottom: 2px; border: 1px solid grey">
+	<table id="userlistTable" style="width: 100%; top: 0px; bottom: 26px; font-size: 11px;"
+		cellspacing="0">
+	</table>
+</div>
+
+<div style="position: absolute; left: 244px; top: 366px; bottom: 26px; width: 722px; border: 1px solid grey;">
 	<div id="chathistoryDiv" style="width: 100%; height: 100%; overflow: auto; font-size: 11px;"></div>
 </div>
 
-<div id="input" style="position: absolute; left: 244px; bottom: 2px; height: 20px; width: 480px; border: 1px solid grey;">
-	<input id="inputText" type="text" style="border: none; width: 100%" autocomplete="off"
+<div id="input" style="position: absolute; left: 244px; bottom: 2px; height: 20px; width: 722px; border: 1px solid grey;">
+	<input id="inputText" type="text" style="border: none; width: 720px" autocomplete="off"
 		title="Enter a message here in this chat room"
 		value="Enter a chat message here" 
 		onclick="if (document.getElementById('inputText').value == 'Enter a chat message here') {
@@ -310,19 +435,25 @@ for (y=gap; y<(gap+height)*rows; y+=(height+gap)) {
 		}"/>
 </div>
 
-<div style="position: absolute; left: 2px; top: 366px; bottom: 2px; width: 238px; border: 1px solid grey; overflow: auto;">
+<div id="hiddenHelp" style="position: absolute; left: 2px; width: 238px; top: 2px; height: 20px; border: 1px solid grey; overflow: hidden;">
+	<span style="font-size: 12pt;"><a href="#" onclick="return showHelp();" style="cursor: pointer;">Click here on how to get started</a></span>
+</div>
+
+<div id="help" style="visibility: hidden; position: absolute; left: 2px; width: 238px; top: 2px; height: 360px; border: 1px solid grey; overflow: hidden;">
 	<span style="font-size: 12pt;">How to get started?</span>
+	<a href="#" onclick="return hideHelp();">hide</a>
 	<ol style="font-size: 9pt; padding-left: 20px; padding-top: 0px; padding-bottom: 0px;">
-		<li>Expand your browser window so that you see the user list on right.</li>
-		<li>Set your name on bottom-right corner.</li>
-		<li>Select the checkbox near your name on bottom-right corner to enable your video.</li>
-		<li>Select the checkbox near names of other people in user list of right corner to view their video.</li>
+		<li>Expand your browser window so that you see all the six video boxes.</li>
+		<li>The left panel below represents user list including your name. The right panel on top contains various participant videos including yours. The right panel on bottom is for text chat.</li>
+		<li>Change your name from "User ..." to your real name in the second edit box below.</li>
+		<li>Select the checkbox before your name to enable your camera.</li>
+		<li>Select the checkbox before the names of other people in the user list to view their video.</li>
 		<li>Enter the text chat message in bottom-center corner in this chat room.</li>
-		<li>If needed, set your room name on top-right corner, for a private room, instead of a default room name of "public".</li>
+		<li>If needed, set your room name in the first edit box below, for a private room, instead of a default room name of "public".</li>
 		<li>If needed, send private message to a particular user starting with <i>@user name:</i> before your message.</li>
 	</ol>
-	<p style="font-size: 9pt; color: #aaaaaa;">Copyright &copy; 2010, 
-		<a href="http://code.google.com/p/flash-videoio" style="text-decoration: none; color: #aaaaaa;"> Kundan Singh</a>.</p>
+	<p style="font-size: 9pt; color: #aaaaaa;">Copyright &copy; 2010-2011, 
+		<a href="http://code.google.com/p/flash-videoio" style="text-decoration: none; color: #aaaaaa;"> Kundan Singh</a></p>
 </div>
 
 </body>

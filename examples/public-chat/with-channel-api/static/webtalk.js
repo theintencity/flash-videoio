@@ -45,7 +45,7 @@ socket: null,
 // periodic refresh timer
 load: function() {
 	webtalk.clientId = Math.floor(Math.random()*10000000000).toString();
-    webtalk.createChannel();
+	webtalk.createChannel();
 },
 
 // When the page is unloaded, clear the periodic timer, and logout.
@@ -416,6 +416,10 @@ onUserListChange: function(added, removed) {
 	}
 	users.sort(function(a, b) {return ( a.name < b.name ? -1 : (a.name > b.name ? 1 : 0));})
 	webtalk.onUserList(users);
+	
+	for (var j in added) {
+		webtalk.onUserListAdded(added[j]);
+	}
 },
 
 //Application will override this method to update the display as needed.
@@ -431,6 +435,11 @@ onUserList: function(users) {
 	//	var userlist = document.getElementById("userlist");
 	//	var text = users ? users.map(function(obj) { return obj.name; }).sort().join("\n") : "";
 	//	userlist.value = text || "<empty>";
+},
+
+// Callback invoked after a user is added to the user list.
+onUserListAdded: function(user) {
+	// do nothing
 },
 
 // Display an error message in the input box.
