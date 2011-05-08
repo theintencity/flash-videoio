@@ -155,18 +155,20 @@ function play(inputName) {
 			}
 		}
 		var src = webtalk.userlist[userId].extra;
-		var name = null;
-		for (var i=1; i<=6; ++i) {
-			var obj = getFlashMovie("video" + i);
-			if (obj.getProperty("src") == null) {
-				result = true;
-				name = "video" + i;
-				break;
+		var name = webtalk.user2Video[userId];
+		if (name == null) {
+			for (var i=1; i<=6; ++i) {
+				var obj = getFlashMovie("video" + i);
+				if (obj.getProperty("src") == null) {
+					result = true;
+					name = "video" + i;
+					break;
+				}
 			}
 		}
 		if (name != null) {
 			webtalk.user2Video[userId] = name;
-			obj.setProperty("src", src);
+			getFlashMovie(name).setProperty("src", src);
 		}
 	}
 	else {
@@ -202,7 +204,7 @@ function onAutoAdd(user) {
 	}
 }
 
-webtalk.onUserListAdded = function(user) {	
+webtalk.onUserListAdded = function(user) {
 	if (created_videos == 6 && auto == true) {
 		onAutoAdd(user);
 	}
@@ -213,10 +215,11 @@ webtalk.onUserListAdded = function(user) {
 // and join the other users whose videos are enabled.
 
 var created_videos = 0;
+var userlist_count = 0;
 
 function onCreationComplete(event) {
 	created_videos += 1;
-	if (auto == true && created_videos == 6) {
+	if (auto == true && created_videos == 6 && userlist_count > 0) {
 		onAutoInit();
 	}
 }
@@ -266,6 +269,8 @@ webtalk.onChatHistory = function(msgs) {
 };
 
 webtalk.onUserList = function(users) {
+	userlist_count += 1;
+	
 	try {
 		for (var userId in webtalk.user2Video) {
 			if (webtalk.userlist[userId] == undefined || !webtalk.userlist[userId].extra) {
@@ -281,6 +286,7 @@ webtalk.onUserList = function(users) {
 	
 	if (navigator.appName == "Microsoft Internet Explorer") {
 		var userlist = document.getElementById("userlistTable");
+		var firstTime = !(userlist.firstChild);
 		while (userlist.firstChild) {
 			userlist.removeChild(userlist.firstChild);
 		}
@@ -299,9 +305,9 @@ webtalk.onUserList = function(users) {
 				input.setAttribute("autocomplete", "off");
 				input.setAttribute("value", user.clientId);
 				input.setAttribute("title", "Play this video");
-				input.checked = webtalk.user2Video[user.clientId] != undefined;
+				input.checked = (webtalk.user2Video[user.clientId] != undefined);
 				input.onclick = function() {
-					return play(input.id);
+					return play(event.srcElement.id);
 				};
 				td1.appendChild(input);
 			}
@@ -317,6 +323,9 @@ webtalk.onUserList = function(users) {
 			td.appendChild(document.createTextNode("<empty>"));
 			tr.appendChild(td);
 			userlist.appendChild(tr);
+		}
+		if (firstTime && created_videos == 6 && auto == true) {
+			onAutoInit();
 		}
 	} else {
 		var html = "";
