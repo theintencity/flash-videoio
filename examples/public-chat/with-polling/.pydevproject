@@ -7,7 +7,7 @@
 <value>/usr/local/google_appengine</value>
 </pydev_variables_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
-<path>/googleapp-public-chat/src</path>
+<path>/googleapp-public-chat-polling/src</path>
 </pydev_pathproperty>
 <pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
 <path>${GOOGLE_APP_ENGINE}</path>
