@@ -2,6 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Video Component Demo</title>
+<script src="AC_OETags.js" language="javascript"></script>
 <style type="text/css">
 body { font-size: small; }
 td { font-size: small; }
@@ -103,11 +104,11 @@ function onCreationComplete(event) {
         'sound':'boolean','volume':'number',
         'camera':'boolean','cameraLoopback':'boolean','cameraWidth':'number','cameraHeight':'number',
         'cameraFPS':'number','keyFrameInterval':'number','cameraQuality':'number',
+        'privacyEvent':'boolean','deviceAllowed':'boolean', 'detectActivity':'boolean',
         'display':'boolean','videoWidth':'number','videoHeight':'number','currentFPS':'number',
         'cameraBandwidth':'number','smoothing':'boolean','enableFullscreen':'boolean','fullscreen':'boolean',
         'currentTime':'number','duration':'number','bytesLoaded':'number','bytesTotal':'number',
-        'quality':'number', 'bandwidth':'number',
-        'sip':'string'
+        'quality':'number', 'bandwidth':'number'
     };
     for (var name in props) {
         var type = props[name];
@@ -144,6 +145,10 @@ function onPostingNotify(event) {
     log("onPostingNotify() user=" + event.user + ", text=" + event.text);
 }
 
+function onShowingSettings(event) {
+	log("onShowingSettings()");
+}
+
 function help(name) {
     var obj = getFlashMovie("video1");
     if (obj) {
@@ -167,6 +172,57 @@ function help(name) {
 </script>
 
 <div style="left: 10px; top: 50px; position: absolute">
+
+	<script language="JavaScript" type="text/javascript">
+	<!--
+	var hasProductInstall = DetectFlashVer(6, 0, 65);
+	var hasVersion10 = DetectFlashVer(10, 0, 0);
+	var hasVersion10_3 = DetectFlashVer(10, 3, 0);
+	
+	if (hasProductInstall && !hasVersion10) {
+		var MMPlayerType = (isIE == true) ? "ActiveX" : "PlugIn";
+		var MMredirectURL = window.location;
+	    document.title = document.title.slice(0, 47) + " - Flash Player Installation";
+	    var MMdoctitle = document.title;
+	
+		AC_FL_RunContent(
+			"src", "playerProductInstall",
+			"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
+			"width", "320",
+			"height", "240",
+			"align", "middle",
+			"id", "video1",
+			"quality", "high",
+			"bgcolor", "#000000",
+			"name", "video1",
+			"allowScriptAccess","always",
+			"type", "application/x-shockwave-flash",
+			"pluginspage", "http://www.adobe.com/go/getflashplayer"
+		);
+	} else if (hasVersion10) {
+		AC_FL_RunContent(
+				"src", hasVersion10_3 ? "VideoIO45" : "VideoIO",
+				"width", "320",
+				"height", "240",
+				"align", "middle",
+				"id", "video1",
+				"quality", "high",
+				"bgcolor", "#000000",
+				"name", "video1",
+				"allowScriptAccess","always",
+				"allowFullScreen","true",
+				"type", "application/x-shockwave-flash",
+				"pluginspage", "http://www.adobe.com/go/getflashplayer"
+		);
+	  } else {
+	    var alternateContent = 'This content requires the Adobe Flash Player. '
+	   	+ '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
+	    document.write(alternateContent);
+	  }
+	// -->
+	</script>
+	
+	<!--
   	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 			id="video1" width="320" height="240"
 			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
@@ -184,6 +240,7 @@ function help(name) {
 				pluginspage="http://www.adobe.com/go/getflashplayer">
 			</embed>
 	</object>
+	-->
 </div>
 
 <div style="left: 350px; top: 50px; width: 320px; position: absolute">
@@ -260,6 +317,19 @@ function help(name) {
             onclick="setBool('recording', 'recording')"/>
         <a href="javascript:help('recording')">recording</a>
             
+        <br/>
+        
+        <input id="privacyEvent" type="checkbox"
+            onclick="setBool('privacyEvent', 'privacyEvent')"/>
+        <a href="javascript:help('privacyEvent')">privacyEvent</a>,
+                
+        <input id="deviceAllowed" type="checkbox" disabled/>
+        <a href="javascript:help('deviceAllowed')">deviceAllowed</a>, 
+                
+        <input id="detectActivity" type="checkbox"
+        	onclick="setBool('detectActivity', 'detectActivity')"/>
+        <a href="javascript:help('detectActivity')">detectActivity</a>, 
+                
         <br/><br/>
         
         <table style="width: 300px;">
@@ -485,7 +555,7 @@ function help(name) {
                 <td align="right" colspan="2">
                     <input id="method" type="text" style="width: 240px" value='call("invite","sip:target@localhost")' 
                         onkeypress="if (isEnter(event)) return callMethod('method')"/>
-                    <a href="javascript:callMethod('method')">call</a>
+                    <a href="#" onclick="callMethod('method'); return false;">call</a>
                 </td>
             </tr>
         </table>

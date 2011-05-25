@@ -148,113 +148,133 @@ Represents the publish or stop state of the stream. This is useful only for a pu
 </td></tr>
 
 <tr class="d0">
+<td>privacyEvent</td><td>boolean,<br/>default false</td><td>
+Controls whether <tt>onShowingSettings</tt> callback function is called when the Flash Player settings is about to be displayed for device access. This is also useful if you wish to use the <tt>deviceAllowed</tt> property to know whether the device access is allowed or one. One use case is when you want to hide the audio-only Flash application under normal use but want to show it for settings display.
+</td></tr>
+
+<tr class="d1">
+<td>deviceAllowed</td><td>boolean,<br/>default false,<br/>read only</td><td>
+Represents whether device access is allowed by the end user for this application in the Flash Player settings. To get the correct value for this property you must set the <tt>privacyEvent</tt> property to <tt>true</tt>. Please note that the Flash Player does not dispatch any event when the settings dialog box is closed, but does send an event when the user clicks on <tt>allow</tt> or <tt>deny</tt> radio buttons.
+</td></tr>
+
+<tr class="d0">
+<td>detectActivity</td><td>boolean,<br/>default true</td><td>
+Controls whether to detect mouse activity so that the control-bar, if present, can be automatically hidden after some inactivity. If you set this to <tt>false</tt> and set <tt>controls</tt> to <tt>true</tt> then the control-bar will not hide after mouse inactivity.
+</td></tr>
+
+<tr class="d1">
 <td>microphone</td><td>boolean,<br/>default false</td><td>
 Represents whether the microphone is on and capturing audio or not. This is implicitly set when <tt>publish</tt> property is set. This can be explicitly set to control the microphone on/off. This property is also attached to the microphone on/off icon on the control panel if visible.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>codec</td><td>string,<br/>default "Speex"</td><td>
 Represents the microphone codec to use, and is "Speex" or "NellyMoser", as supported by Flash Player plugin. Setting the property also affects currenly publishing audio stream.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>rate</td><td>number,<br/>default 16</td><td>
 Represents the microphone sampling rate to use, and is 8 or 16. This is useful only when <tt>codec</tt> is "Speex". It represents the sampling rate of the audio codec in kHz. It is not recommended to change this value unless you really need to use a different sampling rate, e.g., for interoperating with telephony network you may need 8 kHz sampling.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>encodeQuality</td><td>number,<br/>default 6</td><td>
 Represents the microphone encode quality, and is a number between 0 and 10, with 10 indicating highest quality. This is useful only when <tt>codec</tt> is "Speex" and controls the bandwidth of the captured audio stream.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>framesPerPacket</td><td>number,<br/>default 1</td><td>
 Represents the microphone frames per packet, and is typically a small number like 1 or 2. It is not recommended to change this value. Some versions of Flash Player are known to work well when <tt>framesPerPacket</tt> is 1 if the <tt>codec</tt> is "Speex".
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>gain</td><td>number,<br/>default 0.5</td><td>
 Represents the microphone gain, and is between 0 and 1, with 1 indicating maximum gain and 0 indicating mute. Since current version of Flash Player plugin does not have good acoustic echo cancellation, setting the gain to higher values causes lot of echo disturbance when used in multimedia call with speaker phone. This property is also attached to the microphone gain slider on the control panel if visible.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>level</td><td>number,<br/>default 0,<br/>read-only</td><td>
 Indicates the microphone activity level, and is between 0 and 1. It is valid only when <tt>microphone</tt> is true and you are actively publishing a media stream indicating that the microphone is actively capturing the audio. This property is also attached to the microphone activity level on the control panel if visible.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>echoSuppression</td><td>boolean,<br/>default true</td><td>
 Controls whether to enable or disable echo suppression on the underlying microphone object.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>sileneceLevel</td><td>number,<br/>default 0</td><td>
 Represents the microphone silenece level for silence suppression, and is between 0 and 100, 0 indicating no silence suppression and 100 indicating suppress all audio. Recommended value is 2.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>sound</td><td>boolean,<br/>default true</td><td>
 Controls whether the play sound is on or off. You can implement speaker mute mode by setting <tt>sound</tt> to false. This property is also attached to the speaker on/off icon on the control panel if visible. This controls the global sound volume of the application.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>volume</td><td>number,<br/>default 0.5</td><td>
 Represents the play sound volume between 0 and 1, with 1 indicating full volume. This property is also attached to the speaker volume slider on the control panel if visible. This controls the global sound volume of the application.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>camera</td><td>boolean,<br/>default false</td><td>
 Represents whether the camera is on and capturing video or not. This is implicitly set when <tt>live</tt> or <tt>publish</tt> property is set. This can be explicitly set to control the camera on/off. This property is also attached to the camera on/off icon on the control panel if visible. On Mac OS, when set, it tries to use the "USB Video Class Video" camera, whereas on other platforms it tries to use the default camera.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>cameraLoopback</td><td>boolean,<br/>default false</td><td>
 Controls whether a local view of what the camera is capturing is compressed and decompressed (true), as it would be for live transmission, or whether the local view is uncompressed (false). Enabling this property is useful to show the compressed video quality in local view, which otherwise shows only uncompressed video. Note that the local preview video is scaled to fit to the dimensions of VideoIO object.
  </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>cameraWidth</td><td>number,<br/>default 320</td><td>
 Represents the camera capture width in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording. The aspect ratio is always 4:3, hence setting the <tt>cameraWidth</tt> also sets the <tt>cameraHeight</tt> accordingly. Note that the local preview video is scaled to fit to the dimensions of VideoIO object.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>cameraHeight</td><td>number,<br/>default 240</td><td>
 Represents the camera capture height in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording.The aspect ratio is always 4:3, hence setting the <tt>cameraHeight</tt> also sets the <tt>cameraWidth</tt> accordingly.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>cameraFPS</td><td>number,<br/>default 12</td><td>
 Controls the desired frames per second for the camera. Higher value gives better quality picture but consume higher bandwidth. The application may want to increase the frames per second for higher quality recording. Note however that this is just the desired value, and the actual value may be less than this based on other constraints such as maximum bandwidth available. Use <tt>currentFPS</tt> to know the actual frames per second.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>keyFrameInterval</td><td>number,<br/>default 15</td><td>
 Controls the desired key frame interval of the camera. The key or intra frame captures full image data instead of difference from previous or next frame. Key frames are useful to refresh the video when seeking or when there are packet loss on unreliable channel. Since Flash media streams run over reliable TCP transport, packet loss is not an issue unless gatewaying with some other system. A <tt>keyFrameInterval</tt> of 15 means that every 15th frame is a key frame. Allowed values are 1 to 28. We recommend not to change this value.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>cameraQuality</td><td>number,<br/>default 0</td><td>
 Controls the desired frame quality of the camera and is between 0 and 100. A value of 0 means the quality can vary as needed to avoid exceeding the available <tt>cameraBandwidth</tt>. A value of 1 means lowest quality with maximum compressions and 100 means highest quality without compression. For live video communication a value between 70-90 is ideal -- more than 90 consumes too much bandwidth, and less than 70 gives blocky picture quality. Ideally only one of <tt>cameraBandwidth</tt> or <tt>cameraQuality</tt>, but not both, should be set.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>cameraBandwidth</td><td>number,<br/>default 0</td><td>
 Controls the maximum bandwidth in bytes per second of the camera. A value of 0 means the camera can use as much bandwidth as needed to maintain the desired <tt>cameraQuality</tt>. Ideally only one of <tt>cameraBandwidth</tt> or <tt>cameraQuality</tt>, but not both, should be set.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>videoWidth</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Represents the width in pixels of the active video display, if any, or NaN if none. This is the original unscaled width. The actual video display is scaled to fit the dimensions of VideoIO object.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>videoHeight</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Represents the height in pixels of the active video display, if any, or NaN if none. This is the original unscaled height. The actual video display is scaled to fit the dimensions of VideoIO object.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>currentFPS</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Represents the current frames per second of video display in live streaming mode. If unavailable, this is NaN.
+</td></tr>
+
+<tr class="d1">
+<td>display</td><td>boolean,<br/>default true</td><td>
+Controls whether video display is enabled or not, and applies to both publish and play mode. If you do not want to display the video, e.g., for audio-only user interface, or if you have multiple publish VideoIO instances, you can set this to <tt>false</tt>.
 </td></tr>
 
 <tr class="d0">
@@ -263,41 +283,56 @@ Controls whether smoothing is applied to any video display or not. Since video s
 </td></tr>
 
 <tr class="d1">
+<td>enableFullScreen</td><td>boolean,<br/>default true</td><td>
+Controls whether the full screen mode is enabled or not. If the full screen mode is disabled, then the user interface elements needed to do full screen are hidden. Resetting this property to <tt>false</tt> is useful if you know that full screen is not available, e.g., in Facebook FBML application.
+</td></tr>
+
+<tr class="d0">
 <td>fullscreen</td><td>boolean,<br/>default false,<br/>read-only</td><td>
 Represents the full screen mode of the application. Due to restriction in Flash Player, this property can only be set in response to a mouse click or button press within Flash application. Hence setting this property by an external application has no effect. This property is also attached to the fullscreen button state in the control panel if visible, and the clicking the button toggles full screen mode. To allow full screen mode, the embedding HTML page must supply the <tt>allowFullScreen</tt> parameter as true in the <tt>object</tt> tag.
 </td></tr>
 
+<tr class="d1">
+<td>snapshot</td><td>string</td><td>
+Represents a one-time snapshot of the video stream as a Base64 encoded JPEG image data. Reading this property captures the current snapshot. You can set a previously captured snapshot to show that image. This property is useful in capturing the snapshot without the builtin control-bar button, e.g., to capture and send the image to some backend script.
+</td></tr>
+
 <tr class="d0">
+<td>group</td><td>string</td><td>
+Represents the group name of the application level multicast in both publish and play mode. This is implicitly set using the <tt>group</tt> parameter of the <tt>src</tt> property, e.g., when <tt>src</tt> is set to "rtmfp://server/path?group=my/group1&publish=live1" then the <tt>group</tt> property is automatically set to <tt>my/group1</tt>. This property must be set before <tt>publish</tt> or <tt>play</tt> so that it takes effect before publishing or playing. Note that the <tt>group</tt> feature is available only in Flash Player 10.1 or later, and you need appropriate VideoIO45.swf compiled using Flex SDK 4.5 or later.
+</td></tr>
+
+<tr class="d1">
 <td>currentTime</td><td>number,<br/>default NaN</td><td>
 Represents the current play head position, in seconds, since the video started to play or record. For playback of live stream, the playhead position may start from some initial positive value if the player joins the stream after some time. If the current time is not known, the value is NaN. This property is also attached to the numeric display (as formatted duration in hh:mm:ss) on the control panel if available. Additionally, if <tt>duration</tt> is available, the <tt>currentTime</tt> controls the play head bar position on the control panel. Setting this property causes seek on media stream, if possible.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>duration</td><td>number,<br/>default NaN</td><td>
 Represents the total length of the media, in seconds. For live or recorded streams, this value is unavailable or NaN. For real-time playback of the stream or downloaded video file, this value may not be available, unless set by metadata or video resource has finished playback once. If this is not available on the media stream or resource, but the application knows the duration out of band, it can set the property. This property is also attached to the length of the play head bar on the control panel if available.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>bytesLoaded</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Indicates the number of bytes of data that have been loaded so far in the system. If unavailable, this is NaN.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>bytesTotal</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Indicates the total size of the media resource being loaded in the system for play. If unavailable, such as for live streams, this is NaN.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>quality</td><td>number,<br/>default 0,<br/>read-only</td><td>
 Indicates the quality of the play stream as a number between 0 (very low) and 1 (very high). The quality is calculated based on some combination of other metrics such as live delay of the stream. This property is also attached to the quality bars displayed in the control panel if available. In media stream play mode the control panel displays 4 quality bars indicating quality values in the range of (0, 0.25], (0.25, 0.5], (0.5, 0.75], (0.75, 1.0]), respectively.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>bandwidth</td><td>number,<br/>default 0,<br/>read-only</td><td>
 Indicates the media stream bandwidth in bytes per second for live play or publish mode. It includes only the audio and video bandwidth of the stream. This property gives the rough idea of the bandwidth utilization. If unavailable, this is NaN.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>bidirection</td><td>boolean,<br/>default false</td><td>
 Controls whether to allow media streams in both directions at the same time. This is applicable when setting <tt>play</tt> and <tt>publish</tt> properties. If <tt>bidirection</tt> is false, then setting <tt>play</tt> resets <tt>publish</tt> and vice-versa.
 </td></tr>
@@ -357,6 +392,14 @@ function getFlashMovie(movieName) {
 
 <p>Actually, <tt>callProperty</tt> is a generic method which allows you to call any public method on the underlying VideoIO object. The "call" method is a public method on VideoIO object which uses <tt>NetConnection</tt>'s <tt>call</tt> method to invoke a remote function on the server.</p>
 
+<p>Additionally, we have added a new <tt>post</tt> method, to send some text message to the group communication. This is used in conjunction with <tt>group</tt> property described earlier. In particular, if VideoIO is used to publish a stream to a group, the application can also invoke <tt>post</tt> as follows. The second argument is the user name and the third is the text message.</p>
+
+<pre class="code">
+    getFlashMovie('video1').callProperty('<b>post</b>', 'my name', 'some message text');
+</pre>
+
+<p>On the receiving side, the <tt>onPostingNotify</tt> callback method is invoked as described later. The <tt>post</tt> method and <tt>onPostingNotify</tt> callback are useful for implementing multicast group communication, e.g., multiparty text chat. Note that similar to the <tt>group</tt> property, you need Flash Player version 10.1 or later and VideoIO45.swf compiled using Flex SDK 4.5 or later.</p>
+
 <h2>Creation and change events</h2>
 
 <p>The VideoIO application invokes three JavaScript functions on certain events. These JavaScript functions, if defined, must be present in the global scope of the embedding HTML page. The <tt>onCreationComplete</tt> is invoked when the VideoIO application is created. The <tt>event</tt> parameter supplied to this function has an <tt>objectID</tt> property which you can use to identify the VideoIO <tt>object</tt>. The <tt>onPropertyChange</tt> is invoked when some property of the VideoIO application changes. The <tt>event</tt> parameter supplied to this function has <tt>objectID</tt>, <tt>property</tt>, <tt>oldValue</tt> and <tt>newValue</tt> properties. The <tt>property</tt> value stores the name of the property, e.g., "gain", which changed. The <tt>oldValue</tt> and <tt>newValue</tt> store the old and new value of that property during this change. The <tt>onCallback</tt> is invoked when the server invokes a client method on the <tt>NetConnection</tt> object. This is the reserve of the server method call, and allows the server to invoke a method on the client if needed. You may choose to ignore this method and not do anything.</p>
@@ -382,6 +425,20 @@ function onCallback(event) {
 }
 &lt;/script&gt;
 </pre>
+
+<p>We have added two additional callbacks (or events) as follows. The <tt>onPostingNotify</tt> is invoked to notify any group posts to the application. Please see the <tt>post</tt> method for the meaning of user and text attributes of the event. The <tt>onShowingSettings</tt> is invoked to notify that the Flash Player security settings box is about to be shown. Please see the <tt>privacyEvent</tt> and <tt>deviceAllowed</tt> properties for details.</p>
+
+<pre class="code">
+&lt;script&gt;
+function onPostingNotify(event) {
+    log("onPostingNotify() user=" + event.user + ", text=" + event.text);
+}
+function onShowingSettings(event) {
+	log("onShowingSettings()");
+}
+&lt;/script&gt;
+</pre>
+
 
 <h2>Documentation</h2>
 
