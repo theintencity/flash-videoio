@@ -106,7 +106,8 @@ function onCreationComplete(event) {
         'cameraFPS':'number','keyFrameInterval':'number','cameraQuality':'number',
         'privacyEvent':'boolean','deviceAllowed':'boolean', 'detectActivity':'boolean',
         'display':'boolean','videoWidth':'number','videoHeight':'number','currentFPS':'number',
-        'cameraBandwidth':'number','smoothing':'boolean','enableFullscreen':'boolean','fullscreen':'boolean',
+        'cameraBandwidth':'number','mirrored':'boolean','smoothing':'boolean',
+				'enableFullscreen':'boolean','fullscreen':'boolean',
         'currentTime':'number','duration':'number','bytesLoaded':'number','bytesTotal':'number',
         'quality':'number', 'bandwidth':'number'
     };
@@ -468,7 +469,11 @@ function help(name) {
                     <a href="javascript:help('currentFPS')">currentFPS</a>:
                     <input id="currentFPS" type="text" style="width: 40px" readonly/> 
                 </td>
-				<td>&nbsp;</td>
+								<td align="right">
+										<input id="mirrored" type="checkbox"
+						onclick="setBool('mirrored', 'mirrored')"/>
+                    <a href="javascript:help('mirrored')">mirrored</a>
+								</td>
             </tr>
             <tr>
                 <td align="right">

@@ -278,61 +278,66 @@ Controls whether video display is enabled or not, and applies to both publish an
 </td></tr>
 
 <tr class="d0">
+<td>mirrored</td><td>boolean,<br/>default true</td><td>
+Controls whether local view is mirrored or not. This does not apply to the play mode of remote view. This is useful if you want to avoid mirror view for local video.
+</td></tr>
+
+<tr class="d1">
 <td>smoothing</td><td>boolean,<br/>default true</td><td>
 Controls whether smoothing is applied to any video display or not. Since video smoothing algorithm consumes CPU cycles, applications may want to reset this property to reduce CPU utilization during play. The video smoothing removes pixelation effect on video if the video is scaled, e.g., the VideoIO dimension is different than actual video's width and height.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>enableFullScreen</td><td>boolean,<br/>default true</td><td>
 Controls whether the full screen mode is enabled or not. If the full screen mode is disabled, then the user interface elements needed to do full screen are hidden. Resetting this property to <tt>false</tt> is useful if you know that full screen is not available, e.g., in Facebook FBML application.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>fullscreen</td><td>boolean,<br/>default false,<br/>read-only</td><td>
 Represents the full screen mode of the application. Due to restriction in Flash Player, this property can only be set in response to a mouse click or button press within Flash application. Hence setting this property by an external application has no effect. This property is also attached to the fullscreen button state in the control panel if visible, and the clicking the button toggles full screen mode. To allow full screen mode, the embedding HTML page must supply the <tt>allowFullScreen</tt> parameter as true in the <tt>object</tt> tag.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>snapshot</td><td>string</td><td>
 Represents a one-time snapshot of the video stream as a Base64 encoded JPEG image data. Reading this property captures the current snapshot. You can set a previously captured snapshot to show that image. This property is useful in capturing the snapshot without the builtin control-bar button, e.g., to capture and send the image to some backend script.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>group</td><td>string</td><td>
 Represents the group name of the application level multicast in both publish and play mode. This is implicitly set using the <tt>group</tt> parameter of the <tt>src</tt> property, e.g., when <tt>src</tt> is set to "rtmfp://server/path?group=my/group1&publish=live1" then the <tt>group</tt> property is automatically set to <tt>my/group1</tt>. This property must be set before <tt>publish</tt> or <tt>play</tt> so that it takes effect before publishing or playing. Note that the <tt>group</tt> feature is available only in Flash Player 10.1 or later, and you need appropriate VideoIO45.swf compiled using Flex SDK 4.5 or later.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>currentTime</td><td>number,<br/>default NaN</td><td>
 Represents the current play head position, in seconds, since the video started to play or record. For playback of live stream, the playhead position may start from some initial positive value if the player joins the stream after some time. If the current time is not known, the value is NaN. This property is also attached to the numeric display (as formatted duration in hh:mm:ss) on the control panel if available. Additionally, if <tt>duration</tt> is available, the <tt>currentTime</tt> controls the play head bar position on the control panel. Setting this property causes seek on media stream, if possible.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>duration</td><td>number,<br/>default NaN</td><td>
 Represents the total length of the media, in seconds. For live or recorded streams, this value is unavailable or NaN. For real-time playback of the stream or downloaded video file, this value may not be available, unless set by metadata or video resource has finished playback once. If this is not available on the media stream or resource, but the application knows the duration out of band, it can set the property. This property is also attached to the length of the play head bar on the control panel if available.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>bytesLoaded</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Indicates the number of bytes of data that have been loaded so far in the system. If unavailable, this is NaN.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>bytesTotal</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Indicates the total size of the media resource being loaded in the system for play. If unavailable, such as for live streams, this is NaN.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>quality</td><td>number,<br/>default 0,<br/>read-only</td><td>
 Indicates the quality of the play stream as a number between 0 (very low) and 1 (very high). The quality is calculated based on some combination of other metrics such as live delay of the stream. This property is also attached to the quality bars displayed in the control panel if available. In media stream play mode the control panel displays 4 quality bars indicating quality values in the range of (0, 0.25], (0.25, 0.5], (0.5, 0.75], (0.75, 1.0]), respectively.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>bandwidth</td><td>number,<br/>default 0,<br/>read-only</td><td>
 Indicates the media stream bandwidth in bytes per second for live play or publish mode. It includes only the audio and video bandwidth of the stream. This property gives the rough idea of the bandwidth utilization. If unavailable, this is NaN.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>bidirection</td><td>boolean,<br/>default false</td><td>
 Controls whether to allow media streams in both directions at the same time. This is applicable when setting <tt>play</tt> and <tt>publish</tt> properties. If <tt>bidirection</tt> is false, then setting <tt>play</tt> resets <tt>publish</tt> and vice-versa.
 </td></tr>
