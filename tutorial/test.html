@@ -102,7 +102,8 @@ function onCreationComplete(event) {
         'framesPerPacket':'number','gain':'number','level':'number',
         'echoSuppression':'boolean', 'silenceLevel':'number',
         'sound':'boolean','volume':'number',
-        'camera':'boolean','cameraLoopback':'boolean','cameraWidth':'number','cameraHeight':'number',
+        'camera':'boolean','cameraLoopback':'boolean','videoCodec':'string',
+        'cameraWidth':'number','cameraHeight':'number',
         'cameraFPS':'number','keyFrameInterval':'number','cameraQuality':'number',
         'privacyEvent':'boolean','deviceAllowed':'boolean', 'detectActivity':'boolean',
         'display':'boolean','videoWidth':'number','videoHeight':'number','currentFPS':'number',
@@ -146,8 +147,12 @@ function onPostingNotify(event) {
     log("onPostingNotify() user=" + event.user + ", text=" + event.text);
 }
 
+function onReceiveData(event) {
+    log("onReceiveData() data=" + event.data);
+}
+
 function onShowingSettings(event) {
-	log("onShowingSettings()");
+	log("onShowingSettings() showing=" + event.showing);
 }
 
 function help(name) {
@@ -179,6 +184,7 @@ function help(name) {
 	var hasProductInstall = DetectFlashVer(6, 0, 65);
 	var hasVersion10 = DetectFlashVer(10, 0, 0);
 	var hasVersion10_3 = DetectFlashVer(10, 3, 0);
+	var hasVersion11 = DetectFlashVer(11, 0, 0);
 	
 	if (hasProductInstall && !hasVersion10) {
 		var MMPlayerType = (isIE == true) ? "ActiveX" : "PlugIn";
@@ -202,7 +208,7 @@ function help(name) {
 		);
 	} else if (hasVersion10) {
 		AC_FL_RunContent(
-				"src", hasVersion10_3 ? "VideoIO45" : "VideoIO",
+				"src", (hasVersion11 ? "VideoIO11" : (hasVersion10_3 ? "VideoIO45" : "VideoIO")),
 				"width", "320",
 				"height", "240",
 				"align", "middle",
@@ -416,6 +422,16 @@ function help(name) {
                     <input id="cameraLoopback" type="checkbox"
                         onclick="setBool('cameraLoopback', 'cameraLoopback')"/>
                     <a href="javascript:help('cameraLoopback')">cameraLoopback</a>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('videoCodec')">videoCodec</a>:
+                    <input id="videoCodec" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setString('videoCodec', 'videoCodec')"/>
+                </td>
+                <td align="right">
+		    &nbsp;
                 </td>
             </tr>
             <tr>
