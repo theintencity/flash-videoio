@@ -1,0 +1,72 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Picture in picture using VideoIO</title>
+</head>
+
+<body>
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+function start() {
+    var active = document.getElementById("start").value == "stop";
+    getFlashMovie("video2").setProperty("src",  !active ? document.getElementById('url2').value: null);
+    getFlashMovie("video1").setProperty("src",  !active ? document.getElementById('url1').value: null);
+    document.getElementById("start").value = active ? "start" : "stop";
+}
+</script>
+
+<div style="position: absolute; left: 10px; top: 10px; width: 640px; height: 480px;">
+<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+    id="video1" width="640" height="480"
+    codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+    <param name="movie" value="VideoIO45.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+    <embed src="VideoIO45.swf" quality="high" bgcolor="#000000"
+	    width="640" height="480" name="video1" align="middle"
+	    play="true" loop="false" quality="high"
+	    allowFullScreen="true"
+	    allowScriptAccess="always"
+	    type="application/x-shockwave-flash"
+	    pluginspage="http://www.adobe.com/go/getflashplayer">
+    </embed>
+</object>
+</div>
+
+<div style="position: absolute; left: 408px; top: 308px; width: 240px; height: 180px;">
+<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+    id="video2" width="240" height="180"
+    codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+    <param name="movie" value="VideoIO45.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#ffffff" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+    <embed src="VideoIO45.swf" quality="high" bgcolor="#ffffff"
+	    width="240" height="180" name="video2" align="middle"
+	    play="true" loop="false" quality="high"
+	    allowFullScreen="true"
+	    allowScriptAccess="always"
+	    type="application/x-shockwave-flash"
+	    pluginspage="http://www.adobe.com/go/getflashplayer">
+    </embed>
+</object>
+</div>
+
+<div style="position: absolute; left: 10px; top: 500px;">
+To test, run <a href="http://code.google.com/p/rtmplite">rtmp.py</a> locally as media server.
+Then click on start to publish your local video in picture-in-picture and play that from the server in bigger video.
+Please use Flash Player 10.3 or later.<br/>
+<input id="url2" type="text" value="rtmp://localhost/myapp?publish=live"/><br/>
+<input id="url1" type="text" value="rtmp://localhost/myapp?play=live"/><br/>
+<input id="start" type="button" value="start" onclick="start()"/><br/>
+
+</div>
+
+</body>
+</html>

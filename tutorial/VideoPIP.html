@@ -1,0 +1,117 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Picture in picture using VideoPIP.swf</title>
+</head>
+
+<body>
+<script type="text/javascript">
+function getFlashMovie(movieName) {
+    var isIE = navigator.appName.indexOf("Microsoft") != -1;
+    return (isIE) ? window[movieName] : document[movieName];  
+}
+function start() {
+    var obj = getFlashMovie("video1");
+    var active = document.getElementById("start").value == "stop";
+    if (!active) {
+	obj.setProperty("inner", "src", document.getElementById('url2').value);
+	obj.setProperty("outer", "controls", true);
+	obj.setProperty("outer", "src", document.getElementById('url1').value);
+    }
+    else {
+	obj.setProperty("inner", "src", null);
+	obj.setProperty("outer", "src", null);
+    }
+    obj.setProperty("inner", "style:borderColor", 0xffffff);
+    obj.setProperty("inner", "style:borderStyle", "solid");
+    obj.setProperty("inner", "style:borderThickness", 1);
+    document.getElementById("start").value = active ? "start" : "stop";
+}
+function changePosition() {
+    var obj = getFlashMovie("video1");
+    if (obj != null) {
+	var top = obj.getProperty("inner-swf", "style:top");
+	var bottom = obj.getProperty("inner-swf", "style:bottom");
+	var left = obj.getProperty("inner-swf", "style:left");
+	var right = obj.getProperty("inner-swf", "style:right");
+	//alert(top + " " + bottom + " " + left + " " + right);
+	if (top == 2 && right == 2) {
+	    obj.setProperty("inner-swf", "style:top", 2);
+	    obj.setProperty("inner-swf", "style:bottom", undefined);
+	    obj.setProperty("inner-swf", "style:left", 2);
+	    obj.setProperty("inner-swf", "style:right", undefined);
+	} else if (top == 2 && left == 2) {
+	    obj.setProperty("inner-swf", "style:top", undefined);
+	    obj.setProperty("inner-swf", "style:bottom", 22);
+	    obj.setProperty("inner-swf", "style:left", 2);
+	    obj.setProperty("inner-swf", "style:right", undefined);
+	} else if (bottom == 22 && left == 2) {
+	    obj.setProperty("inner-swf", "style:top", undefined);
+	    obj.setProperty("inner-swf", "style:bottom", 22);
+	    obj.setProperty("inner-swf", "style:left", undefined);
+	    obj.setProperty("inner-swf", "style:right", 2);
+	} else if (bottom == 22 && right == 2) {
+	    obj.setProperty("inner-swf", "style:top", 2);
+	    obj.setProperty("inner-swf", "style:bottom", undefined);
+	    obj.setProperty("inner-swf", "style:left", undefined);
+	    obj.setProperty("inner-swf", "style:right", 2);
+	}
+    }
+}
+function changeSize() {
+    var obj = getFlashMovie("video1");
+    if (obj != null) {
+	var width = obj.getProperty("inner-swf", "attr:percentWidth");
+	if (width == 25) {
+	    obj.setProperty("inner-swf", "attr:percentWidth", 35);
+	    obj.setProperty("inner-swf", "attr:percentHeight", 35);
+	} else if (width == 35) {
+	    obj.setProperty("inner-swf", "attr:percentWidth", 50);
+	    obj.setProperty("inner-swf", "attr:percentHeight", 50);
+	} else if (width == 50) {
+	    obj.setProperty("inner-swf", "attr:percentWidth", 15);
+	    obj.setProperty("inner-swf", "attr:percentHeight", 15);
+	} else if (width == 15) {
+	    obj.setProperty("inner-swf", "attr:percentWidth", 25);
+	    obj.setProperty("inner-swf", "attr:percentHeight", 25);
+	}
+    }
+}
+</script>
+
+<div style="position: absolute; left: 10px; top: 10px; width: 640px; height: 480px;">
+<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+    id="video1" width="320" height="240"
+    codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+    <param name="movie" value="VideoPIP.swf" />
+    <param name="quality" value="high" />
+    <param name="bgcolor" value="#000000" />
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+    <embed src="VideoPIP.swf" quality="high" bgcolor="#000000"
+	    width="320" height="240" name="video1" align="middle"
+	    play="true" loop="false" quality="high"
+	    allowFullScreen="true"
+	    allowScriptAccess="always"
+	    type="application/x-shockwave-flash"
+	    pluginspage="http://www.adobe.com/go/getflashplayer">
+    </embed>
+</object>
+</div>
+
+<div style="position: absolute; left: 10px; top: 260px;">
+To test, run <a href="http://code.google.com/p/rtmplite">rtmp.py</a> locally as media server.
+Then click on start to publish your local video in picture-in-picture and play that from the server in bigger video.
+Please use Flash Player 10.3 or later. The source code with details on the API of this SWF are in
+<a href="VideoPIP.mxml">VideoPIP.mxml</a>. View the source of this HTML page to learn more on
+how this API is used.<br/>
+<input id="url2" type="text" value="rtmp://localhost/myapp?publish=live"/><br/>
+<input id="url1" type="text" value="rtmp://localhost/myapp?play=live"/><br/>
+<input id="start" type="button" value="start" onclick="start()"/><br/>
+<input type="button" value="change position" onclick="changePosition()"/>
+<input type="button" value="change size" onclick="changeSize()"/>
+<br/>
+</div>
+
+</body>
+</html>

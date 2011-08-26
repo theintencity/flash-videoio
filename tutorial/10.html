@@ -149,7 +149,7 @@ Represents the publish or stop state of the stream. This is useful only for a pu
 
 <tr class="d0">
 <td>privacyEvent</td><td>boolean,<br/>default false</td><td>
-Controls whether <tt>onShowingSettings</tt> callback function is called when the Flash Player settings is about to be displayed for device access. This is also useful if you wish to use the <tt>deviceAllowed</tt> property to know whether the device access is allowed or one. One use case is when you want to hide the audio-only Flash application under normal use but want to show it for settings display.
+Controls whether <tt>onShowingSettings</tt> callback function is called when the Flash Player settings is about to be displayed or hidden for device access. This is also useful if you wish to use the <tt>deviceAllowed</tt> property to know whether the device access is allowed or one. One use case is when you want to hide the audio-only Flash application under normal use but want to show it for settings display.
 </td></tr>
 
 <tr class="d1">
@@ -169,7 +169,7 @@ Represents whether the microphone is on and capturing audio or not. This is impl
 
 <tr class="d0">
 <td>codec</td><td>string,<br/>default "Speex"</td><td>
-Represents the microphone codec to use, and is "Speex" or "NellyMoser", as supported by Flash Player plugin. Setting the property also affects currenly publishing audio stream.
+Represents the microphone codec to use, and is "Speex" or "NellyMoser", as supported by Flash Player plugin. Setting the property also affects currently publishing audio stream. In Flash Player 11 or later, additional G.711 audio codecs are also available. You can set this property to "pcmu" or "pcma" to enable G.711 audio codec modes.
 </td></tr>
 
 <tr class="d1">
@@ -258,86 +258,101 @@ Controls the maximum bandwidth in bytes per second of the camera. A value of 0 m
 </td></tr>
 
 <tr class="d0">
+<td>videoCodec</td><td>string,<br/>default Sorenson,<br/>player 11+ only</td><td>
+Controls the video codec of the publishing NetStream attached to the camera when <tt>publish</tt> property is set. This property is only available when using Flash Player 11 or later, otherwise setting this property has no effect. There are two possible values, "Sorenson" or "H264Avc", for the default Sorenson codec or the new H.264 advanced video coding, respectively. Additionally for "H264Avc", profile and level can be supplied, e.g., "H264Avc/baseline/2" indicates baseline profile and level of 2. The possible values for profile are "baseline" and "main" and supported levels are 1, 1b, 1.1, 1.2, 1.3, 2, 2.1, 2.2, 3, 3.1, 3.2, 4, 4.1, 4.2, 5, and 5.1. Note that the <tt>videoCodec</tt> property is applied to the publishing stream for H.264 and not to the camera. Hence, if you enable <tt>cameraLoopback</tt> you will not see H.264 encoded video in your loopback view, but the remote party listening to this stream will receive H.264 encoded video.
+</td></tr>
+
+<tr class="d1">
 <td>videoWidth</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Represents the width in pixels of the active video display, if any, or NaN if none. This is the original unscaled width. The actual video display is scaled to fit the dimensions of VideoIO object.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>videoHeight</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Represents the height in pixels of the active video display, if any, or NaN if none. This is the original unscaled height. The actual video display is scaled to fit the dimensions of VideoIO object.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>currentFPS</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Represents the current frames per second of video display in live streaming mode. If unavailable, this is NaN.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>display</td><td>boolean,<br/>default true</td><td>
 Controls whether video display is enabled or not, and applies to both publish and play mode. If you do not want to display the video, e.g., for audio-only user interface, or if you have multiple publish VideoIO instances, you can set this to <tt>false</tt>.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>mirrored</td><td>boolean,<br/>default true</td><td>
 Controls whether local view is mirrored or not. This does not apply to the play mode of remote view. This is useful if you want to avoid mirror view for local video.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>smoothing</td><td>boolean,<br/>default true</td><td>
 Controls whether smoothing is applied to any video display or not. Since video smoothing algorithm consumes CPU cycles, applications may want to reset this property to reduce CPU utilization during play. The video smoothing removes pixelation effect on video if the video is scaled, e.g., the VideoIO dimension is different than actual video's width and height.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>enableFullScreen</td><td>boolean,<br/>default true</td><td>
 Controls whether the full screen mode is enabled or not. If the full screen mode is disabled, then the user interface elements needed to do full screen are hidden. Resetting this property to <tt>false</tt> is useful if you know that full screen is not available, e.g., in Facebook FBML application.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>fullscreen</td><td>boolean,<br/>default false,<br/>read-only</td><td>
 Represents the full screen mode of the application. Due to restriction in Flash Player, this property can only be set in response to a mouse click or button press within Flash application. Hence setting this property by an external application has no effect. This property is also attached to the fullscreen button state in the control panel if visible, and the clicking the button toggles full screen mode. To allow full screen mode, the embedding HTML page must supply the <tt>allowFullScreen</tt> parameter as true in the <tt>object</tt> tag.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>snapshot</td><td>string</td><td>
 Represents a one-time snapshot of the video stream as a Base64 encoded JPEG image data. Reading this property captures the current snapshot. You can set a previously captured snapshot to show that image. This property is useful in capturing the snapshot without the builtin control-bar button, e.g., to capture and send the image to some backend script.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>group</td><td>string</td><td>
 Represents the group name of the application level multicast in both publish and play mode. This is implicitly set using the <tt>group</tt> parameter of the <tt>src</tt> property, e.g., when <tt>src</tt> is set to "rtmfp://server/path?group=my/group1&publish=live1" then the <tt>group</tt> property is automatically set to <tt>my/group1</tt>. This property must be set before <tt>publish</tt> or <tt>play</tt> so that it takes effect before publishing or playing. Note that the <tt>group</tt> feature is available only in Flash Player 10.1 or later, and you need appropriate VideoIO45.swf compiled using Flex SDK 4.5 or later.
 </td></tr>
 
+<tr class="d1">
+<td>objectEncoding</td><td>number,<br/>default 3</td><td>
+Controls the connection's object encoding. Possible values are 3 or 0 for AMF3 or AMF0 respectively. This property must be set before <tt>src</tt> or <tt>url</tt> is set so that the value is applied before invoking the connect method on the underlying <tt>NetConnection</tt>. Setting it after the connection is initiated has no effect on the current connection.
+</td></tr>
+
 <tr class="d0">
+<td>proxyType</td><td>string,<br/>default "none"</td><td>
+Determines which fallback methods are tried if an initial connection attempt fails. Possible values are "none", "best", "HTTP" and "CONNECT". The value of "best" is particularly useful when using "rtmps" with native SSL instead of HTTPS tunneling. This property must be set before <tt>src</tt> or <tt>url</tt> is set so that the value is applied before invoking the connect method on the underlying <tt>NetConnection</tt>. Setting it after the connection is initiated has no effect on the current connection.
+</td></tr>
+
+<tr class="d1">
 <td>currentTime</td><td>number,<br/>default NaN</td><td>
 Represents the current play head position, in seconds, since the video started to play or record. For playback of live stream, the playhead position may start from some initial positive value if the player joins the stream after some time. If the current time is not known, the value is NaN. This property is also attached to the numeric display (as formatted duration in hh:mm:ss) on the control panel if available. Additionally, if <tt>duration</tt> is available, the <tt>currentTime</tt> controls the play head bar position on the control panel. Setting this property causes seek on media stream, if possible.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>duration</td><td>number,<br/>default NaN</td><td>
 Represents the total length of the media, in seconds. For live or recorded streams, this value is unavailable or NaN. For real-time playback of the stream or downloaded video file, this value may not be available, unless set by metadata or video resource has finished playback once. If this is not available on the media stream or resource, but the application knows the duration out of band, it can set the property. This property is also attached to the length of the play head bar on the control panel if available.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>bytesLoaded</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Indicates the number of bytes of data that have been loaded so far in the system. If unavailable, this is NaN.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>bytesTotal</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Indicates the total size of the media resource being loaded in the system for play. If unavailable, such as for live streams, this is NaN.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>quality</td><td>number,<br/>default 0,<br/>read-only</td><td>
 Indicates the quality of the play stream as a number between 0 (very low) and 1 (very high). The quality is calculated based on some combination of other metrics such as live delay of the stream. This property is also attached to the quality bars displayed in the control panel if available. In media stream play mode the control panel displays 4 quality bars indicating quality values in the range of (0, 0.25], (0.25, 0.5], (0.5, 0.75], (0.75, 1.0]), respectively.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>bandwidth</td><td>number,<br/>default 0,<br/>read-only</td><td>
 Indicates the media stream bandwidth in bytes per second for live play or publish mode. It includes only the audio and video bandwidth of the stream. This property gives the rough idea of the bandwidth utilization. If unavailable, this is NaN.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>bidirection</td><td>boolean,<br/>default false</td><td>
 Controls whether to allow media streams in both directions at the same time. This is applicable when setting <tt>play</tt> and <tt>publish</tt> properties. If <tt>bidirection</tt> is false, then setting <tt>play</tt> resets <tt>publish</tt> and vice-versa.
 </td></tr>
@@ -405,6 +420,14 @@ function getFlashMovie(movieName) {
 
 <p>On the receiving side, the <tt>onPostingNotify</tt> callback method is invoked as described later. The <tt>post</tt> method and <tt>onPostingNotify</tt> callback are useful for implementing multicast group communication, e.g., multiparty text chat. Note that similar to the <tt>group</tt> property, you need Flash Player version 10.1 or later and VideoIO45.swf compiled using Flex SDK 4.5 or later.</p>
 
+<p>We have also added a new <tt>sendData</tt> method, to send some text message in a non-group communication, such as client-server RTMP or peer-to-peer RTMFP sessions. This method is used to send some text data in a publishing stream to all the other subscribed playing streams. This is particularly useful for P2P RTMFP mode using Stratus service where you cannot use the <tt>call</tt> method with server side chat feature, but you need an end-to-end text data transfer mechanism. Unlike the previous <tt>post</tt> method that works in a group, the <tt>sendData</tt> method is useful for client-server and peer-to-peer streams.</p>
+
+<pre class="code">
+    getFlashMovie('video1').callProperty('<b>sendData</b>', 'some text message');
+</pre>
+
+<p>The other end receives a <tt>onReceiveData</tt> callback as described later when it receives the text data in the stream. For a one-to-many stream, the publishers calls <tt>sendData</tt> and all the players receive <tt>onReceiveData</tt> callback. You can call <tt>sendData</tt> only if VideoIO is publishing, and will get <tt>onReceiveData</tt> only if VideoIO is playing. It is up to the application to define the meaning of the text data sent and received via this method.</p>
+
 <h2>Creation and change events</h2>
 
 <p>The VideoIO application invokes three JavaScript functions on certain events. These JavaScript functions, if defined, must be present in the global scope of the embedding HTML page. The <tt>onCreationComplete</tt> is invoked when the VideoIO application is created. The <tt>event</tt> parameter supplied to this function has an <tt>objectID</tt> property which you can use to identify the VideoIO <tt>object</tt>. The <tt>onPropertyChange</tt> is invoked when some property of the VideoIO application changes. The <tt>event</tt> parameter supplied to this function has <tt>objectID</tt>, <tt>property</tt>, <tt>oldValue</tt> and <tt>newValue</tt> properties. The <tt>property</tt> value stores the name of the property, e.g., "gain", which changed. The <tt>oldValue</tt> and <tt>newValue</tt> store the old and new value of that property during this change. The <tt>onCallback</tt> is invoked when the server invokes a client method on the <tt>NetConnection</tt> object. This is the reserve of the server method call, and allows the server to invoke a method on the client if needed. You may choose to ignore this method and not do anything.</p>
@@ -431,15 +454,18 @@ function onCallback(event) {
 &lt;/script&gt;
 </pre>
 
-<p>We have added two additional callbacks (or events) as follows. The <tt>onPostingNotify</tt> is invoked to notify any group posts to the application. Please see the <tt>post</tt> method for the meaning of user and text attributes of the event. The <tt>onShowingSettings</tt> is invoked to notify that the Flash Player security settings box is about to be shown. Please see the <tt>privacyEvent</tt> and <tt>deviceAllowed</tt> properties for details.</p>
+<p>We have added additional callbacks (or events) as follows. The <tt>onPostingNotify</tt> is invoked to notify any group posts to the application. Please see the <tt>post</tt> method for the meaning of user and text attributes of the event. The <tt>onReceiveData</tt> is invoked to indicate incoming text data in a playing stream. Please see the <tt>sendData</tt> method on how to send the data, which is available as the data attribute of the event in <tt>onReceiveData</tt>. The <tt>onShowingSettings</tt> is invoked to notify that the Flash Player security settings box is about to be shown or hidden. The <tt>showing</tt> boolean property in the event object is true if the settings box is about to be shown and false if it is hidden. We use a timer to periodically check whether the number of children on the stage has changed to determine when the settings box is closed. It is assumed that the application does not add or remove child object to the stage itself. The callback is invoked only when the <tt>privacyEvent</tt> property is set to true to indicate that the application is interested in receiving the privacy events using this callback. Please see the <tt>privacyEvent</tt> and <tt>deviceAllowed</tt> properties for details.</p>
 
 <pre class="code">
 &lt;script&gt;
 function onPostingNotify(event) {
     log("onPostingNotify() user=" + event.user + ", text=" + event.text);
 }
+function onReceiveData(event) {
+    log("onReceiveData() data=" + event.data);
+}
 function onShowingSettings(event) {
-	log("onShowingSettings()");
+	log("onShowingSettings() showing=" + event.showing);
 }
 &lt;/script&gt;
 </pre>
