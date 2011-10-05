@@ -100,17 +100,17 @@ function onCreationComplete(event) {
         'record':'boolean','live':'boolean','playing':'boolean','recording':'boolean','bidirection':'boolean',
         'microphone':'boolean','codec':'string','encodeQuality':'number', 'rate':'number',
         'framesPerPacket':'number','gain':'number','level':'number',
-        'echoSuppression':'boolean', 'silenceLevel':'number',
+        'echoSuppression':'boolean', 'silenceLevel':'number', 'echoCancel':'boolean',
         'sound':'boolean','volume':'number',
         'camera':'boolean','cameraLoopback':'boolean','videoCodec':'string',
         'cameraWidth':'number','cameraHeight':'number',
         'cameraFPS':'number','keyFrameInterval':'number','cameraQuality':'number',
         'privacyEvent':'boolean','deviceAllowed':'boolean', 'detectActivity':'boolean',
         'display':'boolean','videoWidth':'number','videoHeight':'number','currentFPS':'number',
-        'cameraBandwidth':'number','mirrored':'boolean','smoothing':'boolean',
-				'enableFullscreen':'boolean','fullscreen':'boolean',
+        'cameraBandwidth':'number','mirrored':'boolean','zoom':'string','smoothing':'boolean',
+        'enableFullscreen':'boolean','fullscreen':'boolean',
         'currentTime':'number','duration':'number','bytesLoaded':'number','bytesTotal':'number',
-        'quality':'number', 'bandwidth':'number'
+        'quality':'number', 'bandwidth':'number', 'bufferTime':'number', 'bufferTimeMax':'number'
     };
     for (var name in props) {
         var type = props[name];
@@ -388,13 +388,21 @@ function help(name) {
                 <td align="right">
                     <input id="echoSuppression" type="checkbox"
                         onclick="setBool('echoSuppression', 'echoSuppression')"/>
-                    <a href="javascript:help('echoSuppression')">echoSuppression</a>:
+                    <a href="javascript:help('echoSuppression')">echoSuppression</a>
                 </td>
                 <td align="right">
                     <a href="javascript:help('silenceLevel')">silenceLevel</a>:
                     <input id="silenceLevel" type="text" style="width: 40px"
                         onkeypress="if (isEnter(event)) return setNumber('silenceLevel', 'silenceLevel')"/>
                 </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <input id="echoCancel" type="checkbox""
+                        onclick="setBool('echoCancel', 'echoCancel')"/>
+                    <a href="javascript:help('echoCancel')">echoCancel</a>:
+                </td>
+		<td>&nbsp;</td>
             </tr>
             <tr>
                 <td align="right">
@@ -485,16 +493,26 @@ function help(name) {
                     <a href="javascript:help('currentFPS')">currentFPS</a>:
                     <input id="currentFPS" type="text" style="width: 40px" readonly/> 
                 </td>
-								<td align="right">
-										<input id="mirrored" type="checkbox"
-						onclick="setBool('mirrored', 'mirrored')"/>
+                <td align="right">
+                    &nbsp;
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('zoom')">zoom</a>:
+                    <input id="zoom" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setString('zoom', 'zoom')"/>
+                </td>
+                <td align="right">
+                    <input id="mirrored" type="checkbox"
+                        onclick="setBool('mirrored', 'mirrored')"/>
                     <a href="javascript:help('mirrored')">mirrored</a>
-								</td>
+                </td>
             </tr>
             <tr>
                 <td align="right">
                     <input id="display" type="checkbox"
-						onclick="setBool('display', 'display')"/>
+                        onclick="setBool('display', 'display')"/>
                     <a href="javascript:help('display')">display</a>
                 </td>
                 <td align="right">
@@ -557,6 +575,18 @@ function help(name) {
                 <td align="right">
                     <a href="javascript:help('bandwidth')">bandwidth</a>:
                     <input id="bandwidth" type="text" style="width: 40px" readonly/>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <a href="javascript:help('bufferTime')">bufferTime</a>:
+                    <input id="bufferTime" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('bufferTime', 'bufferTime')"/>
+                </td>
+                <td align="right">
+                    <a href="javascript:help('bufferTimeMax')">bufferTimeMax</a>:
+                    <input id="bufferTimeMax" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setNumber('bufferTimeMax', 'bufferTimeMax')"/>
                 </td>
             </tr>
         </table>

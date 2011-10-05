@@ -203,83 +203,93 @@ Controls whether to enable or disable echo suppression on the underlying microph
 </td></tr>
 
 <tr class="d1">
+<td>echoCancel</td><td>boolean,<br/>default true</td><td>
+Controls whether to enable or disable echo cancellation on the underlying microphone object when using Flash Player 10.3 or later. For earlier versions, it does not have any effect. If true it uses <tt>getEnhancedMicrophone</tt> with the default echo cancellation options, and if false it uses <tt>getMicrophone</tt> without echo cancellation options. Changing the property does not have any effect after <tt>microphone</tt> is set to true, which happens implicitly in publish mode.
+</td></tr>
+
+<tr class="d0">
 <td>sileneceLevel</td><td>number,<br/>default 0</td><td>
 Represents the microphone silenece level for silence suppression, and is between 0 and 100, 0 indicating no silence suppression and 100 indicating suppress all audio. Recommended value is 2.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>sound</td><td>boolean,<br/>default true</td><td>
 Controls whether the play sound is on or off. You can implement speaker mute mode by setting <tt>sound</tt> to false. This property is also attached to the speaker on/off icon on the control panel if visible. This controls the global sound volume of the application.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>volume</td><td>number,<br/>default 0.5</td><td>
 Represents the play sound volume between 0 and 1, with 1 indicating full volume. This property is also attached to the speaker volume slider on the control panel if visible. This controls the global sound volume of the application.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>camera</td><td>boolean,<br/>default false</td><td>
 Represents whether the camera is on and capturing video or not. This is implicitly set when <tt>live</tt> or <tt>publish</tt> property is set. This can be explicitly set to control the camera on/off. This property is also attached to the camera on/off icon on the control panel if visible. On Mac OS, when set, it tries to use the "USB Video Class Video" camera, whereas on other platforms it tries to use the default camera.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>cameraLoopback</td><td>boolean,<br/>default false</td><td>
 Controls whether a local view of what the camera is capturing is compressed and decompressed (true), as it would be for live transmission, or whether the local view is uncompressed (false). Enabling this property is useful to show the compressed video quality in local view, which otherwise shows only uncompressed video. Note that the local preview video is scaled to fit to the dimensions of VideoIO object.
  </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>cameraWidth</td><td>number,<br/>default 320</td><td>
 Represents the camera capture width in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording. The aspect ratio is always 4:3, hence setting the <tt>cameraWidth</tt> also sets the <tt>cameraHeight</tt> accordingly. Note that the local preview video is scaled to fit to the dimensions of VideoIO object.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>cameraHeight</td><td>number,<br/>default 240</td><td>
 Represents the camera capture height in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording.The aspect ratio is always 4:3, hence setting the <tt>cameraHeight</tt> also sets the <tt>cameraWidth</tt> accordingly.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>cameraFPS</td><td>number,<br/>default 12</td><td>
 Controls the desired frames per second for the camera. Higher value gives better quality picture but consume higher bandwidth. The application may want to increase the frames per second for higher quality recording. Note however that this is just the desired value, and the actual value may be less than this based on other constraints such as maximum bandwidth available. Use <tt>currentFPS</tt> to know the actual frames per second.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>keyFrameInterval</td><td>number,<br/>default 15</td><td>
 Controls the desired key frame interval of the camera. The key or intra frame captures full image data instead of difference from previous or next frame. Key frames are useful to refresh the video when seeking or when there are packet loss on unreliable channel. Since Flash media streams run over reliable TCP transport, packet loss is not an issue unless gatewaying with some other system. A <tt>keyFrameInterval</tt> of 15 means that every 15th frame is a key frame. Allowed values are 1 to 28. We recommend not to change this value.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>cameraQuality</td><td>number,<br/>default 0</td><td>
 Controls the desired frame quality of the camera and is between 0 and 100. A value of 0 means the quality can vary as needed to avoid exceeding the available <tt>cameraBandwidth</tt>. A value of 1 means lowest quality with maximum compressions and 100 means highest quality without compression. For live video communication a value between 70-90 is ideal -- more than 90 consumes too much bandwidth, and less than 70 gives blocky picture quality. Ideally only one of <tt>cameraBandwidth</tt> or <tt>cameraQuality</tt>, but not both, should be set.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>cameraBandwidth</td><td>number,<br/>default 0</td><td>
 Controls the maximum bandwidth in bytes per second of the camera. A value of 0 means the camera can use as much bandwidth as needed to maintain the desired <tt>cameraQuality</tt>. Ideally only one of <tt>cameraBandwidth</tt> or <tt>cameraQuality</tt>, but not both, should be set.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>videoCodec</td><td>string,<br/>default Sorenson,<br/>player 11+ only</td><td>
 Controls the video codec of the publishing NetStream attached to the camera when <tt>publish</tt> property is set. This property is only available when using Flash Player 11 or later, otherwise setting this property has no effect. There are two possible values, "Sorenson" or "H264Avc", for the default Sorenson codec or the new H.264 advanced video coding, respectively. Additionally for "H264Avc", profile and level can be supplied, e.g., "H264Avc/baseline/2" indicates baseline profile and level of 2. The possible values for profile are "baseline" and "main" and supported levels are 1, 1b, 1.1, 1.2, 1.3, 2, 2.1, 2.2, 3, 3.1, 3.2, 4, 4.1, 4.2, 5, and 5.1. Note that the <tt>videoCodec</tt> property is applied to the publishing stream for H.264 and not to the camera. Hence, if you enable <tt>cameraLoopback</tt> you will not see H.264 encoded video in your loopback view, but the remote party listening to this stream will receive H.264 encoded video.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>videoWidth</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Represents the width in pixels of the active video display, if any, or NaN if none. This is the original unscaled width. The actual video display is scaled to fit the dimensions of VideoIO object.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>videoHeight</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Represents the height in pixels of the active video display, if any, or NaN if none. This is the original unscaled height. The actual video display is scaled to fit the dimensions of VideoIO object.
 </td></tr>
 
-<tr class="d1">
+<tr class="d0">
 <td>currentFPS</td><td>number,<br/>default NaN,<br/>read-only</td><td>
 Represents the current frames per second of video display in live streaming mode. If unavailable, this is NaN.
 </td></tr>
 
-<tr class="d0">
+<tr class="d1">
 <td>display</td><td>boolean,<br/>default true</td><td>
 Controls whether video display is enabled or not, and applies to both publish and play mode. If you do not want to display the video, e.g., for audio-only user interface, or if you have multiple publish VideoIO instances, you can set this to <tt>false</tt>.
+</td></tr>
+
+<tr class="d0">
+<td>zoom</td><td>string,<br/>default "in"</td><td>
+Controls the zoom mode when the video aspect ratio is different than the display aspect ratio. The video aspect ratio is set by the capture device such as Camera, sent by the publishing stream to the playing stream or present in the video file itself. The display aspect ratio is determined by the dimension of the <tt>VideoIO.swf</tt> object and is based on the dimensions specified in embedding <tt>object</tt> or </tt>embed</tt> tags in HTML, <tt>SWFLoader</tt> component in parent SWF or monitor size in full screen mode. When this property is set to null, there is no zoom adjustiment made and the displayed video may be distorted, e.g., if 320x240 video is displayed in 1280x720 it will appear to be horizontally stretched. When this property is set to "in", the video is zoomed in without distortion so as to fill the full display size, e.g., if 320x240 video is displayed in 1280x720 it will zoom in central 320x180 of the video and fill the dull display area. When this property is set to "out", the video is zoomed out without distortion so as to show the full video, e.g., is 320x240 video is displayed in 1280x720 it will expand full 320x240 to central 960x720 region on the display area, but leave blank spaces on left and right side of the video. Default is "in" which is well suited for video conferencing. Allowed values are null, "in" and "out". If you have sub-titles or icon to be displayed on top or bottom, use null or "out" to display the full video because "in" can hide parts of the video on the sides.
 </td></tr>
 
 <tr class="d1">
@@ -350,6 +360,16 @@ Indicates the quality of the play stream as a number between 0 (very low) and 1 
 <tr class="d0">
 <td>bandwidth</td><td>number,<br/>default 0,<br/>read-only</td><td>
 Indicates the media stream bandwidth in bytes per second for live play or publish mode. It includes only the audio and video bandwidth of the stream. This property gives the rough idea of the bandwidth utilization. If unavailable, this is NaN.
+</td></tr>
+
+<tr class="d1">
+<td>bufferTime</td><td>number,<br/>default -1</td><td>
+Controls the playing stream <tt>bufferTime</tt> in seconds. Default is negative (-1.0) which indicates do not set. If you are experiencing choppiness or jerkiness in the video display, set it to a higher value, especially for recorded video playback. This property only affects the <tt>play</tt> mode.
+</td></tr>
+
+<tr class="d0">
+<td>bufferTimeMax</td><td>number,<br/>default -1</td><td>
+Controls the playing stream <tt>bufferTimeMax</tt> in seconds. Default is negative (-1.0) which indicates do not set. This property puts an upper limit on <tt>bufferTime</tt>. This property only affects the <tt>play</tt> mode.
 </td></tr>
 
 <tr class="d1">
