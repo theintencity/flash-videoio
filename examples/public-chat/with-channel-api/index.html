@@ -6,6 +6,7 @@
 
 <script src="/_ah/channel/jsapi"></script>
 <script type="text/javascript" src="static/webtalk.js"></script>
+<script type="text/javascript" src="static/AC_OETags.js" language="javascript"></script>
 
 <script type="text/javascript">
 <!--
@@ -232,21 +233,31 @@ function onPropertyChange(event) {
 	}
 }
 
+var hasVersion10 = DetectFlashVer(10, 0, 0);
+var hasVersion10_3 = DetectFlashVer(10, 3, 0);
+var VideoIO = (hasVersion10_3 ? "VideoIO45.swf" : (hasVersion10 ? "VideoIO.swf" : null));
+
+if (VideoIO == null) {
+	alert("please install the latest Flash Player to use this site.", "missinge Flash Player 10+");
+}
+
 function getVideoTag(index, x, y, width, height) {
 	return '<div style="position: absolute; left: ' + x + 'px; top: ' + y + 'px; width: ' + width + 'px; height: ' + height + 'px;">\n\
 	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"\n\
 		id="video' + index + '" width="100%" height="100%"\n\
 		codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">\n\
-		<param name="movie" value="/static/VideoIO45.swf" />\n\
+		<param name="movie" value="/static/' + VideoIO + '" />\n\
 		<param name="quality" value="high" />\n\
 		<param name="bgcolor" value="#000000" />\n\
 		<param name="flashVars" value="cameraQuality=80" />\n\
 		<param name="allowScriptAccess" value="always" />\n\
-		<embed src="/static/VideoIO45.swf" quality="high" bgcolor="#000000"\n\
+		<param name="allowFullScreen" value="true" />\n\
+		<embed src="/static/' + VideoIO + '" quality="high" bgcolor="#000000"\n\
 			width="100%" height="100%" name="video' + index + '" align="middle"\n\
 			play="true" loop="false" quality="high"\n\
 			flashVars="cameraQuality=80"\n\
 			allowScriptAccess="always"\n\
+			allowFullScreen="true"\n\
 			type="application/x-shockwave-flash"\n\
 			pluginspage="http://www.adobe.com/go/getflashplayer">\n\
 		</embed>\n\
@@ -452,14 +463,14 @@ for (y=gap; y<(gap+height)*rows; y+=(height+gap)) {
 	<span style="font-size: 12pt;">How to get started?</span>
 	<a href="#" onclick="return hideHelp();">hide</a>
 	<ol style="font-size: 9pt; padding-left: 20px; padding-top: 0px; padding-bottom: 0px;">
-		<li>Expand your browser window so that you see all the six video boxes.</li>
-		<li>The left panel below represents user list including your name. The right panel on top contains various participant videos including yours. The right panel on bottom is for text chat.</li>
-		<li>Change your name from "User ..." to your real name in the second edit box below.</li>
-		<li>Select the checkbox before your name to enable your camera.</li>
-		<li>Select the checkbox before the names of other people in the user list to view their video.</li>
-		<li>Enter the text chat message in bottom-center corner in this chat room.</li>
-		<li>If needed, set your room name in the first edit box below, for a private room, instead of a default room name of "public".</li>
-		<li>If needed, send private message to a particular user starting with <i>@user name:</i> before your message.</li>
+		<li>To learn who is using the site: See the list of users in the panel on the left below.</li>
+		<li>To display your name: Change the name that appears in the second edit box below.</li>
+		<li>To select a public or private room:  By default you are in a public room.  To create a private room, give it a name using the first edit box below.</li>
+		<li>To enable your camera: Select the checkbox before your name.</li>
+		<li>To view video from others: Select the checkbox before their names in the list of attendees.</li>
+		<li>To send a chat message to everyone on the conference: Enter a message in the bottom right hand panel.</li>
+		<li>To send a chat message to an individual on the conference: Enter @&lt;intended recipient’s name&rt;: &lt;Your chat message&rt;</li>
+		<li>To end your conference, close your browser.</li>
 	</ol>
 	<p style="font-size: 9pt; color: #aaaaaa;">Copyright &copy; 2010-2011, 
 		<a href="http://code.google.com/p/flash-videoio" style="text-decoration: none; color: #aaaaaa;"> Kundan Singh</a></p>
