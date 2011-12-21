@@ -109,7 +109,7 @@ function onCreationComplete(event) {
         'display':'boolean','videoWidth':'number','videoHeight':'number','currentFPS':'number',
         'cameraBandwidth':'number','mirrored':'boolean','zoom':'string','smoothing':'boolean',
         'enableFullscreen':'boolean','fullscreen':'boolean',
-        'currentTime':'number','duration':'number','bytesLoaded':'number','bytesTotal':'number',
+        'currentTime':'number','duration':'number','bytesLoaded':'number','bytesTotal':'number','playerState':'string',
         'quality':'number', 'bandwidth':'number', 'bufferTime':'number', 'bufferTimeMax':'number'
     };
     for (var name in props) {
@@ -439,7 +439,8 @@ function help(name) {
                         onkeypress="if (isEnter(event)) return setString('videoCodec', 'videoCodec')"/>
                 </td>
                 <td align="right">
-		    &nbsp;
+                    <a href="javascript:help('playerState')">playerState</a>:
+                    <input id="playerState" type="text" style="width: 40px" readonly/>
                 </td>
             </tr>
             <tr>

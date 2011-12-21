@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This sample flex application demonstrates how to wrap VideoIO.swf in another application to
+enable Picture-in-Picture mode. Please use this application with VideoPIP.html file available
+in the tutorial.
+
+It needs Flex SDK 4.5 or later and Flash Player 10.3 or later. For different version of SDK or
+Flash Player, change the loaded VideoIO45.swf to VideoIO.swf and change the compilation
+instructions below.
+
+The compilation instructions are as follows:
+
+mxmlc -output VideoPIP.swf -compiler.debug=true -swf-version=12 -target-player 10.3.0 \
+  -static-link-runtime-shared-libraries=true VideoPIP.mxml
+  
+The generated VideoPIP.swf has same set of API as the VideoIO, except that setProperty,
+getProperty and callProperty must supply an additional first argument to identify "inner"
+or "outer" VideoIO object. For example, a call to
+obj.setProperty("inner", "src", ...);
+in Javascript will call setProperty("src", ...) on the inner VideoIO object.
+
+Additionally, this VideoPIP.swf allows setting/getting attributes and properties on the
+Flex component of inner and outer VideoIO object as well as on the SWFLoader component
+of the inner and outer VideoIO. Following examples illustrate this:
+
+To change the percent dimension of inner VideoIO SWFLoader from default 25% to 50%,
+obj.setProperty("inner-swf", "attr:percentWidth", 50);
+obj.setProperty("inner-swf", "attr:percentHeight", 50);
+
+To set the border of the inner VideoIO object,
+obj.setProperty("inner", "style:borderColor", 0xffffff);
+obj.setProperty("inner", "style:borderStyle", "solid");
+obj.setProperty("inner", "style:borderThickness", 1);
+
+To position the inner VideoIO SWFLoader on top-left instead of default top-right,
+obj.setProperty("inner-swf", "style:top", 2);
+obj.setProperty("inner-swf", "style:bottom", undefined);
+obj.setProperty("inner-swf", "style:left", 2);
+obj.setProperty("inner-swf", "style:right", undefined);
+It is necessary to change un-used style to undefined especially for position.
+
+The positional and size properties and styles are applicable on the SWFLoader whereas all
+other styles such as border are applicable on the VideoIO object.
+-->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" 
+	addedToStage="creationCompleteHandler(event)" backgroundAlpha="0"
+	minWidth="215" minHeight="138">
+
+	<mx:Script>
+		<![CDATA[
+			import mx.events.DynamicEvent;
+			import mx.utils.ObjectUtil;
+			import mx.events.PropertyChangeEvent;
+			import mx.events.FlexEvent;
+			import mx.controls.Alert;
+			
+			import mx.events.DynamicEvent;
+			import mx.events.FlexEvent;
+			import mx.core.IUIComponent;
+			import mx.managers.SystemManager;
+			
+			private var _mgrOuter:Object;
+			private var _mgrInner:Object;
+			private var _appOuter:Object;
+			private var _appInner:Object;
+			
+			public function setProperty(video:String, name:String, value:Object):void
+			{
+				var app:Object = (video.indexOf("inner") == 0 ? _appInner : _appOuter);
+				if (name.indexOf(":") >= 0) {
+					var obj:Object = (video.indexOf("inner") == 0 ? inner : outer);
+					var parts:Array = name.split(":");
+					if (video.indexOf("-swf") > 0) {
+						if (parts[0] == "attr" && obj.hasOwnProperty(parts[1]))
+							obj[parts[1]] = value;
+						else if (parts[0] == "style")
+							obj.setStyle(parts[1], value);
+					}
+					else {
+						if (parts[0] == "attr" && app.hasOwnProperty(parts[1]))
+							app[parts[1]] = value;
+						else if (parts[0] == "style")
+							app.setStyle(parts[1], value);
+					}
+				}
+				else {
+					app.setProperty(name, value);
+				}
+			}
+			
+			public function getProperty(video:String, name:String):Object
+			{
+				var app:Object = (video.indexOf("inner") == 0 ? _appInner : _appOuter);
+				if (name.indexOf(":") >= 0) {
+					var obj:Object = (video.indexOf("inner") == 0 ? inner : outer);
+					var parts:Array = name.split(":");
+					if (video.indexOf("-swf") > 0) {
+						if (parts[0] == "attr" && obj.hasOwnProperty(parts[1]))
+							return obj[parts[1]];
+						else if (parts[0] == "style")
+							return obj.getStyle(parts[1]);
+					}
+					else {
+						if (parts[0] == "attr" && app.hasOwnProperty(parts[1]))
+							return app[parts[1]];
+						else if (parts[0] == "style")
+							return app.getStyle(parts[1]);
+					}
+					return null;
+				}
+				else {
+					return app.getProperty(name);
+				}
+			}
+			
+			public function callProperty(video:String, ...args):void
+			{
+				var app:Object = (video.indexOf("inner") == 0 ? _appInner : _appOuter);
+				var func:Function = app.callProperty;
+				func.apply(app, args);
+			}
+			
+			private function creationCompleteHandler(event:Event):void
+			{
+				if (ExternalInterface.available) {
+					ExternalInterface.addCallback("setProperty", setProperty);
+					ExternalInterface.addCallback("getProperty", getProperty);
+					ExternalInterface.addCallback("callProperty", callProperty);
+				} 
+				else {
+					trace("ExternalInterface is not available");
+				}
+			}
+			
+			private function completeHandler(event:Event):void 
+			{
+				var mgr:Object;
+				if (event.currentTarget == inner) {
+					mgr = SystemManager(inner.content);
+					_mgrInner = mgr;
+				} else {
+					mgr = SystemManager(outer.content);
+					_mgrOuter = mgr;
+				}
+				mgr.addEventListener(FlexEvent.APPLICATION_COMPLETE, applicationCompleteHandler);
+				mgr.addEventListener(FlexEvent.UPDATE_COMPLETE, applicationCompleteHandler);
+			}
+			
+			private function applicationCompleteHandler(event:Event):void 
+			{
+				var mgr:Object = event.currentTarget;
+				var app:Object = mgr.application;
+				if (mgr == _mgrInner)
+					_appInner = app;
+				else
+					_appOuter = app;
+				app.addEventListener("onPropertyChange", eventHandler);
+				app.addEventListener("onCreationComplete", eventHandler);
+				app.addEventListener("onCallback", eventHandler);
+				app.addEventListener("onPostingNotify", eventHandler);
+				app.addEventListener("onShowingSettings", eventHandler);
+				app.addEventListener("onReceiveData", eventHandler);
+			}
+			
+			private function eventHandler(event:Event):void
+			{
+				var video:String = (event.currentTarget == inner ? "inner": "outer");
+				try {
+					if (ExternalInterface.available && ExternalInterface.objectID != null) {
+						var param:Object = {
+							objectID: ExternalInterface.objectID,
+							video: video
+						};
+						for (var s:String in event) {
+							if ((event[s] is String) && s != "type")
+								param[s] = event[s];
+						}
+						ExternalInterface.call(event.type, param);
+					}
+				} catch (e:Error) {
+					trace(e.getStackTrace());
+				}
+			}
+		]]>
+	</mx:Script>
+	
+	<mx:SWFLoader id="outer" source="VideoIO45.swf" width="100%" height="100%" init="completeHandler(event)"/>
+	<mx:SWFLoader id="inner" source="VideoIO45.swf" init="completeHandler(event)"
+		top="2" right="2" width="25%" height="25%"/>
+	
+</mx:Application>
