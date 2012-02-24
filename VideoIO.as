@@ -541,6 +541,7 @@ class VideoIOInternal extends Canvas
 	private var _bytesTotal:Number;
 	private var _videoWidth:Number;
 	private var _videoHeight:Number;
+	private var _liveDelay:Number;
 	private var _currentFPS:Number;
 	private var _zoom:String = "in";
 	private var _playerState:String;
@@ -675,6 +676,7 @@ class VideoIOInternal extends Canvas
 			setProperty("bytesTotal", new Number(0));
 			setProperty("videoWidth", NaN);
 			setProperty("videoHeight", NaN);
+			setProperty("liveDelay", NaN);
 			setProperty("currentFPS", NaN);
 			setProperty("playerState", null);
 			if ('bidirection' in result)
@@ -1614,6 +1616,18 @@ class VideoIOInternal extends Canvas
 			sendVideoSize();
 			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "zoom", oldValue, value));
 		}
+	}
+	
+	public const __doc__liveDelay:String =
+	'The "liveDelay" read-only number property refers to the play streams live delay ' + 
+	'If unavailable, this is NaN.\n';
+	 
+	/**
+	 * The liveDelay of playing stream.
+	 */
+	public function get liveDelay():Number
+	{
+		return _liveDelay;
 	}
 	
 	public const __doc__currentFPS:String =
@@ -2657,6 +2671,31 @@ class VideoIOInternal extends Canvas
 		}
 	}
 	
+	
+	public const __doc__multicastWindowDuration:String =
+	'Mirror of NetStream\'s multicastWindowDuration property.\n';
+	
+	private var _multicastWindowDuration:Number
+	
+	[Bindable('propertyChange')]
+	public function get multicastWindowDuration():Number
+	{
+		return _multicastWindowDuration;
+	}
+	public function set multicastWindowDuration(value:Number):void
+	{
+		var oldValue:Number = _multicastWindowDuration;
+		_multicastWindowDuration = value;
+		if (value != oldValue) {
+			var ns:NetStream = (_local != null ? _local : _remote);
+			if (ns != null && ns.hasOwnProperty("multicastWindowDuration")) {
+				ns["multicastWindowDuration"] = value;
+			}
+			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "multicastWindowDuration", oldValue, value));
+		}
+		
+	}
+	
 	//--------------------------------------
 	// PUBLIC METHODS
 	//--------------------------------------
@@ -3225,6 +3264,7 @@ class VideoIOInternal extends Canvas
 			var ns:NetStream = _local != null ? _local : _remote;
 			currentTime = ns.time;
 			setProperty("currentFPS", ns.currentFPS);
+			setProperty("liveDelay", ns.liveDelay);
 			quality = delayToQuality(ns.liveDelay);
 			if (ns.info != null)
 				setProperty("bandwidth", new Number(int(ns.info.videoBytesPerSecond + ns.info.audioBytesPerSecond)));
