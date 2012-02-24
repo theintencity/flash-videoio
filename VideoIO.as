@@ -16,12 +16,19 @@ package {
 	import mx.events.VideoEvent;
 	import mx.utils.ObjectUtil;
 	
+	/**
+	 * The main application for Flash-VideoIO hides the internal implementation of VideoIOInternal
+	 * and translates the API using ExternalInterface. This model allows clear separation between
+	 * the application interface and the implementation.
+	 */
 	public class VideoIO extends Application {
+		// a reference to the internal implementation class
 		private var component:Class = VideoIOInternal;
 		
+		// a reference to an instance of type VideoIOInternal.
 		private var obj:Object = null;
 		
-		// facebook specific ones
+		// facebook specific interfaces.
 		private var fbConnection1:LocalConnection;
 		private var fbConnectionName1:String;
 		private var fbConnection2:LocalConnection;
@@ -30,8 +37,13 @@ package {
 		// enable notification or not?
 		private var isChild:Boolean = false;
 		
+		// The URL of the project for facebook.
 		private static const BASE_URL:String = "http://myprojectguide.org/p/face-talk";
 
+		/**
+		 * The constructor sets the absolute layout with transparent background, no border, and
+		 * installes the listener for start up on "addedToStage" event.
+		 */
 		public function VideoIO() {
 			this.layout = "absolute";
 			this.setStyle("backgroundAlpha", 0);
@@ -41,12 +53,17 @@ package {
 			addEventListener("addedToStage", creationCompleteHandler);
 		}
 
-			
+		/**
+		 * When the application is added to stage this initialization function is run.
+		 * It creates a new VideoIOInternal object with 100% dimension, and adds it as a
+		 * child object. It also installs various ExternalInterface functions.
+		 */
 		private function creationCompleteHandler(event:Event):void
 		{
 			obj = new component();
 			obj.percentWidth = obj.percentHeight = 100;
 			
+			// whether this is a child application or the top-level application.
 			if (CONFIG::sdk4) {
 				isChild = (mx.core.FlexGlobals.topLevelApplication != this);
 			}
@@ -56,6 +73,7 @@ package {
 			trace("isChild=" + isChild);
 			
 			if (!isChild) {
+				// Facebook specific initialization
 				fbInitialize(null);
 
 				// minimum dimension to popup SecurityPanel
@@ -65,6 +83,7 @@ package {
 			}
 			
 			try {
+				// Listen for all interesting events from the internal implementation.
 				obj.addEventListener(FlexEvent.CREATION_COMPLETE, componentCompleteHandler, false, 0, true);
 				obj.addEventListener(PropertyChangeEvent.PROPERTY_CHANGE, propertyChangeHandler, false, 0, true);
 				obj.addEventListener("callback", callbackHandler, false, 0, true);
@@ -74,6 +93,7 @@ package {
 				obj.addEventListener("receiveData", receiveDataHandler, false, 0, true);
 				
 				if (ExternalInterface.available) {
+					// For top-level application, install the Javascript API.
 					if (!isChild) {
 						ExternalInterface.addCallback("setProperty", setProperty);
 						ExternalInterface.addCallback("getProperty", getProperty);
@@ -87,6 +107,7 @@ package {
 				trace("security exception: " + e.message); 
 			}
 			
+			// For top-level application, process the "flashVars"
 			if (!isChild) {
 				for (var name:String in parameters) {
 					var value:String = parameters[name];
@@ -101,6 +122,10 @@ package {
 			addChild(DisplayObject(obj));
 		}
 		
+		/**
+		 * When "setProperty" is invoked from Javascript or parent application, it passes it
+		 * to the internal implementation.
+		 */
 		public function setProperty(name:String, value:Object):void
 		{
 			if (obj.hasOwnProperty(name)) {
@@ -112,6 +137,10 @@ package {
 			}
 		}
 		
+		/**
+		 * When "getProperty" is invoked from Javascript or parent application, it passes it
+		 * to the internal implementation.
+		 */
 		public function getProperty(name:String):Object
 		{
 			var result:Object = obj.hasOwnProperty(name) ? obj[name] : null;
@@ -119,6 +148,10 @@ package {
 			return result;
 		}
 		
+		/**
+		 * When "callProperty" is invoked from Javascript or parent application, it passes it
+		 * to the internal implementation.
+		 */
 		public function callProperty(name:String, ...args):void
 		{
 			try {
@@ -130,6 +163,10 @@ package {
 			}
 		}
 		
+		/**
+		 * When the internal implementation is created, it dispatches the onCreationComplete
+		 * event to parent application and onCreationComplete callback to javascript.
+		 */
 		private function componentCompleteHandler(event:Event):void
 		{
 			try {
@@ -149,6 +186,10 @@ package {
 			}
 		}
 		
+		/**
+		 * When the internal implementation's property changes, it dispatches the onPropertyChange
+		 * event to parent application and onPropertyChange callback to javascript.
+		 */
 		private function propertyChangeHandler(event:PropertyChangeEvent):void
 		{
 			try {
@@ -184,6 +225,10 @@ package {
 			}
 		}
 		
+		/**
+		 * When the internal implementation invokes a callback, it dispatches the onCallback
+		 * event to parent application and onCallback callback to javascript.
+		 */
 		private function callbackHandler(event:DynamicEvent):void
 		{
 			try {
@@ -213,6 +258,10 @@ package {
 			}
 		}
 		
+		/**
+		 * When the internal implementation dispatches postingNotify , it dispatches the onPostingNotify
+		 * event to parent application and onPostingNotify callback to javascript.
+		 */
 		private function postingNotifyHandler(event:DynamicEvent):void
 		{
 			try {
@@ -242,6 +291,10 @@ package {
 			}
 		}
 		
+		/**
+		 * When the internal implementation dispatches receiveData, it dispatches the onReceiveData
+		 * event to parent application and onReceiveData callback to javascript.
+		 */
 		private function receiveDataHandler(event:DataEvent):void
 		{
 			try {
@@ -268,6 +321,12 @@ package {
 			}
 		}
 		
+		/**
+		 * When the internal implementation dispatches showingSettings or hidingSettings,
+		 * it dispatches the onShowingSettings event to parent application and onShowingSettings
+		 * callback to javascript. The showing (Boolean) property determines the showing or
+		 * hiding mode.
+		 */
 		private function showingSettingsHandler(event:Event):void
 		{
 			try {
@@ -294,6 +353,10 @@ package {
 			}
 		}
 		
+		/**
+		 * To initialize for Facebook interface, we need to load the crossdomain and allow the facebook domains.
+		 * Finally we need to map the setProperty and getProperty functions.
+		 */
 		private function fbInitialize(event:Event):void
 		{
 			try {
@@ -344,6 +407,10 @@ package {
 			}
 		}	
 		
+		/**
+		 * When dispatching an event, also dispatch using the loader info of the system manager
+		 * so that if this is a child application then the parent receives the event.
+		 */
 		private function dispatchEvent2(event:Event):void
 		{
 			//trace("dispatchEvent type=" + event.type);
@@ -354,6 +421,7 @@ package {
 		}
 	}
 }
+
 
 import flash.display.BitmapData;
 import flash.display.Bitmap;
