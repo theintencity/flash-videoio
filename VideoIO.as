@@ -1,5 +1,6 @@
 /*  Copyright (c) 2010-2011, Kundan Singh. See website for LICENSING.*/
 /*  Copyright (c) 2010-2011, VoIP Researcher.*/
+/*  Copyright (c) 2011-2012, Intencity Cloud Technologies.*/
 package {
 	import flash.display.DisplayObject;
 	import flash.display.LoaderInfo;

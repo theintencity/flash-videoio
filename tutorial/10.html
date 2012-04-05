@@ -234,12 +234,12 @@ Controls whether a local view of what the camera is capturing is compressed and 
 
 <tr class="d1">
 <td>cameraWidth</td><td>number,<br/>default 320</td><td>
-Represents the camera capture width in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording. The aspect ratio is always 4:3, hence setting the <tt>cameraWidth</tt> also sets the <tt>cameraHeight</tt> accordingly. Note that the local preview video is scaled to fit to the dimensions of VideoIO object.
+<i>(Deprecated in version 3.2+, see cameraDimension)</i> Represents the camera capture width in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording. The aspect ratio is always 4:3, hence setting the <tt>cameraWidth</tt> also sets the <tt>cameraHeight</tt> accordingly. Note that the local preview video is scaled to fit to the dimensions of VideoIO object.
 </td></tr>
 
 <tr class="d0">
 <td>cameraHeight</td><td>number,<br/>default 240</td><td>
-Represents the camera capture height in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording.The aspect ratio is always 4:3, hence setting the <tt>cameraHeight</tt> also sets the <tt>cameraWidth</tt> accordingly.
+<i>(Deprecated in version 3.2+, see cameraDimension)</i> Represents the camera capture height in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording.The aspect ratio is always 4:3, hence setting the <tt>cameraHeight</tt> also sets the <tt>cameraWidth</tt> accordingly.
 </td></tr>
 
 <tr class="d1">
@@ -269,12 +269,12 @@ Controls the video codec of the publishing NetStream attached to the camera when
 
 <tr class="d0">
 <td>videoWidth</td><td>number,<br/>default NaN,<br/>read-only</td><td>
-Represents the width in pixels of the active video display, if any, or NaN if none. This is the original unscaled width. The actual video display is scaled to fit the dimensions of VideoIO object.
+Represents the width in pixels of the active video display, if any, or NaN if none. This is the original unscaled width. The actual video display is scaled to fit the dimensions of VideoIO object. If the publish side sends a <tt>setVideoSize</tt> data then it is used to populate the <tt>videoWidth</tt> (and <tt>videoHeight</tt>) property.
 </td></tr>
 
 <tr class="d1">
 <td>videoHeight</td><td>number,<br/>default NaN,<br/>read-only</td><td>
-Represents the height in pixels of the active video display, if any, or NaN if none. This is the original unscaled height. The actual video display is scaled to fit the dimensions of VideoIO object.
+Represents the height in pixels of the active video display, if any, or NaN if none. This is the original unscaled height. The actual video display is scaled to fit the dimensions of VideoIO object. If the publish side sends a <tt>setVideoSize</tt> data then it is used to populate the <tt>videoHeight</tt> (and <tt>videoWidth</tt>) property.
 </td></tr>
 
 <tr class="d0">
@@ -377,6 +377,25 @@ Controls the playing stream <tt>bufferTimeMax</tt> in seconds. Default is negati
 Controls whether to allow media streams in both directions at the same time. This is applicable when setting <tt>play</tt> and <tt>publish</tt> properties. If <tt>bidirection</tt> is false, then setting <tt>play</tt> resets <tt>publish</tt> and vice-versa.
 </td></tr>
 
+<tr class="d0">
+<td>cameraDimension</td><td>string,<br/>default "320x240"</td><td>
+<b>(version 3.2+)</b> Controls the camera capture dimension. This property should be used instead of the <tt>cameraWidth</tt> or <tt>cameraHeight</tt> and is required when setting to a non-standard aspect ratio such as HD camera capture. When this property is changes, the <tt>cameraWidth</tt> and <tt>cameraHeight</tt> are also changed to reflect the new value. When the display size is not "320x240", it periodically transmits the publish dimension to the player using the <tt>NetStream</tt>'s <tt>setVideoSize</tt> function, which in turn is used by the play side to adjust the aspect ratio of the display.
+</td></tr>
+
+<tr class="d1">
+<td>playerState</td><td>string,<br/>default null,<br/>read-only</td><td>
+<b>(version 3.2+)</b> Indicates the player state when playing a video using an <tt>http</tt> or <tt>https</tt> URL. For other play or publish modes such as using <tt>rtmp</tt> or <tt>rtmfp</tt> URLs, the value is null. Please see the <tt>VideoDisplay.state</tt> property in Adobe Flex documentation for details on the value of this <tt>playerState</tt> property.
+</td></tr>
+
+<tr class="d0">
+<td>liveDelay</td><td>number,<br/>default NaN,<br/>read-only</td><td>
+<b>(version 3.2+)</b> Indicates the play stream's live delay value in milliseconds. If this is unavailable (e.g., http playback) or not applicable (e.g., publish mode), it is set to <tt>NaN</tt> (not a number). This is useful in getting a rough idea on the quality of the play stream. In fact, the <tt>quality</tt> property for play stream uses this value to generate a quality number between 0 and 1.
+</td></tr>
+
+<tr class="d1">
+<td>multicastWindowDuration</td><td>number</td><td>
+<b>(version 3.2+)</b> This is a mirror of the <tt>NetStream</tt>'s <tt>multicastWindowDuration</tt> property and is useful in reducing the delay in group communication.
+</td></tr>
 
 </table>
 

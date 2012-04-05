@@ -1,10 +1,4 @@
-# 3.0: changed to single source file.
-#      update videoWidth and videoHeight when setVideoSize is received by publisher.
-#      added cameraDimension and deprecated cameraWidth and cameraHeight.
-#      added borderThickness of 0 for application and embedded canvas.
-# 3.1: added player state for VideoDisplay to be propagated up
-
-VERSION:=3.1
+VERSION:=3.2
 MXMLC45:=/Applications/Adobe\ Flash\ Builder\ 4/sdks/4.5/bin/mxmlc -define=CONFIG::version,${VERSION} 
 MXMLC:=/Applications/Adobe\ Flash\ Builder\ 4/sdks/3.5/bin/mxmlc -define=CONFIG::version,${VERSION} 
 
@@ -30,5 +24,5 @@ clean:
 	rm -f bin-debug/VideoIO.swf bin-debug/VideoIO45.swf bin-debug/VideoIO11.swf bin-release/VideoIO.swf bin-release/VideoIO45.swf bin-release/VideoIO11.swf bin-debug/VideoPIP.swf
 
 dist: 
-	tar -zcvf flash-videoio.tgz Makefile bin-release/AC_OETags.js bin-release/test.html bin-release/zoom.html VideoIO.as VideoPIP.mxml
+	tar -zcvf flash-videoio.tgz Makefile bin-release/AC_OETags.js VideoIO.as VideoPIP.mxml
 	
