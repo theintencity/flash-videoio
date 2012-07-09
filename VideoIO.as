@@ -545,6 +545,7 @@ class VideoIOInternal extends Canvas
 	private var _play:String;
 	private var _publish:String;
 	private var _record:Boolean;
+	private var _recordMode:String = "record";
 	private var _live:Boolean;
 	private var _mirrored:Boolean = true;
 	private var _farID:String;
@@ -708,7 +709,7 @@ class VideoIOInternal extends Canvas
 		if (oldValue != value) {
 			
 			var result:Object = { url:null, scheme:null, args:[], farID:null,
-								  publish:null, play:null, record:false, live:false, name:null};
+								  publish:null, play:null, record:false, recordMode:null, live:false, name:null};
 			var params:String = '';
 			
 			if (value != null) {
@@ -728,7 +729,7 @@ class VideoIOInternal extends Canvas
 				index = part.indexOf('=');
 				var name:String = (index >= 0 ? part.substr(0, index) : part);
 				var val:String = (index >= 0 ? part.substr(index+1) : null);
-				if (name == "publish" || name == "play" || name =="farID" || name == "group")
+				if (name == "publish" || name == "play" || name =="farID" || name == "group" || name == "recordMode")
 					result[name] = val;
 				else if (name == "live" || name == "record" || name == "bidirection")
 					result[name] = (val != "false");
@@ -753,7 +754,8 @@ class VideoIOInternal extends Canvas
 				
 			this.level = 0;
 			
-			this.record = result.record;
+			this.recordMode = result.recordMode == "append" ? "append" : "record";
+			this.record = result.record || (result.recordMode == "append" || result.recordMode == "record");
 			this.url = result.url;
 			
 			if (result.publish || result.play) {
@@ -1203,6 +1205,36 @@ class VideoIOInternal extends Canvas
 				createStream();
 			}
 			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "record", oldValue, value));
+		}
+	}
+	
+	public const __doc__recordMode:String =
+	'The "recordMode" read-write string property refers to whether the publish stream is also ' + 
+	'recorded on the server, and is derived from the "recordMode" parameter of the "src" property. ' + 
+	'For example if the "src" is set to "rtmp://server/path?publish=test1&record=true&recordMode=append" ' + 
+	'then the "recordMode" property is set to "append". Although this is a read-write property ' + 
+	'the application should use the "recordMode" parameter of the "src" property to set this. ' +
+	'This property could be "record" or "append", and defaulst to "record". If this parameter is set ' +
+	'in "src", the "record" property is implicitly set.\n';
+	
+	[Bindable('propertyChange')]
+	/**
+	 * The record property along with publish allows recording of video to server.
+	 */
+	public function get recordMode():String
+	{
+		return _recordMode;
+	}
+	public function set recordMode(value:String):void
+	{
+		var oldValue:String = _recordMode;
+		_recordMode = value;
+		if (oldValue != value) {
+			if (recording) { // reset recording stream
+				destroyStream();
+				createStream();
+			}
+			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "recordMode", oldValue, value));
 		}
 	}
 	
@@ -3254,7 +3286,7 @@ class VideoIOInternal extends Canvas
 			}
 			
 			if (createLocal)
-				_local.publish(publish, (record && scheme == 'rtmp' ? "record" : null));
+				_local.publish(publish, (record && scheme == 'rtmp' ? recordMode : null));
 			if (createRemote)
 				_remote.play(play);
 				
