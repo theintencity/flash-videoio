@@ -1394,7 +1394,7 @@ class VideoIOInternal extends Canvas
 				if (value)
 					_videoDisplay.play();
 			}
-			else if (_playMode == "vod") {
+			else if (_play != null && _playMode == "vod") {
 				if (_remote == null)
 					createStream();
 				
