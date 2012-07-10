@@ -97,7 +97,8 @@ function onCreationComplete(event) {
     var props = {
         'preload':'boolean','autoplay':'boolean','loop':'boolean','controls':'boolean',
         'url':'string','play':'string','publish':'string','group':'string',
-        'record':'boolean','recordMode':'string','live':'boolean','playing':'boolean','recording':'boolean','bidirection':'boolean',
+        'record':'boolean','recordMode':'string','playMode':'string',
+				'live':'boolean','playing':'boolean','recording':'boolean','bidirection':'boolean',
         'microphone':'boolean','codec':'string','encodeQuality':'number', 'rate':'number',
         'framesPerPacket':'number','gain':'number','level':'number',
         'echoSuppression':'boolean', 'silenceLevel':'number', 'echoCancel':'boolean',
@@ -328,6 +329,9 @@ function help(name) {
 				
         <a href="javascript:help('recordMode')">recordMode</a>:
         <input id="recordMode" type="text" style="width: 40px" readonly/>
+				
+        <a href="javascript:help('playMode')">playMode</a>:
+        <input id="playMode" type="text" style="width: 40px" readonly/>
 				
         <br/>
         

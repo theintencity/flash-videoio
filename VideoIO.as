@@ -546,6 +546,7 @@ class VideoIOInternal extends Canvas
 	private var _publish:String;
 	private var _record:Boolean;
 	private var _recordMode:String = "record";
+	private var _playMode:String = "live";
 	private var _live:Boolean;
 	private var _mirrored:Boolean = true;
 	private var _farID:String;
@@ -709,7 +710,7 @@ class VideoIOInternal extends Canvas
 		if (oldValue != value) {
 			
 			var result:Object = { url:null, scheme:null, args:[], farID:null,
-								  publish:null, play:null, record:false, recordMode:null, live:false, name:null};
+								  publish:null, play:null, record:false, recordMode:null, playMode:null, live:false, name:null};
 			var params:String = '';
 			
 			if (value != null) {
@@ -729,7 +730,7 @@ class VideoIOInternal extends Canvas
 				index = part.indexOf('=');
 				var name:String = (index >= 0 ? part.substr(0, index) : part);
 				var val:String = (index >= 0 ? part.substr(index+1) : null);
-				if (name == "publish" || name == "play" || name =="farID" || name == "group" || name == "recordMode")
+				if (name == "publish" || name == "play" || name =="farID" || name == "group" || name == "recordMode" || name == "playMode")
 					result[name] = val;
 				else if (name == "live" || name == "record" || name == "bidirection")
 					result[name] = (val != "false");
@@ -754,9 +755,11 @@ class VideoIOInternal extends Canvas
 				
 			this.level = 0;
 			
+			this.playMode = (result.scheme == "http" || result.scheme == "https" ? "web" : (result.playMode == "vod" ? "vod" : "live"));
 			this.recordMode = result.recordMode == "append" ? "append" : "record";
 			this.record = result.record || (result.recordMode == "append" || result.recordMode == "record");
 			this.url = result.url;
+			
 			
 			if (result.publish || result.play) {
 				if (this.bidirection) {
@@ -1080,7 +1083,7 @@ class VideoIOInternal extends Canvas
 	}
 	
 	public const __doc__isDownload:String =
-	'The "isDownload read-only boolean property indicates whether the "src" will cause ' + 
+	'The "isDownload" (deprecated) read-only boolean property indicates whether the "src" will cause ' + 
 	'progressive download of media or not? It is true for "http" and "https" URLs, and ' + 
 	'false for other URLs such as "rtmp" and "rtmfp".\n'
 	
@@ -1219,7 +1222,7 @@ class VideoIOInternal extends Canvas
 	
 	[Bindable('propertyChange')]
 	/**
-	 * The record property along with publish allows recording of video to server.
+	 * The recordMode property along with record controls whether to overwrite or append.
 	 */
 	public function get recordMode():String
 	{
@@ -1227,14 +1230,58 @@ class VideoIOInternal extends Canvas
 	}
 	public function set recordMode(value:String):void
 	{
-		var oldValue:String = _recordMode;
-		_recordMode = value;
-		if (oldValue != value) {
-			if (recording) { // reset recording stream
-				destroyStream();
-				createStream();
+		if (value == "record" || value == "append") {
+			var oldValue:String = _recordMode;
+			_recordMode = value;
+			if (oldValue != value) {
+				if (recording) { // reset recording stream
+					destroyStream();
+					createStream();
+				}
+				dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "recordMode", oldValue, value));
 			}
-			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "recordMode", oldValue, value));
+		}
+		else {
+			trace("setting invalid value to recordMode=" + value);
+		}
+	}
+	
+	public const __doc__playMode:String =
+	'The "playMode" read-write string property refers to whether the playing stream is downloaded ' + 
+	'from web, is live stream or a video-on-demand (vod) stream. It is derived from the "src" property ' +
+	'as follows. If the URL scheme is "http" or "https" then "playMode" is set to "web". ' +
+	'Otherwise, if the "playMode" parameter is present in "src" property, then it is used. Otherwise ' +
+	'it is set to "live" as default. For example if the "src" is set to "rtmp://server/path?play=test1&playMode=vod" ' + 
+	'then the "playMode" property is set to "vod". Although this is a read-write property ' + 
+	'the application should use the "playMode" parameter of the "src" property to set this if needed. ' +
+	'The possible values are "web", "live" or "vod", but when setting only "live" or "vod" is allowed because ' +
+	'"web" is set implicitly based on the URL scheme. The "playMode" controls how setting the "playing" ' +
+	'property affects the stream. In "web" mode, setting the "playing" property calls the play() or ' +
+	'pause() method of the VideoDisplay object. In the "live" mode, it creates or destroys the NetStream ' +
+	'for playing. In the "vod" mode, it calls the pause() or resume() method of the NetStream object ' +
+	'for playing. Thus, if you do not want to destroy/re-create the NetStream on pause/play, you should set ' +
+	'the "playMode" to "vod", instead of the default "live". Setting this property affects only subsequent ' +
+	'change in the "playing" property.\n';
+	
+	[Bindable('propertyChange')]
+	/**
+	 * The playMode property along with playing controls how the streams are affected when playing is changed.
+	 */
+	public function get playMode():String
+	{
+		return _playMode;
+	}
+	public function set playMode(value:String):void
+	{
+		if (value == "vod" || value == "live") {
+			var oldValue:String = _playMode;
+			_playMode = value;
+			if (oldValue != value) {
+				dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "playMode", oldValue, value));
+			}
+		}
+		else {
+			trace("setting invalid value to playMode=" + value);
 		}
 	}
 	
@@ -1315,12 +1362,14 @@ class VideoIOInternal extends Canvas
 	
 	public const __doc__playing:String =
 	'The "playing" read-write boolean property refers to the play or pause state of the stream. ' + 
-	'If "isDownload" is true, i.e., the "src" is a "http" or "https" URL, then the "playing" ' + 
+	'If "playMode" is "web", i.e., the "src" is a "http" or "https" URL, then the "playing" ' + 
 	'property calls the play() or pause() method of the VideoDisplay object. Otherwise, ' + 
-	'it creates or destroys the NetStream for playing. This property is implicitly set when ' + 
+	'if "playMode" is "live", then it creates or destroys the NetStream for playing. ' +
+	'Otherwise, if "playMode" is "vod", then it calls the resume() and pause() method on the ' +
+	'NetStream for playing. This property is implicitly set when ' + 
 	'"autoplay" is set and the "src" property is set to indicate a play mode. This property ' + 
 	'is also attached to the state of play/pause button in the control panel if visible.\n';
-			
+	
 	[Bindable('propertyChange')]
 	/**
 	 * Whether the video is playing or not (if play is valid).
@@ -1339,13 +1388,24 @@ class VideoIOInternal extends Canvas
 			if (value) 
 				detachPoster();
 				
-			if (isDownload) {
+			if (_playMode == "web") {
 				if (oldValue)
 					_videoDisplay.pause();
 				if (value)
 					_videoDisplay.play();
 			}
-			else {
+			else if (_playMode == "vod") {
+				if (_remote == null)
+					createStream();
+				
+				if (_remote != null) {
+					if (oldValue)
+						_remote.pause();
+					if (value)
+						_remote.resume();
+				}
+			}
+			else { // default is "live"
 				if (oldValue)
 					destroyStream();
 				if (value)
@@ -1635,7 +1695,7 @@ class VideoIOInternal extends Canvas
 	
 	public const __doc__videoDisplay:String =
 	'The "videoDisplay" read-only property refers to the currently displayed VideoDisplay ' + 
-	'object when "isDownload" is true, or none if there is no VideoDisplay. Either the ' + 
+	'object when "playMode" is "web", or none if there is no VideoDisplay. Either the ' + 
 	'VideoDisplay or Video object is available when a video is displaying.\n';
 	 
 	/**
