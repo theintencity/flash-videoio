@@ -3517,44 +3517,50 @@ class VideoIOInternal extends Canvas
 		
 	}
 	
+	private function localViewMatrix(zoom:String, mirrored:Boolean):Matrix
+	{
+		var ratio:Number = _cameraWidth/_cameraHeight;
+		var m:Matrix = new Matrix();
+		var parent:DisplayObject = _video.parent;
+		trace("setting video transform parent=" + parent.width + "x" + parent.height + " camera=" + _cameraWidth + "x" + _cameraHeight + " mirrored=" + mirrored + " zoom=" + zoom);
+		if (mirrored) {
+			if (zoom == null) {
+				m.scale(-parent.width/320, parent.height/240);
+				m.translate(parent.width, 0);
+			}
+			else if (zoom == "out") {
+				m.scale(-Math.min(parent.width, ratio*parent.height)/320, Math.min(parent.height, (1/ratio)*parent.width)/240);
+				m.translate(Math.min(parent.width, ratio*parent.height)-(Math.min(parent.width, ratio*parent.height)-parent.width)/2, -(Math.min(parent.height, (1/ratio)*parent.width)-parent.height)/2);
+			}
+			else if (zoom == "in") {
+				m.scale(-Math.max(parent.width, ratio*parent.height)/320, Math.max(parent.height, (1/ratio)*parent.width)/240);
+				m.translate(Math.max(parent.width, ratio*parent.height)-(Math.max(parent.width, ratio*parent.height)-parent.width)/2, -(Math.max(parent.height, (1/ratio)*parent.width)-parent.height)/2);
+			}
+		} 
+		else {
+			if (zoom == null) {
+				m.scale(parent.width/320, parent.height/240);
+				m.translate(0, 0);
+			}
+			else if (zoom == "out") {
+				m.scale(Math.min(parent.width, ratio*parent.height)/320, Math.min(parent.height, (1/ratio)*parent.width)/240);
+				m.translate(-(Math.min(parent.width, ratio*parent.height)-parent.width)/2, -(Math.min(parent.height, (1/ratio)*parent.width)-parent.height)/2);
+			}
+			else if (zoom == "in") {
+				m.scale(Math.max(parent.width, ratio*parent.height)/320, Math.max(parent.height, (1/ratio)*parent.width)/240);
+				m.translate(-(Math.max(parent.width, ratio*parent.height)-parent.width)/2, -(Math.max(parent.height, (1/ratio)*parent.width)-parent.height)/2);
+			}
+		}
+		return m;
+	}
+	
 	private function resizeVideoHandler(event:ResizeEvent):void
 	{
 		var ratio:Number = _cameraWidth/_cameraHeight;
 
 		if (_video != null) {
 			if (_live) {
-				var m:Matrix = new Matrix();
-				var parent:DisplayObject = _video.parent;
-				trace("setting video transform parent=" + parent.width + "x" + parent.height + " camera=" + _cameraWidth + "x" + _cameraHeight + " mirrored=" + _mirrored + " zoom=" + _zoom);
-				if (_mirrored) {
-					if (_zoom == null) {
-						m.scale(-parent.width/320, parent.height/240);
-						m.translate(parent.width, 0);
-					}
-					else if (_zoom == "out") {
-						m.scale(-Math.min(parent.width, ratio*parent.height)/320, Math.min(parent.height, (1/ratio)*parent.width)/240);
-						m.translate(Math.min(parent.width, ratio*parent.height)-(Math.min(parent.width, ratio*parent.height)-parent.width)/2, -(Math.min(parent.height, (1/ratio)*parent.width)-parent.height)/2);
-					}
-					else if (_zoom == "in") {
-						m.scale(-Math.max(parent.width, ratio*parent.height)/320, Math.max(parent.height, (1/ratio)*parent.width)/240);
-						m.translate(Math.max(parent.width, ratio*parent.height)-(Math.max(parent.width, ratio*parent.height)-parent.width)/2, -(Math.max(parent.height, (1/ratio)*parent.width)-parent.height)/2);
-					}
-				} 
-				else {
-					if (_zoom == null) {
-						m.scale(parent.width/320, parent.height/240);
-						m.translate(0, 0);
-					}
-					else if (_zoom == "out") {
-						m.scale(Math.min(parent.width, ratio*parent.height)/320, Math.min(parent.height, (1/ratio)*parent.width)/240);
-						m.translate(-(Math.min(parent.width, ratio*parent.height)-parent.width)/2, -(Math.min(parent.height, (1/ratio)*parent.width)-parent.height)/2);
-					}
-					else if (_zoom == "in") {
-						m.scale(Math.max(parent.width, ratio*parent.height)/320, Math.max(parent.height, (1/ratio)*parent.width)/240);
-						m.translate(-(Math.max(parent.width, ratio*parent.height)-parent.width)/2, -(Math.max(parent.height, (1/ratio)*parent.width)-parent.height)/2);
-					}
-				}
-				_video.transform.matrix = m; 
+				_video.transform.matrix = localViewMatrix(_zoom, _mirrored);
 			}
 			else {
 				if (_zoom == null || isNaN(publishWidth) || isNaN(publishHeight)) {
@@ -3583,13 +3589,11 @@ class VideoIOInternal extends Canvas
 	{
 		if (_video != null || _videoDisplay != null) {
 			var snap:BitmapData = new BitmapData(this.width, this.height, true);
-			var ratio:Number = 1.0;
-			if (_live) {
-				var wr:Number = this.width / _cameraWidth;
-				var hr:Number = this.height / _cameraHeight;
-				ratio = (wr <= hr ? wr : hr);
+			var matrix:Matrix = new Matrix(1, 0, 0, 1, 0, 0);
+			if (_live && (this.width != 320 || this.height != 240)) {
+				// since the live display scales from 320x240, need to use the similar matrix
+				matrix = localViewMatrix(_zoom, false); // do not mirror, but use the same zoom.
 			}
-			var matrix:Matrix = new Matrix(ratio, 0, 0, ratio, 0, 0);
 			snap.draw(_video != null ? _video : _videoDisplay, matrix);
 			var bm:Bitmap = new Bitmap(snap);
 			var encoder:JPEGEncoder = new JPEGEncoder(quality);
