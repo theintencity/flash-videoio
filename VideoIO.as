@@ -3583,7 +3583,13 @@ class VideoIOInternal extends Canvas
 	{
 		if (_video != null || _videoDisplay != null) {
 			var snap:BitmapData = new BitmapData(this.width, this.height, true);
-			var matrix:Matrix = new Matrix(1, 0, 0, 1, 0, 0);
+			var ratio:Number = 1.0;
+			if (_live) {
+				var wr:Number = this.width / _cameraWidth;
+				var hr:Number = this.height / _cameraHeight;
+				ratio = (wr <= hr ? wr : hr);
+			}
+			var matrix:Matrix = new Matrix(ratio, 0, 0, ratio, 0, 0);
 			snap.draw(_video != null ? _video : _videoDisplay, matrix);
 			var bm:Bitmap = new Bitmap(snap);
 			var encoder:JPEGEncoder = new JPEGEncoder(quality);
