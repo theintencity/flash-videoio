@@ -627,6 +627,7 @@ class VideoIOInternal extends Canvas
 	
 	private var _fullscreen:Boolean = false;
 	private var _enableFullscreen:Boolean = true;
+	private var _enableFullscreenOnDoubleClick:Boolean = false;
 	
 	private var _lastSendTime:Number=0;
 	private var publishWidth:Number;
@@ -670,6 +671,9 @@ class VideoIOInternal extends Canvas
 		
 		addEventListener(Event.ADDED_TO_STAGE, addHandler);
 		addEventListener(Event.REMOVED_FROM_STAGE, removeHandler);
+		
+		this.doubleClickEnabled = true;
+		addEventListener(MouseEvent.DOUBLE_CLICK, doubleClickHandler);
 		
 		installContextMenu();
 	}
@@ -2706,6 +2710,30 @@ class VideoIOInternal extends Canvas
 		}
 	}
 	
+	public const __doc__enableFullscreenOnDoubleClick:String =
+	'The "enableFullscreenOnDoubleClick" read-write property controls whether full screen mode is toggled ' + 
+	'on double-click or not. Default is false. This is useful because a bug in Flash Player prevents the ' +
+	'right-click context-menu to toggle the full screen when the video is displayed on top. This property ' +
+	'provides an alternative or work-around to that problem. This property is independent of the ' +
+	'"enableFullscreen" property.\n';
+	
+	[Bindable('propertyChange')]
+	/**
+	 * Whether the full screen is enabled on double-click or not?
+	 */
+	public function get enableFullscreenOnDoubleClick():Boolean
+	{
+		return _enableFullscreenOnDoubleClick;
+	}
+	public function set enableFullscreenOnDoubleClick(value:Boolean):void
+	{
+		var oldValue:Boolean = _enableFullscreenOnDoubleClick;
+		_enableFullscreenOnDoubleClick = value;
+		if (oldValue != value) {
+			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "enableFullscreenOnDoubleClick", oldValue, value));
+		}
+	}
+	
 //		public const __doc__sip:String =
 //		'The "sip" read-write property controls and indicates the SIP call state as follows:\n' + 
 //		' Setting to "invite:sip:user@domain" will initiate a SIP call to the target destination.\n' +
@@ -3812,6 +3840,17 @@ class VideoIOInternal extends Canvas
 		fullscreen = !fullscreen;
 	}
 
+	private function doubleClickHandler(event:Event):void
+	{
+		if (_enableFullscreenOnDoubleClick) {
+			trace("double-click detected");
+			var oldValue:Boolean = fullscreen;
+			fullscreen = !fullscreen;
+			// for some reason the property change is not dispatched here. So explicitly do that.
+			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "fullscreen", oldValue, fullscreen));
+		}
+	}
+	
 	private function productMenuHandler(event:Event):void
 	{
 		try {

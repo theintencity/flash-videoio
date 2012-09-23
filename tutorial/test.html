@@ -109,7 +109,7 @@ function onCreationComplete(event) {
         'privacyEvent':'boolean','deviceAllowed':'boolean', 'detectActivity':'boolean',
         'display':'boolean','videoWidth':'number','videoHeight':'number','currentFPS':'number',
         'cameraBandwidth':'number','mirrored':'boolean','zoom':'string','smoothing':'boolean',
-        'enableFullscreen':'boolean','fullscreen':'boolean',
+        'enableFullscreen':'boolean','fullscreen':'boolean','enableFullscreenOnDoubleClick':'boolean',
         'currentTime':'number','duration':'number','bytesLoaded':'number','bytesTotal':'number','playerState':'string',
         'quality':'number', 'bandwidth':'number', 'bufferTime':'number', 'bufferTimeMax':'number'
     };
@@ -533,13 +533,20 @@ function help(name) {
             </tr>
             <tr>
                 <td align="right">
+                    <input id="fullscreen" type="checkbox" disabled/>
+                    <a href="javascript:help('fullscreen')">fullscreen</a>
+                </td>
+                <td align="right">
                     <input id="enableFullscreen" type="checkbox"
                         onclick="setBool('enableFullscreen', 'enableFullscreen')"/>
                     <a href="javascript:help('enableFullscreen')">enableFullscreen</a>
                 </td>
-                <td align="right">
-                    <input id="fullscreen" type="checkbox" disabled/>
-                    <a href="javascript:help('fullscreen')">fullscreen</a>
+            </tr>
+            <tr>
+                <td align="right" colspan="2">
+                    <input id="enableFullscreenOnDoubleClick" type="checkbox"
+                        onclick="setBool('enableFullscreenOnDoubleClick', 'enableFullscreenOnDoubleClick')"/>
+                    <a href="javascript:help('enableFullscreenOnDoubleClick')">enableFullscreenOnDoubleClick</a>
                 </td>
             </tr>
         </table>
