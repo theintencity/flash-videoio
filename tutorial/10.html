@@ -28,6 +28,7 @@ div.info {margin-left: 40px; margin-right: 40px; border: 1px solid grey; padding
 tr.d0 td { background-color: #f0f0f0; color: black; vertical-align: top; }
 tr.d1 td { background-color: #ffffff; color: black; vertical-align: top;}
 p { text-align: justify; }
+.deprecated { text-decoration: line-through; }
 </style>
 
 <script type="text/javascript">
@@ -159,12 +160,16 @@ Represents the publish or stop state of the stream. This is useful only for a pu
 
 <tr class="d0">
 <td>privacyEvent</td><td>boolean,<br/>default false</td><td>
-Controls whether <tt>onShowingSettings</tt> callback function is called when the Flash Player settings is about to be displayed or hidden for device access. This is also useful if you wish to use the <tt>deviceAllowed</tt> property to know whether the device access is allowed or one. One use case is when you want to hide the audio-only Flash application under normal use but want to show it for settings display.
+<span class="deprecated">
+(Deprecated in version 3.4+) Controls whether <tt>onShowingSettings</tt> callback function is called when the Flash Player settings is about to be displayed or hidden for device access. This is also useful if you wish to use the <tt>deviceAllowed</tt> property to know whether the device access is allowed or one. One use case is when you want to hide the audio-only Flash application under normal use but want to show it for settings display.
+</span>
 </td></tr>
 
 <tr class="d1">
 <td>deviceAllowed</td><td>boolean,<br/>default false,<br/>read only</td><td>
-Represents whether device access is allowed by the end user for this application in the Flash Player settings. To get the correct value for this property you must set the <tt>privacyEvent</tt> property to <tt>true</tt>. Please note that the Flash Player does not dispatch any event when the settings dialog box is closed, but does send an event when the user clicks on <tt>allow</tt> or <tt>deny</tt> radio buttons.
+<span class="deprecated">
+Represents whether device access is allowed by the end user for this application in the Flash Player settings. Please note that the Flash Player does not dispatch any event when the settings dialog box is closed, but does send an event when the user clicks on <tt>allow</tt> or <tt>deny</tt> radio buttons in the security panel box.
+</span>
 </td></tr>
 
 <tr class="d0">
@@ -244,12 +249,15 @@ Controls whether a local view of what the camera is capturing is compressed and 
 
 <tr class="d1">
 <td>cameraWidth</td><td>number,<br/>default 320</td><td>
-<i>(Deprecated in version 3.2+, see cameraDimension)</i> Represents the camera capture width in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording. The aspect ratio is always 4:3, hence setting the <tt>cameraWidth</tt> also sets the <tt>cameraHeight</tt> accordingly. Note that the local preview video is scaled to fit to the dimensions of VideoIO object.
+<span class="deprecated">
+(Deprecated in version 3.2+, see cameraDimension) Represents the camera capture width in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording. The aspect ratio is always 4:3, hence setting the <tt>cameraWidth</tt> also sets the <tt>cameraHeight</tt> accordingly. Note that the local preview video is scaled to fit to the dimensions of VideoIO object.
+</span>
 </td></tr>
 
 <tr class="d0">
 <td>cameraHeight</td><td>number,<br/>default 240</td><td>
-<i>(Deprecated in version 3.2+, see cameraDimension)</i> Represents the camera capture height in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording.The aspect ratio is always 4:3, hence setting the <tt>cameraHeight</tt> also sets the <tt>cameraWidth</tt> accordingly.
+<span class="deprecated">(Deprecated in version 3.2+, see cameraDimension) Represents the camera capture height in pixels. By default we use 320x240 for all video dimension. Higher values give better quality picture but consume higher bandwidth. The application may want to increase the resolution of capture for higher quality recording.The aspect ratio is always 4:3, hence setting the <tt>cameraHeight</tt> also sets the <tt>cameraWidth</tt> accordingly.
+</span>
 </td></tr>
 
 <tr class="d1">
@@ -508,7 +516,9 @@ function onCallback(event) {
 &lt;/script&gt;
 </pre>
 
-<p>We have added additional callbacks (or events) as follows. The <tt>onPostingNotify</tt> is invoked to notify any group posts to the application. Please see the <tt>post</tt> method for the meaning of user and text attributes of the event. The <tt>onReceiveData</tt> is invoked to indicate incoming text data in a playing stream. Please see the <tt>sendData</tt> method on how to send the data, which is available as the data attribute of the event in <tt>onReceiveData</tt>. The <tt>onShowingSettings</tt> is invoked to notify that the Flash Player security settings box is about to be shown or hidden. The <tt>showing</tt> boolean property in the event object is true if the settings box is about to be shown and false if it is hidden. We use a timer to periodically check whether the number of children on the stage has changed to determine when the settings box is closed. It is assumed that the application does not add or remove child object to the stage itself. The callback is invoked only when the <tt>privacyEvent</tt> property is set to true to indicate that the application is interested in receiving the privacy events using this callback. Please see the <tt>privacyEvent</tt> and <tt>deviceAllowed</tt> properties for details.</p>
+<p>We have added additional callbacks (or events) as follows. The <tt>onPostingNotify</tt> is invoked to notify any group posts to the application. Please see the <tt>post</tt> method for the meaning of user and text attributes of the event. The <tt>onReceiveData</tt> is invoked to indicate incoming text data in a playing stream. Please see the <tt>sendData</tt> method on how to send the data, which is available as the data attribute of the event in <tt>onReceiveData</tt>. The <tt>onShowingSettings</tt> is invoked to notify that the Flash Player security panel box is about to be shown.</p>
+
+<p><span class="deprecated">This feature described in this paragraph has been deprecated in version 3.4 because our workaround of using the number of children no longer works in the latest version of Flash Player. Additionally, <tt>onShowingSettings</tt> is dispatched when the security panel box is closed. The <tt>showing</tt> boolean property in the event object is true if the settings box is about to be shown and false if it is hidden. We use a timer to periodically check whether the number of children on the stage has changed to determine when the settings box is closed. It is assumed that the application does not add or remove child object to the stage itself. The callback is invoked only when the <tt>privacyEvent</tt> property is set to true to indicate that the application is interested in receiving the privacy events using this callback. Please see the <tt>privacyEvent</tt> and <tt>deviceAllowed</tt> properties for details.</span></p>
 
 <pre class="code">
 &lt;script&gt;
