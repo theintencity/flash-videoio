@@ -1495,14 +1495,15 @@ class VideoIOInternal extends Canvas
 					}
 				}
 				if (_cameraObject != null) {
-					if (_cameraObject.muted) {
+					_camera = value;
+					
+					if (!deviceAllowed) {
 						setProperty("deviceAllowed", false);
 						showSettings();
 						_cameraObject.addEventListener(StatusEvent.STATUS, cameraStatusHandler, false, 0, true);
 					}
 					else {
 						setProperty("deviceAllowed", true);
-						_camera = value;
 					}
 				}
 			}
@@ -1582,15 +1583,16 @@ class VideoIOInternal extends Canvas
 					}
 				}
 				if (_microphoneObject != null) {
-					if (_microphoneObject.muted) {
+					_microphone = value;
+					startMicLevelTimer();
+						
+					if (!deviceAllowed) {
 						setProperty("deviceAllowed", false);
 						showSettings();
 						_microphoneObject.addEventListener(StatusEvent.STATUS, micStatusHandler, false, 0, true);
 					}
 					else {
 						setProperty("deviceAllowed", true);
-						_microphone = value;
-						startMicLevelTimer();
 					}
 				}
 			}
@@ -1623,7 +1625,7 @@ class VideoIOInternal extends Canvas
 	}
 	
 	public const __doc__privacyEvent:String =
-	'The "privacyEvent" read-write boolean property controls whether an event callback is ' + 
+	'(Deprecated) The "privacyEvent" read-write boolean property controls whether an event callback is ' + 
 	'invoked when the Flash Player demands privacy settings display or not? It also allows ' + 
 	'using the deviceAllowed property to know if the user has changed his device access ' + 
 	'permissions. Default is "false".\n';
@@ -1648,16 +1650,15 @@ class VideoIOInternal extends Canvas
 	public const __doc__deviceAllowed:String =
 	'The "deviceAllowed" read-only boolean property indicates whether the microphone and/or ' + 
 	'camera device is allowed (or denied) by the end user in the Flash Player security' + 
-	'settings. To get the correct values for this property, you must set the "privacyEvent" ' + 
-	'property to "true". The value is not valid until a device access is needed.\n';
+	'settings. The value is not valid until a device access is needed.\n';
 	
 	/**
 	 * Whether access to camera and microphone is allowed?
 	 */
 	public function get deviceAllowed():Boolean
 	{
-		var mic:Microphone = Microphone.getMicrophone();
-		var cam:Camera = Camera.getCamera();
+		var mic:Microphone = _microphoneObject != null ? _microphoneObject : Microphone.getMicrophone();
+		var cam:Camera = _cameraObject != null ? _cameraObject : Camera.getCamera();
 		return (mic && !mic.muted || cam && !cam.muted);
 	}
 	
@@ -2980,7 +2981,7 @@ class VideoIOInternal extends Canvas
 	 */
 	public function showSettings():void
 	{
-		if (privacyEvent) {
+		if (privacyEvent && settingsTimer == null) {
 			dispatchEvent(new Event("showingSettings"));
 			
 			if (CONFIG::sdk4) {
@@ -3057,34 +3058,22 @@ class VideoIOInternal extends Canvas
 	private function cameraStatusHandler(event:StatusEvent):void
 	{
 		var oldValue:Boolean = _camera;
-		if (event.code != null && event.code.toLowerCase().indexOf("unmuted") >= 0) {
+		if (deviceAllowed) {
 			setProperty("deviceAllowed", true);
-			_camera = true;
 		}
 		else {
 			setProperty("deviceAllowed", false);
-			_camera = false;
-		}
-		if (oldValue != _camera) {
-			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "camera", oldValue, _camera));
 		}
 	}
 	
 	private function micStatusHandler(event:StatusEvent):void
 	{
 		var oldValue:Boolean = _microphone;
-		if (event.code != null && event.code.toLowerCase().indexOf("unmuted") >= 0) {
+		if (deviceAllowed) {
 			setProperty("deviceAllowed", true);
-			startMicLevelTimer();
-			_microphone = true;
 		}
 		else {
 			setProperty("deviceAllowed", false);
-			stopMicLevelTimer();
-			_microphone = false;
-		}
-		if (oldValue != _microphone) {
-			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "microphone", oldValue, _microphone));
 		}
 	}
 	
