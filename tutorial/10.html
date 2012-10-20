@@ -420,6 +420,26 @@ Controls whether to allow media streams in both directions at the same time. Thi
 <b>(version 3.2+)</b> This <tt>multicastWindowDuration</tt> is a mirror of the <tt>NetStream</tt>'s <tt>multicastWindowDuration</tt> property and is useful in reducing the delay in group communication.
 </td></tr>
 
+<tr class="d1">
+<td>cameraNames</td><td>array,<br/>read-only</td><td>
+<b>(version 3.4+)</b> The list of names (string) of the cameras available in the system. It represents the <tt>Camera.names</tt> property of Flash Player. The Flash Player settings also displays this list under the camera tab. You may set any of the item from this list as the value of the <tt>cameraName</tt> property.
+</td></tr>
+
+<tr class="d0">
+<td>microphoneNames</td><td>array,<br/>read-only</td><td>
+<b>(version 3.4+)</b> The list of names (string) of the microphones available in the system. It represents the <tt>Microphone.names</tt> property of Flash Player. The Flash Player settings also displays this list under the microphone tab. You may set any of the item from this list as the value of the <tt>microphoneName</tt> property.
+</td></tr>
+
+<tr class="d1">
+<td>cameraName</td><td>string,<br/>default "default"</td><td>
+<b>(version 3.4+)</b> Controls the selected camera. When this is "default" then it uses the default device set in the end-user's system, and the end-user can select a different one on the Flash Player settings' camera tab. If this is set to any value from the <tt>cameraNames</tt> property, then the end-user cannot select a different device from the Flash Player settings for this instance. Hence, setting this property in your application is generally <b>not recommended</b> because a good application should let the end-user select the default device from the Flash Player settings. Setting the property to an invalid name will cause it to reset to "default" next time a camera object is created. Changing the device in the middle of a session is not supported, hence changing this property will not affect ongoing publish session. You should set this property only before setting any of <tt>publish</tt>, <tt>live</tt> or <tt>camera</tt> property.
+</td></tr>
+
+<tr class="d0">
+<td>microphoneName</td><td>string,<br/>default "default"</td><td>
+<b>(version 3.4+)</b> Controls the selected microphone. When this is "default" then it uses the default device set in the end-user's system, and the end-user can select a different one on the Flash Player settings' microphone tab. If this is set to any value from the <tt>microphoneNames</tt> property, then the end-user cannot select a different device from the Flash Player settings for this instance. Hence, setting this property in your application is generally <b>not recommended</b> because a good application should let the end-user select the default device from the Flash Player settings. Setting the property to an invalid name will cause it to reset to "default" next time a microphone object is created. Changing the device in the middle of a session is not supported, hence changing this property will not affect ongoing publish session. You should set this property only before setting any of <tt>publish</tt>, or <tt>camera</tt> property.
+</td></tr>
+
 </table>
 
 

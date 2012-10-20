@@ -651,6 +651,9 @@ class VideoIOInternal extends Canvas
 	private var _proxyType:String = "none";
 	private var _objectEncoding:uint = ObjectEncoding.DEFAULT;
 	
+	private var _cameraName:String = "default";
+	private var _microphoneName:String = "default";
+	
 	//--------------------------------------
 	// CONSTRUCTOR
 	//--------------------------------------
@@ -1479,14 +1482,25 @@ class VideoIOInternal extends Canvas
 			}
 			else {
 				if (_cameraObject == null) {
-					var index1:int = Camera.names.indexOf("USB Video Class Video");
-					var index2:int = Camera.names.indexOf("Built-in iSight");
-					if (index1 >= 0 && Capabilities.os.indexOf("Mac") >= 0) 
-						_cameraObject = Camera.getCamera(index1.toString());
-					else if (index2 >= 0 && Capabilities.os.indexOf("Mac") >= 0) 
-						_cameraObject = Camera.getCamera(index2.toString());
-					else
-						_cameraObject = Camera.getCamera();
+					if (_cameraName != "default") {
+						var index3:int = Camera.names.indexOf(_cameraName);
+						if (index3 < 0) {
+							cameraName = "default"; // will dispatch the property change event.
+						}
+						else {
+							_cameraObject = Camera.getCamera(index3.toString());
+						}
+					}
+					if (_cameraName == "default") {
+						var index1:int = Camera.names.indexOf("USB Video Class Video");
+						var index2:int = Camera.names.indexOf("Built-in iSight");
+						if (index1 >= 0 && Capabilities.os.indexOf("Mac") >= 0) 
+							_cameraObject = Camera.getCamera(index1.toString());
+						else if (index2 >= 0 && Capabilities.os.indexOf("Mac") >= 0) 
+							_cameraObject = Camera.getCamera(index2.toString());
+						else
+							_cameraObject = Camera.getCamera();
+					}
 					if (_cameraObject != null) {
 						_cameraObject.setLoopback(_cameraLoopback);
 						_cameraObject.setMode(_cameraWidth, _cameraHeight, _cameraFPS);
@@ -1547,18 +1561,26 @@ class VideoIOInternal extends Canvas
 			}
 			else {
 				if (_microphoneObject == null) {
+					var index:int = -1;
+					if (_microphoneName != "default") {
+						index = Microphone.names.indexOf(_microphoneName);
+						if (index < 0) {
+							index = -1;
+							microphoneName = "default";
+						}
+					}
 					if (CONFIG::sdk4) {
 						if(Microphone['getEnhancedMicrophone'] == undefined) {
-							_microphoneObject = Microphone.getMicrophone(-1);
+							_microphoneObject = Microphone.getMicrophone(index);
 						}
 						else {
 							if (!this.echoCancel) {
 								trace('enhanced mic available but not used');
-								_microphoneObject = Microphone.getMicrophone(-1);
+								_microphoneObject = Microphone.getMicrophone(index);
 							}
 							else {
 								trace('enhanced mic available and used');
-								_microphoneObject = Microphone['getEnhancedMicrophone'](-1);
+								_microphoneObject = Microphone['getEnhancedMicrophone'](index);
 								var options:Object = new flash.media.MicrophoneEnhancedOptions();
 								options.mode = flash.media.MicrophoneEnhancedMode.FULL_DUPLEX;
 								options.autoGain = false;
@@ -1569,7 +1591,7 @@ class VideoIOInternal extends Canvas
 						} 
 					} 
 					else {
-						_microphoneObject = Microphone.getMicrophone(-1);
+						_microphoneObject = Microphone.getMicrophone(index);
 					}
 					if (_microphoneObject != null) {
 						_microphoneObject.codec = codec;
@@ -1600,28 +1622,88 @@ class VideoIOInternal extends Canvas
 		}
 	}
 	
-	public const __doc__cameraObject:String =
-	'The "cameraObject" read-only property refers to the currently selected Camera object, ' + 
-	'or null if none is selected or in use.\n';
+	public const __doc__cameraNames:String =
+	'The "cameraNames" read-only property refers to the list of cameras available in the system. ' +
+	'It returns the Camera.names property of Flash Player. The Flash Player settings also displays ' +
+	'this list under the camera tab.\n';
 	 
 	/**
-	 * The camera object.
+	 * The camera names.
 	 */
-	public function get cameraObject():Camera
+	public function get cameraNames():Array
 	{
-		return _cameraObject;
+		return Camera.names;
 	}
 	
-	public const __doc__microphoneObject:String =
-	'The "microphoneObject" read-only property refers to the currently selected Microphone object, ' + 
-	'or null if none is selected or in use.\n';
+	public const __doc__microphoneNames:String =
+	'The "microphoneNames" read-only property refers to the list of microphones available in the system. ' +
+	'It returns the Microphone.names property of Flash Player. The Flash Player settings also displays ' +
+	'this list under the microphone tab.\n';
 	 
 	/**
-	 * The microphone object.
+	 * The microphone names.
 	 */
-	public function get microphoneObject():Microphone
+	public function get microphoneNames():Array
 	{
-		return _microphoneObject;
+		return Microphone.names;
+	}
+	
+	public const __doc__cameraName:String =
+	'The "cameraName" read-write property controls the selected camera. Default is "default" indicating ' +
+	'use of default system camera. The application can set it to "default" to indicate that the ' +
+	'Flash Player settings and system settings are used to determine the default device, or to any ' +
+	'of the value listed in "cameraNames" property to pick a specific device. If the application ' +
+	'picks a specific device, then changing the device from Flash Player settings does not affect ' +
+	'the device selection of this instance. Setting the property to an invalid name will cause reset to ' +
+	'"default" next time a camera object is created. Changing the device in the middle of a session is not ' +
+	'supported. Changing this property will not affect ongoing publish session. You should set this ' +
+	'property before setting any of "publish", "live" or "camera" property.\n';
+	 
+	[Bindable("propertyChange")]
+	/**
+	 * The camera name.
+	 */
+	public function get cameraName():String
+	{
+		return _cameraName;
+	}
+	
+	public function set cameraName(value:String):void
+	{
+		var oldValue:String = _cameraName;
+		_cameraName = value;
+		if (oldValue != value) {
+			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "cameraName", oldValue, value));
+		}
+	}
+	
+	public const __doc__microphoneName:String =
+	'The "microphoneName" read-write property controls the selected microphone. Default is "default" indicating ' +
+	'use of default system microphone. The application can set it to "default" to indicate that the ' +
+	'Flash Player settings and system settings are used to determine the default device, or to any ' +
+	'of the value listed in "microphoneNames" property to pick a specific device. If the application ' +
+	'picks a specific device, then changing the device from Flash Player settings does not affect ' +
+	'the device selection of this instance. Setting the property to an invalid name will cause reset to ' +
+	'"default" next time a microphone object is created. Changing the device in the middle of a session is not ' +
+	'supported. Changing this property will not affect ongoing publish session. You should set this ' +
+	'property before setting any of "publish", "live" or "microphone" property.\n';
+	 
+	[Bindable("propertyChange")]
+	/**
+	 * The microphone name.
+	 */
+	public function get microphoneName():String
+	{
+		return _microphoneName;
+	}
+	
+	public function set microphoneName(value:String):void
+	{
+		var oldValue:String = _microphoneName;
+		_microphoneName = value;
+		if (oldValue != value) {
+			dispatchEvent(PropertyChangeEvent.createUpdateEvent(this, "microphoneName", oldValue, value));
+		}
 	}
 	
 	public const __doc__privacyEvent:String =
@@ -3349,10 +3431,10 @@ class VideoIOInternal extends Canvas
 			
 			if (createLocal) {
 				trace("createStream() publish=" + publish);
-				if (cameraObject != null)
-					_local.attachCamera(cameraObject);
-				if (microphoneObject != null)
-					_local.attachAudio(microphoneObject);
+				if (_cameraObject != null)
+					_local.attachCamera(_cameraObject);
+				if (_microphoneObject != null)
+					_local.attachAudio(_microphoneObject);
 				_recording = true;
 			}
 			if (createRemote) {

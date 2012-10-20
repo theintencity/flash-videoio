@@ -106,6 +106,7 @@ function onCreationComplete(event) {
         'camera':'boolean','cameraLoopback':'boolean','videoCodec':'string',
         'cameraWidth':'number','cameraHeight':'number',
         'cameraFPS':'number','keyFrameInterval':'number','cameraQuality':'number',
+				'cameraName':'string','microphoneName':'string',
         'privacyEvent':'boolean','deviceAllowed':'boolean', 'detectActivity':'boolean',
         'display':'boolean','videoWidth':'number','videoHeight':'number','currentFPS':'number',
         'cameraBandwidth':'number','mirrored':'boolean','zoom':'string','smoothing':'boolean',
@@ -356,7 +357,19 @@ function help(name) {
                         onclick="setBool('microphone', 'microphone')"/>
                     <a href="javascript:help('microphone')">microphone</a>
                 </td>
-                <td>&nbsp;</td>
+                <td align="right">
+                    <a href="javascript:help('microphoneName')">microphoneName</a>:
+                    <input id="microphoneName" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setString('microphoneName', 'microphoneName')"/>
+								</td>
+            </tr>
+            <tr>
+                <td align="right">&nbsp;</td>
+                <td align="right">
+                    <a href="javascript:help('microphoneNames')">microphoneNames</a>:
+                    <a href="javascript:log(getFlashMovie('video1').getProperty('microphoneNames'))"
+											 style="text-decoration: underline;">click</a>
+								</td>
             </tr>
             <tr>
                 <td align="right">
@@ -436,10 +449,19 @@ function help(name) {
                     <a href="javascript:help('camera')">camera</a>
                 </td>
                 <td align="right">
-                    <input id="cameraLoopback" type="checkbox"
-                        onclick="setBool('cameraLoopback', 'cameraLoopback')"/>
-                    <a href="javascript:help('cameraLoopback')">cameraLoopback</a>
-                </td>
+                    <a href="javascript:help('cameraName')">cameraName</a>:
+                    <input id="cameraName" type="text" style="width: 40px" 
+                        onkeypress="if (isEnter(event)) return setString('cameraName', 'cameraName')"/>
+										<a href="javascript:getFlashMovie('video1').getProperty(')"
+								</td>
+            </tr>
+            <tr>
+                <td align="right">&nbsp;</td>
+                <td align="right">
+                    <a href="javascript:help('cameraNames')">cameraNames</a>:
+                    <a href="javascript:log(getFlashMovie('video1').getProperty('cameraNames'))"
+											 style="text-decoration: underline;">click</a>
+								</td>
             </tr>
             <tr>
                 <td align="right">
@@ -504,7 +526,9 @@ function help(name) {
                     <input id="currentFPS" type="text" style="width: 40px" readonly/> 
                 </td>
                 <td align="right">
-                    &nbsp;
+                    <input id="cameraLoopback" type="checkbox"
+                        onclick="setBool('cameraLoopback', 'cameraLoopback')"/>
+                    <a href="javascript:help('cameraLoopback')">cameraLoopback</a>
                 </td>
             </tr>
             <tr>
