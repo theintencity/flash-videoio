@@ -3571,10 +3571,10 @@ class VideoIOInternal extends Canvas
 			this.addChildAt(parent, 0);
 		}
 		
-		if (_cameraObject != null)
-			_video.attachCamera(_cameraObject);
-		else if (_remote != null)
+		if (_remote != null)
 			_video.attachNetStream(_remote);
+		else if (_cameraObject != null)
+			_video.attachCamera(_cameraObject);
 	}
 	
 	private function detachVideo():void
