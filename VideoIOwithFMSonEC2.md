@@ -7,8 +7,8 @@ Capturing Video from Users Browser via Webcam and send it to Server. Similar to 
   1. Flash Player: open Source project available that you can plug-in and start using it.  On development used Flash-VideoIO with rtmplite locally and on production used Flash-VideoIO with FMS on Amazon EC2.
 
 # References #
-  1. Flash-videoIO binary download from http://code.google.com/p/flash-videoio/
-  1. Flash RTMP server in Python download from http://code.google.com/p/rtmplite/
+  1. Flash-videoIO binary download from https://github.com/theintencity/flash-videoio
+  1. Flash RTMP server in Python download from https://github.com/theintencity/rtmplite
   1. Flash Media Server on Amazon EC2 http://www.adobe.com/products/flashmediaserver/amazonwebservices/
   1. How to use Flash-VideoIO with rtmplite http://myprojectguide.org/p/flash-videoio/1.html.
   1. How to use FMS 4 http://help.adobe.com/en_US/flashmediaserver/amazonec2/index.html
