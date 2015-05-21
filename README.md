@@ -3,7 +3,7 @@
 > This project was migrated from <https://code.google.com/p/flash-videoio> on May 17, 2015  
 > Keywords: *Flash Player*, *Recorder*, *Video*, *RTMP*, *RTMFP*, *FLV*, *Conferencing*, *VideoIO*, *Facebook*, *Stratus*, *Google App Engine*  
 > Members: *kundan10* (owner), *theintencity*, *voipresearcher*, *mamtasingh05*  
-> Links: [Support](http://groups.google.com/group/myprojectguide), [Tutorial](http://groups.google.com/group/myprojectguide), [Download](https://github.com/theintencity/flash-videoio/tree/download), [Wiki](https://github.com/theintencity/flash-videoio/tree/wiki)   
+> Links: [Support](http://groups.google.com/group/myprojectguide), [Tutorial](http://myprojectguide.org/p/flash-videoio), [Download](https://github.com/theintencity/flash-videoio/tree/download), [Wiki](https://github.com/theintencity/flash-videoio/tree/wiki)   
 > License: [GNU Lesser GPL](http://www.gnu.org/licenses/lgpl.html)  
 > Others: starred by 73 users  
 
@@ -14,7 +14,7 @@ This project implements example applications for Flash-based audio and video com
 # Announcements #
 **New**: The VideoIO sources are now checked in and available as LGPL. It is our humble request to please please contribute back any improvements or modifications. If you have major improvements, we will be happy to add you as a committer/contributor. Thank you!
 
-<font color='#ff0000'>IMPORTANT</font> Please send any bug/support request to the [support group](http://groups.google.com/group/myprojectguide) instead of directly to the owner
+<font color='red'>IMPORTANT</font> Please send any bug/support request to the [support group](http://groups.google.com/group/myprojectguide) instead of directly to the owner
 
 # Introduction #
 
