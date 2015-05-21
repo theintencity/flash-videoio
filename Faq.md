@@ -11,19 +11,19 @@ Please see my blog article [FAQ on using Flash player to make phone calls](http:
 
 ## Which version of VideoIO should I use? ##
 
-You should always use the latest version in the [downloads](http://code.google.com/p/flash-videoio/downloads/list) page. If you can compile from sources, and notice additional important SVN updates beyond the latest version, we suggest you compile from sources. There is a Makefile containing the compilation commands that you can modify and use on any platform using Flex SDK. We recommend using the latest SDK.
+You should always use the latest version in the [downloads](https://github.com/theintencity/flash-videoio/tree/download) page. If you can compile from sources, and notice additional important SVN updates beyond the latest version, we suggest you compile from sources. There is a Makefile containing the compilation commands that you can modify and use on any platform using Flex SDK. We recommend using the latest SDK.
 
 ## Does it support echo cancellation? ##
 
-Yes. There are three SWF files present in the download archive - VideoIO.swf, VideoIO45.swf, VideoIO11.swf. These binaries are compiled for target player version 10+, 10.3+ and 11+, respectively. For a production ready web application you should dynamically detect the Flash Player version and load the corresponding SWF. An example is shown in [test.html](http://code.google.com/p/flash-videoio/source/browse/trunk/tutorial/test.html) (search for DetectFlashVer). Dynamically detecting and loading the right SWF allows you to use the best features for the given version of the end-user's Flash Player -- enable H.264/G.711 for 11+ and enable echo cancellation for 10.3+. If you statically include VideoIO.swf you will not be able to take advantage of the echo cancellation or advanced codecs.
+Yes. There are three SWF files present in the download archive - VideoIO.swf, VideoIO45.swf, VideoIO11.swf. These binaries are compiled for target player version 10+, 10.3+ and 11+, respectively. For a production ready web application you should dynamically detect the Flash Player version and load the corresponding SWF. An example is shown in [test.html](https://github.com/theintencity/flash-videoio/blob/master/tutorial/test.html) (search for DetectFlashVer). Dynamically detecting and loading the right SWF allows you to use the best features for the given version of the end-user's Flash Player -- enable H.264/G.711 for 11+ and enable echo cancellation for 10.3+. If you statically include VideoIO.swf you will not be able to take advantage of the echo cancellation or advanced codecs.
 
 ## Does it support RTMP? What about RTMFP? ##
 
-Yes, it supports both RTMP (client-server media path) and RTMFP (peer-to-peer media path). Most of the tutorial deals with RTMP. If you set the `src` property to appropriate "rtmfp" URL and set `farID` to appropriate value before setting `play`, then it enables RTMFP mode for peer-to-peer media. Please visit [How to do peer-to-peer video call?](http://myprojectguide.org/p/flash-videoio/9.html) for details. Also some example applications such as iChatNow, Random-Face and Public-Chat listed on the [project page](http://code.google.com/p/flash-videoio) use RTMFP using Adobe Stratus service.
+Yes, it supports both RTMP (client-server media path) and RTMFP (peer-to-peer media path). Most of the tutorial deals with RTMP. If you set the `src` property to appropriate "rtmfp" URL and set `farID` to appropriate value before setting `play`, then it enables RTMFP mode for peer-to-peer media. Please visit [How to do peer-to-peer video call?](http://myprojectguide.org/p/flash-videoio/9.html) for details. Also some example applications such as iChatNow, Random-Face and Public-Chat listed on the [project page](https://github.com/theintencity/flash-videoio) use RTMFP using Adobe Stratus service.
 
 ## Does it support web-to-phone calls and vice-versa? ##
 
-Yes, partially. It supports Flash-to-SIP calls and vice-versa using an external SIP-RTMP gateway such [siprtmp.py](http://code.google.com/p/siprtmp/). You can use the extensive Javascript API to build your own web phone user interface including call control and a dial-pad for sending in-call DTMF digits. You _need_ to use your own PSTN termination provider that can terminate your SIP calls and translate to PSTN, and vice-versa. Please see [How to do SIP-based VoIP calls?](http://myprojectguide.org/p/flash-videoio/11.html) for details. In summary, your termination provider must support Speex voice codec, and understand SIP, SDP and RTP.
+Yes, partially. It supports Flash-to-SIP calls and vice-versa using an external SIP-RTMP gateway such [siprtmp.py](https://github.com/theintencity/siprtmp/). You can use the extensive Javascript API to build your own web phone user interface including call control and a dial-pad for sending in-call DTMF digits. You _need_ to use your own PSTN termination provider that can terminate your SIP calls and translate to PSTN, and vice-versa. Please see [How to do SIP-based VoIP calls?](http://myprojectguide.org/p/flash-videoio/11.html) for details. In summary, your termination provider must support Speex voice codec, and understand SIP, SDP and RTP.
 
 ## Can I use it to build a video call application on Facebook using FBML? ##
 
@@ -71,7 +71,7 @@ To avoid the loss of video on the sides, especially things such as TV channel ic
 
 ## How do I append instead of overwrite when record is true? ##
 
-We have added a new property "recordMode" based on a patch by Qi Wenmin in SVN [r49](https://code.google.com/p/flash-videoio/source/detail?r=49). This will become available in version 3.3 and later, until then feel free to use the SVN copy. The property can be used to set the record mode to append. Please see the [API](http://myprojectguide.org/p/flash-videoio/10.html) description of recordMode for details.
+We have added a new property "recordMode" based on a patch by Qi Wenmin in SVN r49. This will become available in version 3.3 and later, until then feel free to use the SVN copy. The property can be used to set the record mode to append. Please see the [API](http://myprojectguide.org/p/flash-videoio/10.html) description of recordMode for details.
 
 ## It works on my local computer but not on the Internet. Why? ##
 
