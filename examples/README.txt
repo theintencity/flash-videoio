@@ -2,7 +2,7 @@ Examples of real applications using the Flash VideoIO project
 -------------------------------------------------------------
 
 Please see the brief description of these projects on 
-http://code.google.com/p/flash-videoio/
+https://github.com/theintencity/flash-videoio/
 
 For these applications to work, you need to copy the latest
 VideoIO.swf to the following locations.

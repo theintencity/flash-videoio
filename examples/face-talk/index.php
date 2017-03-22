@@ -58,7 +58,7 @@ $media_url = 'rtmfp://stratus.rtmfp.net/d1e1e5b3f17e90eb35d244fd-c711881365d9/';
 $stream = "" . rand(1000000000, 9999999999) . $uid;
 $publish_url = $media_url .  "?publish=" . $stream;
     
-$site_url = 'http://myprojectguide.org/p/face-talk/';
+$site_url = 'http://myprojectguide.kundansingh.com/p/face-talk/';
 $base_url = 'http://apps.facebook.com/face-talk/';
 $invite_url = $base_url . '?caller='. $stream;
 
@@ -292,12 +292,12 @@ $invite_url = $base_url . '?caller='. $stream;
 </fb:js-string>
 
 <fb:js-string var="helptext1">
-     <h1><a href="http://code.google.com/p/flash-videoio" target="_blank">Face Talk</a></h1>
+     <h1><a href="https://github.com/theintencity/flash-videoio" target="_blank">Face Talk</a></h1>
      <p>Select a friend and send him or her a text invitation for a video call.</p>
 </fb:js-string>
 
 <fb:js-string var="helptext2">
-     <h1><a href="http://code.google.com/p/flash-videoio" target="_blank">Face Talk</a></h1>
+     <h1><a href="https://github.com/theintencity/flash-videoio" target="_blank">Face Talk</a></h1>
 </fb:js-string>
 
 <fb:js-string var="invitelist">
@@ -336,7 +336,7 @@ Please see
         <h1>Face Talk</h1>
         <p>This application allows you to video chat with your online friends
         using technology based on the
-        <a href="http://code.google.com/p/flash-videoio" target="_blank">Flash VideoIO</a>
+        <a href="https://github.com/theintencity/flash-videoio" target="_blank">Flash VideoIO</a>
         project. Please connect to this application using your facebook login.</p>
 
     <?php

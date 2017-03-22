@@ -5,19 +5,19 @@
     <title>Flash-VideoIO | Flash-based audio and video communication</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<link rel="shortcut icon" href="http://myprojectguide.org/sites/default/files/garland_favicon.ico" type="image/x-icon" />
-    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/book/book.css?w" />
-<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/node/node.css?w" />
-<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/defaults.css?w" />
-<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system.css?w" />
+<link rel="shortcut icon" href="http://myprojectguide.kundansingh.com/sites/default/files/garland_favicon.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.kundansingh.com/modules/book/book.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.kundansingh.com/modules/node/node.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.kundansingh.com/modules/system/defaults.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.kundansingh.com/modules/system/system.css?w" />
 
-<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/system/system-menus.css?w" />
-<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/user/user.css?w" />
-<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/modules/forum/forum.css?w" />
-<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/sites/default/files/color/garland-a725207e/style.css?w" />
-<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.org/themes/garland/print.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.kundansingh.com/modules/system/system-menus.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.kundansingh.com/modules/user/user.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.kundansingh.com/modules/forum/forum.css?w" />
+<link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.kundansingh.com/sites/default/files/color/garland-a725207e/style.css?w" />
+<link type="text/css" rel="stylesheet" media="print" href="http://myprojectguide.kundansingh.com/themes/garland/print.css?w" />
         <!--[if lt IE 7]>
-      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.org/themes/garland/fix-ie.css" />    <![endif]-->
+      <link type="text/css" rel="stylesheet" media="all" href="http://myprojectguide.kundansingh.com/themes/garland/fix-ie.css" />    <![endif]-->
 
 <style type="text/css">
 pre { color: #606060; font-size: small; line-height: 1; }
@@ -48,7 +48,7 @@ function getFlashMovie(movieName) {
 
       <div id="header">
         <div id="logo-floater">
-        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.org/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
+        <h1><a href="index.html" title="Flash-VideoIO - Flash-based audio and video communication"><img src="http://myprojectguide.kundansingh.com/sites/default/files/garland_logo.png" alt="Gurukul My Project Guide" id="logo" /><span>VideoIO</span> Flash-based audio and video communication</a></h1>
         </div>
 
                                                     
@@ -67,10 +67,10 @@ function getFlashMovie(movieName) {
 
 <h2>How to do SIP-based VoIP call?</h2>
   
-<p>You can use the VideoIO component to build the front-end for a VoIP phone that talks to the backend server capable of translating between RTMP and SIP. In particular, it can work with the API defined by the <a href="http://code.google.com/p/siprtmp">Open Source SIP-RTMP gateway (siprtmp)</a>. The siprtmp module is actually part of the <a href="http://code.google.com/p/rtmplite">Open Source Flash RTMP server in Python (rtmplite)</a> described in <a href="3.html">How to work with media server?</a>. The <tt>siprtmp</tt> API is documented in <a href="http://code.google.com/p/rtmplite/source/browse/trunk/siprtmp.py">siprtmp.py</a> source code. If another backend server can perform similar translation between RTMP and SIP, then you can use VideoIO with that server as well. Additionally, you need a SIP user agent and a SIP proxy and registration server. In this article, we will use the same example set up as described in <tt>siprtmp</tt> web page for illustrations.</p>
+<p>You can use the VideoIO component to build the front-end for a VoIP phone that talks to the backend server capable of translating between RTMP and SIP. In particular, it can work with the API defined by the <a href="https://github.com/theintencity/rtmplite/blob/master/siprtmp.md">Open Source SIP-RTMP gateway (siprtmp)</a>. The siprtmp module is actually part of the <a href="https://github.com/theintencity/rtmplite">Open Source Flash RTMP server in Python (rtmplite)</a> described in <a href="3.html">How to work with media server?</a>. The <tt>siprtmp</tt> API is documented in <a href="https://github.com/theintencity/rtmplite/blob/master/siprtmp.py">siprtmp.py</a> source code. If another backend server can perform similar translation between RTMP and SIP, then you can use VideoIO with that server as well. Additionally, you need a SIP user agent and a SIP proxy and registration server. In this article, we will use the same example set up as described in <tt>siprtmp</tt> web page for illustrations.</p>
 
 <div class="info">
-This article requires <a href="http://code.google.com/p/flash-videoio/downloads/list">version 1.2</a> or later of VideoIO.swf that includes support for methods and events.
+This article requires <a href="https://github.com/theintencity/flash-videoio/downloads/list">version 1.2</a> or later of VideoIO.swf that includes support for methods and events.
 </div>
 <br/>
 
@@ -80,8 +80,8 @@ This article requires <a href="http://code.google.com/p/flash-videoio/downloads/
 
 <p>On first terminal, download <tt>p2p-sip</tt> and run its <tt>sipd.py</tt> module as follows. This will run <tt>sipd</tt> on port 5060 by default.</p>
 <pre class="code">
-$ svn checkout http://p2p-sip.googlecode.com/svn/trunk/ p2p-sip-read-only
-$ cd p2p-sip-read-only/src
+$ git clone https://github.com/theintencity/p2p-sip.git
+$ cd p2p-sip/src
 $ PYTHONPATH=app:external:.
 $ export PYTHONPATH
 $ python app/sipd.py -d
@@ -89,9 +89,9 @@ $ python app/sipd.py -d
 
 <p>On second terminal, download <tt>rtmplite</tt> and run its <tt>siprtmp</tt> module as follows. This will run <tt>siprtmp</tt> on port 1935 by default.</p>
 <pre class="code">
-$ svn checkout http://rtmplite.googlecode.com/svn/trunk/ rtmplite-read-only
-$ cd rtmplite-read-only
-$ PYTHONPATH=../p2p-sip-read-only/src:.
+$ git clone https://github.com/theintencity/rtmplite.git
+$ cd rtmplite
+$ PYTHONPATH=../p2p-sip/src:.
 $ export PYTHONPATH
 $ python siprtmp.py -d
 </pre>
@@ -470,10 +470,10 @@ getFlashMovie('phone1').callProperty('call', '<b>reject</b>', '486 Busy Here'); 
 
   <h2>References</h2>
 
-  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.org">Gurukul - Student Project Guide</a></li>
-<li class="last"><a href="http://code.google.com/p/videocity">Videocity - web video telephony and conference</a></li>
-<li class="last"><a href="http://code.google.com/p/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
-<li class="last"><a href="http://myprojectguide.org/node/6">Project Ideas on Multimedia Networking</a></li>
+  <div class="content"><div class="item-list"><ul><li class="first"><a href="http://myprojectguide.kundansingh.com">Gurukul - Student Project Guide</a></li>
+<li class="last"><a href="https://github.com/theintencity/videocity">Videocity - web video telephony and conference</a></li>
+<li class="last"><a href="https://github.com/theintencity/rtmplite">rtmplite - lightweight Flash media (RTMP) server in Python</a></li>
+<li class="last"><a href="http://myprojectguide.kundansingh.com/node/6">Project Ideas on Multimedia Networking</a></li>
 </ul></div></div>
 </div>
 

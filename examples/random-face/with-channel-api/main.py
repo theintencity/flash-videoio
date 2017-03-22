@@ -21,7 +21,7 @@
 # This version of the project uses the Channel API available in Google App Engine for 
 # asynchronous notifications of connections, disconnections and chat messages.
 #
-# Visit http://code.google.com/p/flash-videoio for more.
+# Visit https://github.com/theintencity/flash-videoio for more.
 
 import os, random, datetime, time, logging
 

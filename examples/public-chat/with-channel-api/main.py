@@ -7,7 +7,7 @@
 # This version of the project uses the Channel API available in Google App Engine for 
 # asynchronous notifications of user list and chat history.
 #
-# Visit http://code.google.com/p/flash-videoio for more.
+# Visit https://github.com/theintencity/flash-videoio for more.
 
 import os, datetime, time, logging
 

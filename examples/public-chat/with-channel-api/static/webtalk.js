@@ -1,5 +1,5 @@
 // Copyright (c) 2010, Kundan Singh, all rights reserved.
-// Visit http://code.google.com/p/flash-videoio for more information.
+// Visit https://github.com/theintencity/flash-videoio for more information.
 
 var webtalk = {
 		

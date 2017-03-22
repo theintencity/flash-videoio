@@ -39,7 +39,7 @@ package {
 		private var isChild:Boolean = false;
 		
 		// The URL of the project for facebook.
-		private static const BASE_URL:String = "http://myprojectguide.org/p/face-talk";
+		private static const BASE_URL:String = "http://myprojectguide.kundansingh.com/p/face-talk";
 
 		/**
 		 * The constructor sets the absolute layout with transparent background, no border, and
@@ -532,7 +532,7 @@ import mx.controls.Button;
 class VideoIOInternal extends Canvas
 {
 	// the product page URL
-	private static const COMPONENT_URL:String = "http://code.google.com/p/flash-videoio";
+	private static const COMPONENT_URL:String = "https://github.com/theintencity/flash-videoio";
 	
 	// the version string
 	private static const COMPONENT_VERSION:String = "Powered by Flash-VideoIO " + CONFIG::version;
@@ -4476,7 +4476,7 @@ class VideoControl extends HBox
 
 /*
  * NOTE: Following classes are borrowed from the videocity project.
- * http://code.google.com/p/videocity
+ * https://github.com/theintencity/videocity
  */
  
 class ShinyButtonSkin extends ProgrammaticSkin
